@@ -4,6 +4,7 @@ import (
 	"dohabits/data"
 	"dohabits/db"
 	"dohabits/logger"
+	"dohabits/validation"
 	"fmt"
 )
 
@@ -25,6 +26,12 @@ type IHabitsModel interface {
 
 func (m *HabitsModel) Create(habit data.NewHabit, db db.IDB, logger logger.ILogger) error {
 	logger.InfoLog("habitsModel.Create")
+
+	if err := validation.ValidateHabit(habit, logger); err != nil {
+		logger.ErrorLog(fmt.Sprintf("habitsModel.Create - err=%s", err))
+		return err
+	}
+
 	err := db.Create(logger, habit)
 
 	if err != nil {
@@ -75,6 +82,12 @@ func (m *HabitsModel) RetrieveAll(db db.IDB, logger logger.ILogger) ([]data.Habi
 
 func (m *HabitsModel) Update(habit data.Habit, id string, db db.IDB, logger logger.ILogger) error {
 	logger.InfoLog(fmt.Sprintf("habitsModel.Update - id=%s", id))
+
+	if err := validation.ValidateHabit(habit, logger); err != nil {
+		logger.ErrorLog(fmt.Sprintf("habitsModel.Update - err=%s", err))
+		return err
+	}
+
 	if err := db.Update(logger, id, habit); err != nil {
 		logger.ErrorLog(fmt.Sprintf("habitsModel.Update - db.Update - err=%s", err))
 		return err

@@ -20,7 +20,7 @@ func TestCreate(t *testing.T) {
 	}{
 		{
 			name:     "Successfully Create Habit",
-			newHabit: data.NewHabit{},
+			newHabit: data.NewHabit{Name: "Create Habit Test", Days: 1, DaysTarget: 11},
 			want:     nil,
 		},
 	}
