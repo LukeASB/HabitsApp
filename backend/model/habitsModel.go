@@ -4,22 +4,34 @@ import (
 	"dohabits/data"
 	"dohabits/db"
 	"dohabits/logger"
+	"dohabits/validation"
 	"fmt"
-	"net/http"
 )
 
 type HabitsModel struct{}
 
 type IHabitsModel interface {
-	Create(w http.ResponseWriter, r *http.Request, habit data.NewHabit, db db.IDB, logger logger.ILogger) error
-	Retrieve(w http.ResponseWriter, r *http.Request, id string, db db.IDB, logger logger.ILogger) (data.Habit, error)
-	RetrieveAll(w http.ResponseWriter, r *http.Request, db db.IDB, logger logger.ILogger) ([]data.Habit, error)
-	Update(w http.ResponseWriter, r *http.Request, habit data.Habit, id string, db db.IDB, logger logger.ILogger) error
-	Delete(w http.ResponseWriter, r *http.Request, id string, db db.IDB, logger logger.ILogger) error
+	Create(habit data.NewHabit, db db.IDB, logger logger.ILogger) error
+	Retrieve(id string, db db.IDB, logger logger.ILogger) (data.Habit, error)
+	RetrieveAll(db db.IDB, logger logger.ILogger) ([]data.Habit, error)
+	Update(habit data.Habit, id string, db db.IDB, logger logger.ILogger) error
+	Delete(id string, db db.IDB, logger logger.ILogger) error
 }
 
-func (m *HabitsModel) Create(w http.ResponseWriter, r *http.Request, habit data.NewHabit, db db.IDB, logger logger.ILogger) error {
+/*
+ Need validate the habits in model layer before they hit the DB. Someone shouldn't be able to call the endpoint to:
+ - Create Habits with random symbols/text
+ - Enter negative days
+*/
+
+func (m *HabitsModel) Create(habit data.NewHabit, db db.IDB, logger logger.ILogger) error {
 	logger.InfoLog("habitsModel.Create")
+
+	if err := validation.ValidateHabit(habit, logger); err != nil {
+		logger.ErrorLog(fmt.Sprintf("habitsModel.Create - err=%s", err))
+		return err
+	}
+
 	err := db.Create(logger, habit)
 
 	if err != nil {
@@ -30,7 +42,7 @@ func (m *HabitsModel) Create(w http.ResponseWriter, r *http.Request, habit data.
 	return nil
 }
 
-func (m *HabitsModel) Retrieve(w http.ResponseWriter, r *http.Request, id string, db db.IDB, logger logger.ILogger) (data.Habit, error) {
+func (m *HabitsModel) Retrieve(id string, db db.IDB, logger logger.ILogger) (data.Habit, error) {
 	logger.InfoLog(fmt.Sprintf("habitsModel.Retrieve - id=%s", id))
 	habit := data.Habit{}
 
@@ -50,7 +62,7 @@ func (m *HabitsModel) Retrieve(w http.ResponseWriter, r *http.Request, id string
 	return habit, nil
 }
 
-func (m *HabitsModel) RetrieveAll(w http.ResponseWriter, r *http.Request, db db.IDB, logger logger.ILogger) ([]data.Habit, error) {
+func (m *HabitsModel) RetrieveAll(db db.IDB, logger logger.ILogger) ([]data.Habit, error) {
 	logger.InfoLog("habitsModel.RetrieveAll")
 	result, err := db.RetrieveAll(logger)
 
@@ -68,8 +80,14 @@ func (m *HabitsModel) RetrieveAll(w http.ResponseWriter, r *http.Request, db db.
 	return habits, nil
 }
 
-func (m *HabitsModel) Update(w http.ResponseWriter, r *http.Request, habit data.Habit, id string, db db.IDB, logger logger.ILogger) error {
+func (m *HabitsModel) Update(habit data.Habit, id string, db db.IDB, logger logger.ILogger) error {
 	logger.InfoLog(fmt.Sprintf("habitsModel.Update - id=%s", id))
+
+	if err := validation.ValidateHabit(habit, logger); err != nil {
+		logger.ErrorLog(fmt.Sprintf("habitsModel.Update - err=%s", err))
+		return err
+	}
+
 	if err := db.Update(logger, id, habit); err != nil {
 		logger.ErrorLog(fmt.Sprintf("habitsModel.Update - db.Update - err=%s", err))
 		return err
@@ -78,7 +96,7 @@ func (m *HabitsModel) Update(w http.ResponseWriter, r *http.Request, habit data.
 	return nil
 }
 
-func (m *HabitsModel) Delete(w http.ResponseWriter, r *http.Request, id string, db db.IDB, logger logger.ILogger) error {
+func (m *HabitsModel) Delete(id string, db db.IDB, logger logger.ILogger) error {
 	logger.InfoLog(fmt.Sprintf("habitsModel.Delete - id=%s", id))
 	if err := db.Delete(logger, id); err != nil {
 		logger.ErrorLog(fmt.Sprintf("habitsModel.Delete - db.Delete - err=%s", err))

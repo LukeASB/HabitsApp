@@ -23,9 +23,7 @@ type IHabitsController interface {
 	Delete(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger)
 }
 
-//https://chatgpt.com/c/66e52c3f-6004-8003-a455-4503633b6d74
-
-// Initialize the processOperations Goroutine
+// Initialise the processOperations Goroutine
 func NewHabitsController(logger logger.ILogger) *HabitsController {
 	logger.InfoLog("habitsController.NewHabitsController")
 
@@ -87,7 +85,7 @@ func (c *HabitsController) Create(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		if err := m.Create(w, r, newHabit, db, logger); err != nil {
+		if err := m.Create(newHabit, db, logger); err != nil {
 			resultChan <- struct {
 				data []byte
 				err  error
@@ -98,7 +96,7 @@ func (c *HabitsController) Create(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		result, err := v.Create(w, r, newHabit, logger)
+		result, err := v.Create(newHabit, logger)
 
 		if err != nil {
 			resultChan <- struct {
@@ -163,7 +161,7 @@ func (c *HabitsController) Retrieve(w http.ResponseWriter, r *http.Request, m mo
 			return
 		}
 
-		habit, err := m.Retrieve(w, r, id, db, logger)
+		habit, err := m.Retrieve(id, db, logger)
 
 		if err != nil {
 			resultChan <- struct {
@@ -176,7 +174,7 @@ func (c *HabitsController) Retrieve(w http.ResponseWriter, r *http.Request, m mo
 			return
 		}
 
-		result, err := v.Retrieve(w, r, habit, logger)
+		result, err := v.Retrieve(habit, logger)
 
 		if err != nil {
 			resultChan <- struct {
@@ -228,7 +226,7 @@ func (c *HabitsController) RetrieveAll(w http.ResponseWriter, r *http.Request, m
 	c.OpsChan <- func() {
 		logger.InfoLog("habitsController.RetrieveAll")
 
-		habits, err := m.RetrieveAll(w, r, db, logger)
+		habits, err := m.RetrieveAll(db, logger)
 
 		if err != nil {
 			resultChan <- struct {
@@ -241,7 +239,7 @@ func (c *HabitsController) RetrieveAll(w http.ResponseWriter, r *http.Request, m
 			return
 		}
 
-		result, err := v.RetrieveAll(w, r, habits, logger)
+		result, err := v.RetrieveAll(habits, logger)
 
 		if err != nil {
 			resultChan <- struct {
@@ -321,7 +319,7 @@ func (c *HabitsController) Update(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		habit, err := m.Retrieve(w, r, id, db, logger)
+		habit, err := m.Retrieve(id, db, logger)
 
 		if err != nil {
 			resultChan <- struct {
@@ -346,7 +344,7 @@ func (c *HabitsController) Update(w http.ResponseWriter, r *http.Request, m mode
 			habit.DaysTarget = *updatedHabit.DaysTarget
 		}
 
-		err = m.Update(w, r, habit, id, db, logger)
+		err = m.Update(habit, id, db, logger)
 
 		if err != nil {
 			resultChan <- struct {
@@ -359,7 +357,7 @@ func (c *HabitsController) Update(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		result, err := v.Update(w, r, habit, logger)
+		result, err := v.Update(habit, logger)
 
 		if err != nil {
 			resultChan <- struct {
@@ -400,6 +398,7 @@ func (c *HabitsController) Update(w http.ResponseWriter, r *http.Request, m mode
 func (c *HabitsController) Delete(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger) {
 	if r.Method != http.MethodDelete {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
 	}
 
 	resultChan := make(chan struct {
@@ -423,7 +422,7 @@ func (c *HabitsController) Delete(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		err := m.Delete(w, r, id, db, logger)
+		err := m.Delete(id, db, logger)
 
 		if err != nil {
 			resultChan <- struct {
@@ -436,7 +435,7 @@ func (c *HabitsController) Delete(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		result, err := v.Delete(w, r, logger)
+		result, err := v.Delete(logger)
 
 		if err != nil {
 			resultChan <- struct {
