@@ -23,7 +23,7 @@ type IHabitsController interface {
 	Delete(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger)
 }
 
-// Initialize the processOperations Goroutine
+// Initialise the processOperations Goroutine
 func NewHabitsController(logger logger.ILogger) *HabitsController {
 	logger.InfoLog("habitsController.NewHabitsController")
 
