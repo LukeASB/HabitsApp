@@ -180,11 +180,12 @@ func TestUpdate(t *testing.T) {
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
 	marshalledHabit, err := json.Marshal(data.Habit{
-		ID:         data.MockHabit[0].ID,
-		CreatedAt:  data.MockHabit[0].CreatedAt,
-		Name:       "Test Update Habit",
-		Days:       30,
-		DaysTarget: 50,
+		ID:               data.MockHabit[0].ID,
+		CreatedAt:        data.MockHabit[0].CreatedAt,
+		Name:             "Test Update Habit",
+		Days:             30,
+		DaysTarget:       50,
+		NumberOfAttempts: 0,
 	})
 
 	if err != nil {

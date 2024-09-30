@@ -44,11 +44,12 @@ func (db *MyMockDB) Create(logger logger.ILogger, value interface{}) error {
 	}
 
 	habit := data.Habit{
-		ID:         fmt.Sprintf("%v", id+1),
-		CreatedAt:  time.Now(),
-		Name:       newHabit.Name,
-		Days:       newHabit.Days,
-		DaysTarget: newHabit.DaysTarget,
+		ID:               fmt.Sprintf("%v", id+1),
+		CreatedAt:        time.Now(),
+		Name:             newHabit.Name,
+		Days:             newHabit.Days,
+		DaysTarget:       newHabit.DaysTarget,
+		NumberOfAttempts: 0,
 	}
 
 	data.MockHabit = append(data.MockHabit, habit)
