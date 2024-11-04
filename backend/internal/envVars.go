@@ -30,7 +30,7 @@ Iterates over a list of required environment variables and checks if each one is
 If any required variable is not set, it logs a fatal error and exits the application.
 */
 func checkEnvVariablesArePopulated() error {
-	requiredEnvVars := []string{"DB_URL", "ENV", "PORT", "SITE_URL", "API_NAME", "APP_VERSION", "API_VERSION"}
+	requiredEnvVars := []string{"DB_URL", "ENV", "PORT", "SITE_URL", "API_NAME", "APP_VERSION", "API_VERSION", "LOG_VERBOSITY"}
 
 	for _, envVal := range requiredEnvVars {
 		if value := os.Getenv(envVal); value == "" {

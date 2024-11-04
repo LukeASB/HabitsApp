@@ -19,25 +19,27 @@ var App *internal.App
 func init() {
 	if err := internal.LoadEnvVariables(); err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	logger := &logger.Logger{}
-	db := &db.MyMockDB{}
-	m := &model.HabitsModel{}
-	v := &view.HabitsView{}
+
+	if err := logger.SetVerbosity(os.Getenv("LOG_VERBOSITY")); err != nil {
+		log.Fatal(err)
+	}
+
+	db := db.NewDB(logger)
+
+	if err := db.Connect(); err != nil {
+		log.Fatal(err)
+	}
+
+	m := model.NewHabitsModel(logger, db)
+	v := view.NewHabitsView(logger)
 	c := controller.NewHabitsController(logger)
 	apiName := os.Getenv("API_NAME")
 	apiVersion := os.Getenv("API_VERSION")
 	appVersion := os.Getenv("APP_VERSION")
 	port := os.Getenv("PORT")
-
-	if err := db.Connect(logger); err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	logger.SetVerbosity(2) // Will be set via env variable
 
 	App = internal.NewApp(m, v, c, db, logger, apiName, apiVersion, appVersion, port)
 
@@ -59,5 +61,5 @@ func main() {
 
 func cleanup() {
 	App.GetLogger().DebugLog("main.cleanup - Executed")
-	App.GetDB().Disconnect(App.GetLogger())
+	App.GetDB().Disconnect()
 }
