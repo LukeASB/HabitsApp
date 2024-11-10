@@ -3,9 +3,9 @@ package db
 type IDB interface {
 	Connect() error
 	Disconnect() error
-	Create(value interface{}) error
-	RetrieveAll() (interface{}, error)
-	Retrieve(id string) (interface{}, error)
-	Update(id string, value interface{}) error
-	Delete(id string) error
+	CreateHandler(value interface{}) error
+	RetrieveAllHandler() (interface{}, error)
+	RetrieveHandler(id string) (interface{}, error)
+	UpdateHandler(id string, value interface{}) error
+	DeleteHandler(id string) error
 }

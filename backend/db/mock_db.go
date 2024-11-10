@@ -34,7 +34,7 @@ func (db *MyMockDB) Disconnect() error {
 	return nil
 }
 
-func (db *MyMockDB) Create(value interface{}) error {
+func (db *MyMockDB) CreateHandler(value interface{}) error {
 	db.logger.InfoLog("mock_db.Create")
 	newHabit, ok := value.(data.NewHabit)
 
@@ -64,12 +64,12 @@ func (db *MyMockDB) Create(value interface{}) error {
 	return nil
 }
 
-func (db *MyMockDB) RetrieveAll() (interface{}, error) {
+func (db *MyMockDB) RetrieveAllHandler() (interface{}, error) {
 	db.logger.InfoLog("mock_db.RetrieveAll")
 	return data.MockHabit, nil
 }
 
-func (db *MyMockDB) Retrieve(id string) (interface{}, error) {
+func (db *MyMockDB) RetrieveHandler(id string) (interface{}, error) {
 	db.logger.InfoLog(fmt.Sprintf("mock_db.Retrieve id=%s\n", id))
 
 	for _, val := range data.MockHabit {
@@ -84,7 +84,7 @@ func (db *MyMockDB) Retrieve(id string) (interface{}, error) {
 	return nil, fmt.Errorf(err)
 }
 
-func (db *MyMockDB) Update(id string, value interface{}) error {
+func (db *MyMockDB) UpdateHandler(id string, value interface{}) error {
 	db.logger.InfoLog("mock_db.Update")
 	newHabit, ok := value.(data.Habit)
 
@@ -96,7 +96,7 @@ func (db *MyMockDB) Update(id string, value interface{}) error {
 
 	for i, val := range data.MockHabit {
 		if val.ID == id {
-			db.logger.InfoLog(fmt.Sprintf("mock_db.Update() match id=%s, val=%s\n", val.ID, val.Name))
+			db.logger.InfoLog(fmt.Sprintf("mock_db.UpdateHandler() match id=%s, val=%s\n", val.ID, val.Name))
 			data.MockHabit[i].Name = newHabit.Name
 			data.MockHabit[i].Days = newHabit.Days
 			data.MockHabit[i].DaysTarget = newHabit.DaysTarget
@@ -109,12 +109,12 @@ func (db *MyMockDB) Update(id string, value interface{}) error {
 	return fmt.Errorf(err)
 }
 
-func (db *MyMockDB) Delete(id string) error {
+func (db *MyMockDB) DeleteHandler(id string) error {
 	db.logger.InfoLog("mock_db.Delete")
 
 	for i, val := range data.MockHabit {
 		if val.ID == id {
-			db.logger.InfoLog(fmt.Sprintf("mock_db.Delete() match id=%s, val=%s\n", val.ID, val.Name))
+			db.logger.InfoLog(fmt.Sprintf("mock_db.DeleteHandler() match id=%s, val=%s\n", val.ID, val.Name))
 			data.MockHabit = append(data.MockHabit[:i], data.MockHabit[i+1:]...)
 			return nil
 		}

@@ -16,12 +16,12 @@ import (
 	"testing"
 )
 
-func TestCreate(t *testing.T) {
+func TestCreateHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
-	m := model.NewHabitsModel(logger, db)
-	v := view.NewHabitsView(logger)
-	c := NewHabitsController(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
@@ -50,7 +50,7 @@ func TestCreate(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/%s/CreateHabit", endpoint), io.NopCloser(bytes.NewBuffer(marshalledNewHabit)))
 			w := httptest.NewRecorder()
 
-			c.Create(w, req, m, v)
+			c.CreateHandler(w, req)
 
 			res := w.Result()
 
@@ -69,12 +69,12 @@ func TestCreate(t *testing.T) {
 	}
 }
 
-func TestRetrieve(t *testing.T) {
+func TestRetrieveHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
-	m := model.NewHabitsModel(logger, db)
-	v := view.NewHabitsView(logger)
-	c := NewHabitsController(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
@@ -102,7 +102,7 @@ func TestRetrieve(t *testing.T) {
 			q.Add("id", "1")
 			req.URL.RawQuery = q.Encode()
 
-			c.Retrieve(w, req, m, v)
+			c.RetrieveHandler(w, req)
 
 			res := w.Result()
 
@@ -121,12 +121,12 @@ func TestRetrieve(t *testing.T) {
 	}
 }
 
-func TestRetrieveAll(t *testing.T) {
+func TestRetrieveAllHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
-	m := model.NewHabitsModel(logger, db)
-	v := view.NewHabitsView(logger)
-	c := NewHabitsController(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
@@ -151,7 +151,7 @@ func TestRetrieveAll(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s/RetrieveAllHabits", endpoint), nil)
 			w := httptest.NewRecorder()
 
-			c.RetrieveAll(w, req, m, v)
+			c.RetrieveAllHandler(w, req)
 
 			res := w.Result()
 
@@ -170,12 +170,12 @@ func TestRetrieveAll(t *testing.T) {
 	}
 }
 
-func TestUpdate(t *testing.T) {
+func TestUpdateHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
-	m := model.NewHabitsModel(logger, db)
-	v := view.NewHabitsView(logger)
-	c := NewHabitsController(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
@@ -222,7 +222,7 @@ func TestUpdate(t *testing.T) {
 			q.Add("id", "1")
 			req.URL.RawQuery = q.Encode()
 
-			c.Update(w, req, m, v)
+			c.UpdateHandler(w, req)
 
 			res := w.Result()
 
@@ -241,12 +241,12 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestDeleteHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
-	m := model.NewHabitsModel(logger, db)
-	v := view.NewHabitsView(logger)
-	c := NewHabitsController(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
@@ -274,7 +274,7 @@ func TestDelete(t *testing.T) {
 				t.Errorf("Fail err: %s", err)
 			}
 
-			c.Delete(w, req, m, v)
+			c.DeleteHandler(w, req)
 
 			res := w.Result()
 

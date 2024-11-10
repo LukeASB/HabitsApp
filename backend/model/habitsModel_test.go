@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestCreate(t *testing.T) {
+func TestCreateHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
 	model := NewHabitsModel(logger, db)
@@ -27,14 +27,14 @@ func TestCreate(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			if err := model.Create(val.newHabit); err != nil {
+			if err := model.CreateHandler(val.newHabit); err != nil {
 				t.Errorf("TestCreate Failed - err=%s", err)
 			}
 		})
 	}
 }
 
-func TestRetrieve(t *testing.T) {
+func TestRetrieveHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
 	model := NewHabitsModel(logger, db)
@@ -53,7 +53,7 @@ func TestRetrieve(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			habit, err := model.Retrieve(val.id)
+			habit, err := model.RetrieveHandler(val.id)
 
 			if err != nil {
 				t.Errorf("TestRetrieve Failed - err=%s", err)
@@ -68,7 +68,7 @@ func TestRetrieve(t *testing.T) {
 	}
 }
 
-func TestRetrieveAll(t *testing.T) {
+func TestRetrieveAllHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
 	model := NewHabitsModel(logger, db)
@@ -85,7 +85,7 @@ func TestRetrieveAll(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			habits, err := model.RetrieveAll()
+			habits, err := model.RetrieveAllHandler()
 
 			if err != nil {
 				t.Errorf("TestRetrieve Failed - err=%s", err)
@@ -102,7 +102,7 @@ func TestRetrieveAll(t *testing.T) {
 	}
 }
 
-func TestUpdate(t *testing.T) {
+func TestUpdateHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
 	model := NewHabitsModel(logger, db)
@@ -121,14 +121,14 @@ func TestUpdate(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			if err := model.Update(val.updateHabit, val.id); err != nil {
+			if err := model.UpdateHandler(val.updateHabit, val.id); err != nil {
 				t.Errorf("TestUpdate Failed - err=%s", err)
 			}
 		})
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestDeleteHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
 	model := NewHabitsModel(logger, db)
@@ -153,7 +153,7 @@ func TestDelete(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			err := model.Delete(val.id)
+			err := model.DeleteHandler(val.id)
 
 			if err != nil {
 				val.got = true

@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func Test_Create(t *testing.T) {
+func Test_CreateHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
@@ -36,7 +36,7 @@ func Test_Create(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.Create(newHabit)
+			got, err := v.CreateHandler(newHabit)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -49,7 +49,7 @@ func Test_Create(t *testing.T) {
 	}
 }
 
-func Test_Retrieve(t *testing.T) {
+func Test_RetrieveHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
@@ -73,7 +73,7 @@ func Test_Retrieve(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.Retrieve(habit)
+			got, err := v.RetrieveHandler(habit)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -86,7 +86,7 @@ func Test_Retrieve(t *testing.T) {
 	}
 }
 
-func Test_RetrieveAll(t *testing.T) {
+func Test_RetrieveAllHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
@@ -110,7 +110,7 @@ func Test_RetrieveAll(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.RetrieveAll(habits)
+			got, err := v.RetrieveAllHandler(habits)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -123,7 +123,7 @@ func Test_RetrieveAll(t *testing.T) {
 	}
 }
 
-func Test_Update(t *testing.T) {
+func Test_UpdateHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
@@ -147,7 +147,7 @@ func Test_Update(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.Update(habit)
+			got, err := v.UpdateHandler(habit)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -160,7 +160,7 @@ func Test_Update(t *testing.T) {
 	}
 }
 
-func Test_Delete(t *testing.T) {
+func Test_DeleteHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
@@ -182,7 +182,7 @@ func Test_Delete(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.Delete()
+			got, err := v.DeleteHandler()
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)

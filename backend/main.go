@@ -5,6 +5,8 @@ import (
 	"dohabits/db"
 	"dohabits/internal"
 	"dohabits/logger"
+	"dohabits/middleware"
+	"dohabits/middleware/session"
 	"dohabits/model"
 	"dohabits/routes"
 	"dohabits/view"
@@ -33,15 +35,23 @@ func init() {
 		log.Fatal(err)
 	}
 
-	m := model.NewHabitsModel(logger, db)
-	v := view.NewHabitsView(logger)
-	c := controller.NewHabitsController(logger)
+	jwtTokens := session.NewJWTTokens(os.Getenv("JWT_SECRET"))
+	csrfTokens := session.NewCSRFToken(logger)
+
+	authModel := model.NewAuthModel(logger, db)
+	habitsModel := model.NewHabitsModel(logger, db)
+	authView := view.NewAuthView(logger)
+	habitsView := view.NewHabitsView(logger)
+	authController := controller.NewAuthController(authModel, authView, jwtTokens, csrfTokens, logger)
+	habitsController := controller.NewHabitsController(habitsModel, habitsView, logger)
+
+	mw := middleware.NewMiddleware(jwtTokens, csrfTokens, logger)
 	apiName := os.Getenv("API_NAME")
 	apiVersion := os.Getenv("API_VERSION")
 	appVersion := os.Getenv("APP_VERSION")
 	port := os.Getenv("PORT")
 
-	App = internal.NewApp(m, v, c, db, logger, apiName, apiVersion, appVersion, port)
+	App = internal.NewApp(authController, habitsController, db, mw, logger, apiName, apiVersion, appVersion, port, jwtTokens)
 
 	App.GetLogger().DebugLog(fmt.Sprintf("main.init() - %s loaded successfully. App Version = %s, API Version = %s", App.GetAPIName(), App.GetAppVersion(), App.GetAPIVersion()))
 }

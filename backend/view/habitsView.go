@@ -12,11 +12,11 @@ type HabitsView struct {
 }
 
 type IHabitsView interface {
-	Create(newHabit data.NewHabit) ([]byte, error)
-	Retrieve(habit data.Habit) ([]byte, error)
-	RetrieveAll(habits []data.Habit) ([]byte, error)
-	Update(habit data.Habit) ([]byte, error)
-	Delete() ([]byte, error)
+	CreateHandler(newHabit data.NewHabit) ([]byte, error)
+	RetrieveHandler(habit data.Habit) ([]byte, error)
+	RetrieveAllHandler(habits []data.Habit) ([]byte, error)
+	UpdateHandler(habit data.Habit) ([]byte, error)
+	DeleteHandler() ([]byte, error)
 }
 
 func NewHabitsView(logger logger.ILogger) *HabitsView {
@@ -25,7 +25,7 @@ func NewHabitsView(logger logger.ILogger) *HabitsView {
 	}
 }
 
-func (v *HabitsView) Create(newHabit data.NewHabit) ([]byte, error) {
+func (v *HabitsView) CreateHandler(newHabit data.NewHabit) ([]byte, error) {
 	v.logger.InfoLog("habitsView.Create")
 	result, err := json.Marshal(newHabit)
 
@@ -37,7 +37,7 @@ func (v *HabitsView) Create(newHabit data.NewHabit) ([]byte, error) {
 	return result, nil
 }
 
-func (v *HabitsView) Retrieve(habit data.Habit) ([]byte, error) {
+func (v *HabitsView) RetrieveHandler(habit data.Habit) ([]byte, error) {
 	v.logger.InfoLog("habitsView.Retrieve")
 	result, err := json.Marshal(habit)
 
@@ -49,7 +49,7 @@ func (v *HabitsView) Retrieve(habit data.Habit) ([]byte, error) {
 	return result, nil
 }
 
-func (v *HabitsView) RetrieveAll(habits []data.Habit) ([]byte, error) {
+func (v *HabitsView) RetrieveAllHandler(habits []data.Habit) ([]byte, error) {
 	v.logger.InfoLog("habitsView.RetrieveAll")
 	result, err := json.Marshal(habits)
 
@@ -61,7 +61,7 @@ func (v *HabitsView) RetrieveAll(habits []data.Habit) ([]byte, error) {
 	return result, nil
 }
 
-func (v *HabitsView) Update(habit data.Habit) ([]byte, error) {
+func (v *HabitsView) UpdateHandler(habit data.Habit) ([]byte, error) {
 	v.logger.InfoLog("habitsView.Update")
 	result, err := json.Marshal(habit)
 
@@ -73,7 +73,7 @@ func (v *HabitsView) Update(habit data.Habit) ([]byte, error) {
 	return result, nil
 }
 
-func (v *HabitsView) Delete() ([]byte, error) {
+func (v *HabitsView) DeleteHandler() ([]byte, error) {
 	v.logger.InfoLog("habitsView.Delete")
 	response := map[string]bool{"success": true}
 
