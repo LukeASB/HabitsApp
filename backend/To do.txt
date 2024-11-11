@@ -1,10 +1,13 @@
 Middleware:
-- Session Management
+- Session Management 
 - Login Access Token ✅
-- CSRF Token
--- Add a SetCSRFToken in csrfToken.go
--- Apply to the POST, PUT, DELETE tokens in habit handlers.
-- Refresh Token - do I need to refresh short-lived JWT at end of each request based on the long-lived token?
+- CSRF Token ✅
+-- Add a SetCSRFToken in csrfToken.go ✅
+- Refresh Token ✅
+Note the JWT tokens currently work just for test-user, will extend these to multiple user's based on query params
+
+
+Add a DEBUG Flag
 
 Session Management / Auth
 Cross-Site Request Forgery Token

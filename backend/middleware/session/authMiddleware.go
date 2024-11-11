@@ -3,6 +3,7 @@ package session
 import (
 	"context"
 	"dohabits/logger"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -17,6 +18,7 @@ func AuthMiddleware(jwtTokens IJWTTokens, logger logger.ILogger) func(http.Handl
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			logger.InfoLog("session.AuthMiddleware - Start")
+
 			authHeader := r.Header.Get("Authorization")
 
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
@@ -37,7 +39,14 @@ func AuthMiddleware(jwtTokens IJWTTokens, logger logger.ILogger) func(http.Handl
 				return
 			}
 
-			logger.InfoLog("session.AuthMiddleware - Success")
+			nwAccessToken, err := jwtTokens.RefreshJWTTokens(claims.Username)
+
+			if err != nil {
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
+			}
+
+			w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", nwAccessToken))
 			ctx := context.WithValue(r.Context(), claimsKey, claims)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}

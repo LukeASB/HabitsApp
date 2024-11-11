@@ -12,7 +12,7 @@ type AuthView struct {
 }
 
 type IAuthView interface {
-	LoginHandler(loginData data.Login) ([]byte, error)
+	LoginHandler(loginData data.UserLoggedIn) ([]byte, error)
 	LogoutHandler(w http.ResponseWriter, r *http.Request)
 	RefreshHandler(w http.ResponseWriter, r *http.Request)
 }
@@ -23,7 +23,7 @@ func NewAuthView(logger logger.ILogger) *AuthView {
 	}
 }
 
-func (ac *AuthView) LoginHandler(loginData data.Login) ([]byte, error) {
+func (ac *AuthView) LoginHandler(loginData data.UserLoggedIn) ([]byte, error) {
 	ac.logger.InfoLog("authView.LoginHandler")
 
 	jsonRes, err := json.Marshal(loginData)

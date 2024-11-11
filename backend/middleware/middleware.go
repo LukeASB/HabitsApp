@@ -38,7 +38,8 @@ func (mw *Middleware) MiddlewareList(handler http.HandlerFunc, dependencies data
 	}
 
 	if dependencies.CSRFRequired {
-		middlewares = append(middlewares, CSRFToken(mw.csrfTokens, mw.logger))
+		mw.logger.DebugLog("middleware.MiddlewareList - CSRF Token commented out for debug")
+		// middlewares = append(middlewares, CSRFToken(mw.csrfTokens, mw.logger)) // Commented out for debug
 	}
 
 	middlewares = append(middlewares, ErrorHandlingMiddleware(mw.logger))

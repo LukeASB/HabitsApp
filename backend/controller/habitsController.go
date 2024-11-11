@@ -72,9 +72,7 @@ func (c *HabitsController) CreateHandler(w http.ResponseWriter, r *http.Request)
 
 		newHabit := data.NewHabit{}
 
-		err := json.NewDecoder(r.Body).Decode(&newHabit)
-
-		if err != nil {
+		if err := json.NewDecoder(r.Body).Decode(&newHabit); err != nil {
 			resultChan <- struct {
 				data []byte
 				err  error
@@ -122,6 +120,7 @@ func (c *HabitsController) CreateHandler(w http.ResponseWriter, r *http.Request)
 
 	if res.err != nil {
 		c.logger.ErrorLog(fmt.Sprintf("%s", res.err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -194,6 +193,7 @@ func (c *HabitsController) RetrieveHandler(w http.ResponseWriter, r *http.Reques
 
 	if res.err != nil {
 		c.logger.ErrorLog(fmt.Sprintf("%s", res.err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -253,6 +253,7 @@ func (c *HabitsController) RetrieveAllHandler(w http.ResponseWriter, r *http.Req
 
 	if res.err != nil {
 		c.logger.ErrorLog(fmt.Sprintf("%s", res.err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -365,6 +366,7 @@ func (c *HabitsController) UpdateHandler(w http.ResponseWriter, r *http.Request)
 
 	if res.err != nil {
 		c.logger.ErrorLog(fmt.Sprintf("%s", res.err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -437,6 +439,7 @@ func (c *HabitsController) DeleteHandler(w http.ResponseWriter, r *http.Request)
 
 	if res.err != nil {
 		c.logger.ErrorLog(fmt.Sprintf("%s", res.err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
