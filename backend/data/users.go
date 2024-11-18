@@ -7,7 +7,14 @@ type UserAuth struct {
 	Password     string `json:"Password"`
 }
 
-type RegisterUser struct {
+type RegisterUserRequest struct {
+	EmailAddress string `json:"EmailAddress"`
+	Password     string `json:"Password"`
+	FirstName    string `json:"FirstName"`
+	LastName     string `json:"LastName"`
+}
+
+type RegisterUserResponse struct {
 	Success bool     `json:"Succcess"`
 	User    UserData `json:"User"`
 }

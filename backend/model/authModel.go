@@ -18,7 +18,7 @@ type AuthModel struct {
 }
 
 type IAuthModel interface {
-	RegisterUser(userData *data.UserData) (*data.RegisterUser, error)
+	RegisterUser(userRegisterRequest *data.RegisterUserRequest) (*data.RegisterUserResponse, error)
 	LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedIn, error)
 	LogoutHandler(w http.ResponseWriter, UserLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedOutResponse, error)
 	RefreshHandler(w http.ResponseWriter, r *http.Request)
@@ -31,22 +31,22 @@ func NewAuthModel(logger logger.ILogger, db db.IDB) *AuthModel {
 	}
 }
 
-func (am *AuthModel) RegisterUser(userData *data.UserData) (*data.RegisterUser, error) {
+func (am *AuthModel) RegisterUser(userRegisterRequest *data.RegisterUserRequest) (*data.RegisterUserResponse, error) {
 	am.logger.InfoLog("authModel.RegisterUser")
 
-	if !validation.IsValidName(userData.FirstName) {
-		return nil, fmt.Errorf("authModel.RegisterUser - user: %s first name is invalid. FirstName: %s", userData.UserID, userData.FirstName)
+	if !validation.IsValidName(userRegisterRequest.FirstName) {
+		return nil, fmt.Errorf("authModel.RegisterUser - user: %s first name is invalid. FirstName: %s", userRegisterRequest.EmailAddress, userRegisterRequest.FirstName)
 	}
 
-	if !validation.IsValidName(userData.LastName) {
-		return nil, fmt.Errorf("authModel.RegisterUser - user: %s last name is invalid. LastName: %s", userData.UserID, userData.LastName)
+	if !validation.IsValidName(userRegisterRequest.LastName) {
+		return nil, fmt.Errorf("authModel.RegisterUser - user: %s last name is invalid. LastName: %s", userRegisterRequest.EmailAddress, userRegisterRequest.LastName)
 	}
 
-	if !validation.IsValidEmail(userData.EmailAddress) {
-		return nil, fmt.Errorf("authModel.RegisterUser - user: %s email address is invalid. LastName: %s", userData.UserID, userData.EmailAddress)
+	if !validation.IsValidEmail(userRegisterRequest.EmailAddress) {
+		return nil, fmt.Errorf("authModel.RegisterUser - user: %s email address is invalid. LastName: %s", userRegisterRequest.EmailAddress, userRegisterRequest.EmailAddress)
 	}
 
-	userDetails, err := am.db.GetUserDetails(&data.UserAuth{EmailAddress: userData.EmailAddress})
+	userDetails, err := am.db.GetUserDetails(&data.RegisterUserRequest{EmailAddress: userRegisterRequest.EmailAddress})
 
 	if err != nil {
 		return nil, err
@@ -62,21 +62,29 @@ func (am *AuthModel) RegisterUser(userData *data.UserData) (*data.RegisterUser, 
 		return nil, fmt.Errorf("authModel.RegisterUser - User already exists. UserID: %s, EmailAddress: %s", currentUserData.UserID, currentUserData.EmailAddress)
 	}
 
-	hashedPassword, err := validation.HashPassword(userData.Password)
+	hashedPassword, err := validation.HashPassword(userRegisterRequest.Password)
 
 	if err != nil {
 		return nil, err
 	}
 
-	userData.Password = string(hashedPassword)
+	userRegisterRequest.Password = string(hashedPassword)
 
-	if err := am.db.RegisterUser(userData); err != nil {
+	userData, err := am.db.RegisterUser(userRegisterRequest)
+
+	if err != nil {
 		return nil, err
 	}
 
-	return &data.RegisterUser{
+	registerUserData, ok := userData.(*data.UserData)
+
+	if !ok {
+		return nil, fmt.Errorf("authModel.RegisterUser - data.UserData is invalid")
+	}
+
+	return &data.RegisterUserResponse{
 		Success: true,
-		User:    *userData,
+		User:    *registerUserData,
 	}, nil
 }
 

@@ -34,19 +34,35 @@ func (db *MyMockDB) Disconnect() error {
 	return nil
 }
 
-func (db *MyMockDB) RegisterUser(value interface{}) error {
+func (db *MyMockDB) RegisterUser(value interface{}) (interface{}, error) {
 	db.logger.InfoLog("mock_db.RegisterUser")
 
-	newUser, ok := value.(data.UserData)
+	newUser, ok := value.(*data.RegisterUserRequest)
 
 	if !ok {
 		db.logger.ErrorLog("mock_db.RegisterUser - value type is not data.UserData")
-		return fmt.Errorf("mock_db.RegisterUser - value type is not data.UserData")
+		return nil, fmt.Errorf("mock_db.RegisterUser - value type is not data.UserData")
 	}
 
-	data.MockUsers = append(data.MockUsers, newUser)
+	latestUserID, err := strconv.Atoi(data.MockUsers[len(data.MockUsers)-1].UserID)
 
-	return nil
+	if err != nil {
+		db.logger.ErrorLog("mock_db.RegisterUser - get latestUserID and convert to int")
+		return nil, fmt.Errorf("mock_db.RegisterUser - couldn't get latestUserID and convert to int")
+	}
+
+	registerUser := data.UserData{
+		UserID:       strconv.Itoa(latestUserID + 1),
+		FirstName:    newUser.FirstName,
+		LastName:     newUser.LastName,
+		Password:     newUser.Password,
+		EmailAddress: newUser.EmailAddress,
+		CreatedAt:    time.Now(),
+	}
+
+	data.MockUsers = append(data.MockUsers, registerUser)
+
+	return &registerUser, err
 }
 
 func (db *MyMockDB) LoginUser(value interface{}) error {
@@ -112,6 +128,16 @@ func (db *MyMockDB) LogoutUser(value interface{}) error {
 
 func (db *MyMockDB) GetUserDetails(value interface{}) (interface{}, error) {
 	db.logger.InfoLog("mock_db.GetUserDetails")
+
+	if userAuth, ok := value.(*data.RegisterUserRequest); ok {
+		for _, val := range data.MockUsers {
+			if val.EmailAddress == userAuth.EmailAddress {
+				return val, nil
+			}
+		}
+
+		return data.UserData{}, nil
+	}
 
 	if userAuth, ok := value.(*data.UserAuth); ok {
 		for _, val := range data.MockUsers {

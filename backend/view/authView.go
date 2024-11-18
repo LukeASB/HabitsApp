@@ -13,7 +13,7 @@ type AuthView struct {
 }
 
 type IAuthView interface {
-	RegisterUser(registeredUserData *data.RegisterUser) ([]byte, error)
+	RegisterUser(registeredUserData *data.RegisterUserResponse) ([]byte, error)
 	LoginHandler(loginData *data.UserLoggedIn) ([]byte, error)
 	LogoutHandler(logoutData *data.UserLoggedOutResponse) ([]byte, error)
 	RefreshHandler(w http.ResponseWriter, r *http.Request)
@@ -25,10 +25,34 @@ func NewAuthView(logger logger.ILogger) *AuthView {
 	}
 }
 
-func (ac *AuthView) RegisterUser(registeredUserData *data.RegisterUser) ([]byte, error) {
+func (ac *AuthView) RegisterUser(registeredUserData *data.RegisterUserResponse) ([]byte, error) {
 	ac.logger.InfoLog("authView.RegisterUser")
 
-	jsonRes, err := json.Marshal(registeredUserData)
+	jsonRes, err := json.Marshal(struct {
+		Success bool `json:"Succcess"`
+		User    struct {
+			UserID       string    `json:"UserID"`
+			FirstName    string    `json:"FirstName"`
+			LastName     string    `json:"LastName"`
+			EmailAddress string    `json:"EmailAddress"`
+			CreatedAt    time.Time `json:"CreatedAt"`
+		} `json:"User"`
+	}{
+		Success: registeredUserData.Success,
+		User: struct {
+			UserID       string    `json:"UserID"`
+			FirstName    string    `json:"FirstName"`
+			LastName     string    `json:"LastName"`
+			EmailAddress string    `json:"EmailAddress"`
+			CreatedAt    time.Time `json:"CreatedAt"`
+		}{
+			UserID:       registeredUserData.User.UserID,
+			FirstName:    registeredUserData.User.FirstName,
+			LastName:     registeredUserData.User.LastName,
+			EmailAddress: registeredUserData.User.EmailAddress,
+			CreatedAt:    registeredUserData.User.CreatedAt,
+		},
+	})
 
 	if err != nil {
 		return nil, err

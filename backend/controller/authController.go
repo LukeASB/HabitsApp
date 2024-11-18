@@ -37,14 +37,14 @@ func NewAuthController(authModel model.IAuthModel, authView view.IAuthView, jwtT
 }
 
 func (ac *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	userData := data.UserData{}
+	userRegisterRequest := data.RegisterUserRequest{}
 
-	if err := json.NewDecoder(r.Body).Decode(&userData); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&userRegisterRequest); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	registeredUserData, err := ac.authModel.RegisterUser(&userData)
+	registeredUserData, err := ac.authModel.RegisterUser(&userRegisterRequest)
 
 	if err != nil {
 		ac.logger.DebugLog(fmt.Sprintf("authController.RegisterUser - err: %s", err))

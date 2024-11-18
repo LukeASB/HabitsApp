@@ -12,7 +12,7 @@ func SetUpRoutes(app internal.IApp) {
 
 	app.GetLogger().InfoLog(fmt.Sprintf("routes.SetUpRoutes() - endpoint = %s", endpoint))
 
-	http.HandleFunc(fmt.Sprintf("/%s/register", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().LoginHandler, data.Middleware{HTTPMethod: http.MethodPost}))
+	http.HandleFunc(fmt.Sprintf("/%s/register", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().RegisterUser, data.Middleware{HTTPMethod: http.MethodPost}))
 	http.HandleFunc(fmt.Sprintf("/%s/login", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().LoginHandler, data.Middleware{HTTPMethod: http.MethodPost}))
 	http.HandleFunc(fmt.Sprintf("/%s/logout", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().LogoutHandler, data.Middleware{HTTPMethod: http.MethodPost}))
 	http.HandleFunc(fmt.Sprintf("/%s/refresh", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().RefreshHandler, data.Middleware{HTTPMethod: http.MethodPost}))
