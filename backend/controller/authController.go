@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 )
 
 type AuthController struct {
@@ -21,6 +20,7 @@ type AuthController struct {
 }
 
 type IAuthController interface {
+	RegisterUser(w http.ResponseWriter, r *http.Request)
 	LoginHandler(w http.ResponseWriter, r *http.Request)
 	LogoutHandler(w http.ResponseWriter, r *http.Request)
 	RefreshHandler(w http.ResponseWriter, r *http.Request)
@@ -36,10 +36,34 @@ func NewAuthController(authModel model.IAuthModel, authView view.IAuthView, jwtT
 	}
 }
 
-func (ac *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	//Validate the user - for new we'll have a test user - username: lsb, password: shushSecret
-	//Create JWT authToken, refreshToken
+func (ac *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
+	userData := data.UserData{}
 
+	if err := json.NewDecoder(r.Body).Decode(&userData); err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	registeredUserData, err := ac.authModel.RegisterUser(&userData)
+
+	if err != nil {
+		ac.logger.DebugLog(fmt.Sprintf("authController.RegisterUser - err: %s", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	response, err := ac.authView.RegisterUser(registeredUserData)
+
+	if err != nil {
+		ac.logger.DebugLog(fmt.Sprintf("authController.RegisterUser - err: %s", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(response)
+}
+
+func (ac *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	userAuth := data.UserAuth{}
 
 	if err := json.NewDecoder(r.Body).Decode(&userAuth); err != nil {
@@ -47,42 +71,53 @@ func (ac *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, err := ac.jwtTokens.GenerateJSONWebTokens(userAuth.Username) // username will be passed as query param
+	userLoggedIn, err := ac.authModel.LoginHandler(w, &userAuth, ac.jwtTokens, ac.csrfTokens)
 
 	if err != nil {
+		ac.logger.DebugLog(fmt.Sprintf("authController.LoginHandler - err: %s", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	if err := ac.csrfTokens.CSRFToken(w); err != nil {
-		http.Error(w, "Error generating CSRF token", http.StatusInternalServerError)
-		return
-	}
-
-	response, err := ac.authView.LoginHandler(data.UserLoggedIn{Success: true, Username: userAuth.Username, LoggedInAt: time.Now()})
+	response, err := ac.authView.LoginHandler(userLoggedIn)
 
 	if err != nil {
+		ac.logger.DebugLog(fmt.Sprintf("authController.LoginHandler - err: %s", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+
+	w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", userLoggedIn.AccessToken))
 	w.Write(response)
 }
 
 func (ac *AuthController) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// frontend will delete this short-lived JWT accessToken from session, delete user's refreshToken to prevent new short-lived JWT accessToken. It will invalidate itself after 5 mins.
 
-	userLoggedOut := data.UserLoggedOut{}
+	userLoggedOutRequest := data.UserLoggedOutRequest{}
 
-	if err := json.NewDecoder(r.Body).Decode(&userLoggedOut); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&userLoggedOutRequest); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	ac.jwtTokens.DestroyJWTRefreshToken(userLoggedOut.Username)
-	ac.csrfTokens.DestroyCSRFToken(w)
+	userLoggedOutResponse, err := ac.authModel.LogoutHandler(w, &userLoggedOutRequest, ac.jwtTokens, ac.csrfTokens)
 
-	w.Write([]byte("Logged out..."))
+	if err != nil {
+		ac.logger.DebugLog(fmt.Sprintf("authController.LogoutHandler - err: %s", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	response, err := ac.authView.LogoutHandler(userLoggedOutResponse)
+
+	if err != nil {
+		ac.logger.DebugLog(fmt.Sprintf("authController.LogoutHandler - err: %s", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte(response))
 }
 
 func (ac *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request) {

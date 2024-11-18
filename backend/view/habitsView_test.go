@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func Test_CreateHandler(t *testing.T) {
+func Test_CreateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
@@ -36,7 +36,7 @@ func Test_CreateHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.CreateHandler(newHabit)
+			got, err := v.CreateHabitsHandler(newHabit)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -49,7 +49,7 @@ func Test_CreateHandler(t *testing.T) {
 	}
 }
 
-func Test_RetrieveHandler(t *testing.T) {
+func Test_RetrieveHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
@@ -73,7 +73,7 @@ func Test_RetrieveHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.RetrieveHandler(habit)
+			got, err := v.RetrieveHabitsHandler(habit)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -86,7 +86,7 @@ func Test_RetrieveHandler(t *testing.T) {
 	}
 }
 
-func Test_RetrieveAllHandler(t *testing.T) {
+func Test_RetrieveAllHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
@@ -110,7 +110,7 @@ func Test_RetrieveAllHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.RetrieveAllHandler(habits)
+			got, err := v.RetrieveAllHabitsHandler(habits)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -123,7 +123,7 @@ func Test_RetrieveAllHandler(t *testing.T) {
 	}
 }
 
-func Test_UpdateHandler(t *testing.T) {
+func Test_UpdateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
@@ -147,7 +147,7 @@ func Test_UpdateHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.UpdateHandler(habit)
+			got, err := v.UpdateHabitsHandler(habit)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -160,7 +160,7 @@ func Test_UpdateHandler(t *testing.T) {
 	}
 }
 
-func Test_DeleteHandler(t *testing.T) {
+func Test_DeleteHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
@@ -182,7 +182,7 @@ func Test_DeleteHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.DeleteHandler()
+			got, err := v.DeleteHabitsHandler()
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)

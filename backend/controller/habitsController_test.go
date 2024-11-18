@@ -16,7 +16,7 @@ import (
 	"testing"
 )
 
-func TestCreateHandler(t *testing.T) {
+func TestCreateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
@@ -50,7 +50,7 @@ func TestCreateHandler(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/%s/CreateHabit", endpoint), io.NopCloser(bytes.NewBuffer(marshalledNewHabit)))
 			w := httptest.NewRecorder()
 
-			c.CreateHandler(w, req)
+			c.CreateHabitsHandler(w, req)
 
 			res := w.Result()
 
@@ -69,7 +69,7 @@ func TestCreateHandler(t *testing.T) {
 	}
 }
 
-func TestRetrieveHandler(t *testing.T) {
+func TestRetrieveHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
@@ -102,7 +102,7 @@ func TestRetrieveHandler(t *testing.T) {
 			q.Add("id", "1")
 			req.URL.RawQuery = q.Encode()
 
-			c.RetrieveHandler(w, req)
+			c.RetrieveHabitsHandler(w, req)
 
 			res := w.Result()
 
@@ -121,7 +121,7 @@ func TestRetrieveHandler(t *testing.T) {
 	}
 }
 
-func TestRetrieveAllHandler(t *testing.T) {
+func TestRetrieveAllHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
@@ -151,7 +151,7 @@ func TestRetrieveAllHandler(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s/RetrieveAllHabits", endpoint), nil)
 			w := httptest.NewRecorder()
 
-			c.RetrieveAllHandler(w, req)
+			c.RetrieveAllHabitsHandler(w, req)
 
 			res := w.Result()
 
@@ -170,7 +170,7 @@ func TestRetrieveAllHandler(t *testing.T) {
 	}
 }
 
-func TestUpdateHandler(t *testing.T) {
+func TestUpdateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
@@ -222,7 +222,7 @@ func TestUpdateHandler(t *testing.T) {
 			q.Add("id", "1")
 			req.URL.RawQuery = q.Encode()
 
-			c.UpdateHandler(w, req)
+			c.UpdateHabitsHandler(w, req)
 
 			res := w.Result()
 
@@ -241,7 +241,7 @@ func TestUpdateHandler(t *testing.T) {
 	}
 }
 
-func TestDeleteHandler(t *testing.T) {
+func TestDeleteHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	db := db.NewDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
@@ -274,7 +274,7 @@ func TestDeleteHandler(t *testing.T) {
 				t.Errorf("Fail err: %s", err)
 			}
 
-			c.DeleteHandler(w, req)
+			c.DeleteHabitsHandler(w, req)
 
 			res := w.Result()
 

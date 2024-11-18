@@ -34,7 +34,110 @@ func (db *MyMockDB) Disconnect() error {
 	return nil
 }
 
-func (db *MyMockDB) CreateHandler(value interface{}) error {
+func (db *MyMockDB) RegisterUser(value interface{}) error {
+	db.logger.InfoLog("mock_db.RegisterUser")
+
+	newUser, ok := value.(data.UserData)
+
+	if !ok {
+		db.logger.ErrorLog("mock_db.RegisterUser - value type is not data.UserData")
+		return fmt.Errorf("mock_db.RegisterUser - value type is not data.UserData")
+	}
+
+	data.MockUsers = append(data.MockUsers, newUser)
+
+	return nil
+}
+
+func (db *MyMockDB) LoginUser(value interface{}) error {
+	db.logger.InfoLog("mock_db.LoginUser")
+
+	userSession, ok := value.(*data.UserSession)
+
+	if !ok {
+		db.logger.ErrorLog("mock_db.LoginUser - value type is not data.UserSession")
+		return fmt.Errorf("mock_db.LoginUser - value type is not data.UserSession")
+	}
+	var sessionID int
+
+	if len(data.MockUserSession) > 0 {
+		id, err := strconv.Atoi(data.MockUserSession[len(data.MockUserSession)-1].ID)
+
+		if err != nil {
+			db.logger.ErrorLog("mock_db.LoginUser - failed to get latest id")
+			return fmt.Errorf("mock_db.LoginUser - failed to get latest id")
+		}
+
+		sessionID = id
+	}
+
+	userSession.ID = fmt.Sprintf("%v", sessionID+1)
+
+	data.MockUserSession = append(data.MockUserSession, *userSession)
+
+	for i, val := range data.MockUsers {
+		if val.UserID == userSession.UserID {
+			data.MockUsers[i].IsLoggedIn = true
+			data.MockUsers[i].LastLogin = userSession.CreatedAt
+		}
+	}
+
+	return nil
+}
+
+func (db *MyMockDB) LogoutUser(value interface{}) error {
+	db.logger.InfoLog("mock_db.LogoutUser")
+	userLoggedOut, ok := value.(*data.UserLoggedOutRequest)
+
+	if !ok {
+		db.logger.ErrorLog("mock_db.LogoutUser - value type is not data.UserLoggedOutRequest")
+		return fmt.Errorf("mock_db.LogoutUser - value type is not data.UserLoggedOutRequest")
+	}
+
+	// Remove user session from struct
+	for i, val := range data.MockUserSession {
+		if val.UserID == userLoggedOut.UserID {
+			data.MockUserSession = append(data.MockUserSession[:i], data.MockUserSession[i+1:]...)
+		}
+	}
+
+	for i, val := range data.MockUsers {
+		if val.UserID == userLoggedOut.UserID {
+			data.MockUsers[i].IsLoggedIn = false
+		}
+	}
+
+	return nil
+}
+
+func (db *MyMockDB) GetUserDetails(value interface{}) (interface{}, error) {
+	db.logger.InfoLog("mock_db.GetUserDetails")
+
+	if userAuth, ok := value.(*data.UserAuth); ok {
+		for _, val := range data.MockUsers {
+			if val.EmailAddress == userAuth.EmailAddress {
+				return val, nil
+			}
+		}
+
+		return nil, fmt.Errorf("mock_db.GetUserData - User doesn't exist")
+	}
+
+	if userLoggedOutRequest, ok := value.(*data.UserLoggedOutRequest); ok {
+		for _, val := range data.MockUsers {
+			if val.EmailAddress == userLoggedOutRequest.EmailAddress {
+				return val, nil
+			}
+		}
+
+		return nil, fmt.Errorf("mock_db.GetUserData - User doesn't exist")
+	}
+
+	db.logger.ErrorLog("mock_db.GetUserData - value type is unsupported")
+	return nil, fmt.Errorf("mock_db.GetUserData - value type is unsupported")
+}
+
+func (db *MyMockDB) CreateHabitsHandler(value interface{}) error {
 	db.logger.InfoLog("mock_db.Create")
 	newHabit, ok := value.(data.NewHabit)
 
@@ -64,12 +167,12 @@ func (db *MyMockDB) CreateHandler(value interface{}) error {
 	return nil
 }
 
-func (db *MyMockDB) RetrieveAllHandler() (interface{}, error) {
+func (db *MyMockDB) RetrieveAllHabitsHandler() (interface{}, error) {
 	db.logger.InfoLog("mock_db.RetrieveAll")
 	return data.MockHabit, nil
 }
 
-func (db *MyMockDB) RetrieveHandler(id string) (interface{}, error) {
+func (db *MyMockDB) RetrieveHabitsHandler(id string) (interface{}, error) {
 	db.logger.InfoLog(fmt.Sprintf("mock_db.Retrieve id=%s\n", id))
 
 	for _, val := range data.MockHabit {
@@ -84,7 +187,7 @@ func (db *MyMockDB) RetrieveHandler(id string) (interface{}, error) {
 	return nil, fmt.Errorf(err)
 }
 
-func (db *MyMockDB) UpdateHandler(id string, value interface{}) error {
+func (db *MyMockDB) UpdateHabitsHandler(id string, value interface{}) error {
 	db.logger.InfoLog("mock_db.Update")
 	newHabit, ok := value.(data.Habit)
 
@@ -96,7 +199,7 @@ func (db *MyMockDB) UpdateHandler(id string, value interface{}) error {
 
 	for i, val := range data.MockHabit {
 		if val.ID == id {
-			db.logger.InfoLog(fmt.Sprintf("mock_db.UpdateHandler() match id=%s, val=%s\n", val.ID, val.Name))
+			db.logger.InfoLog(fmt.Sprintf("mock_db.UpdateHabitsHandler() match id=%s, val=%s\n", val.ID, val.Name))
 			data.MockHabit[i].Name = newHabit.Name
 			data.MockHabit[i].Days = newHabit.Days
 			data.MockHabit[i].DaysTarget = newHabit.DaysTarget
@@ -109,12 +212,12 @@ func (db *MyMockDB) UpdateHandler(id string, value interface{}) error {
 	return fmt.Errorf(err)
 }
 
-func (db *MyMockDB) DeleteHandler(id string) error {
+func (db *MyMockDB) DeleteHabitsHandler(id string) error {
 	db.logger.InfoLog("mock_db.Delete")
 
 	for i, val := range data.MockHabit {
 		if val.ID == id {
-			db.logger.InfoLog(fmt.Sprintf("mock_db.DeleteHandler() match id=%s, val=%s\n", val.ID, val.Name))
+			db.logger.InfoLog(fmt.Sprintf("mock_db.DeleteHabitsHandler() match id=%s, val=%s\n", val.ID, val.Name))
 			data.MockHabit = append(data.MockHabit[:i], data.MockHabit[i+1:]...)
 			return nil
 		}

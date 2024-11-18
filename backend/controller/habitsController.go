@@ -18,11 +18,11 @@ type HabitsController struct {
 }
 
 type IHabitsController interface {
-	CreateHandler(w http.ResponseWriter, r *http.Request)
-	RetrieveHandler(w http.ResponseWriter, r *http.Request)
-	RetrieveAllHandler(w http.ResponseWriter, r *http.Request)
-	UpdateHandler(w http.ResponseWriter, r *http.Request)
-	DeleteHandler(w http.ResponseWriter, r *http.Request)
+	CreateHabitsHandler(w http.ResponseWriter, r *http.Request)
+	RetrieveHabitsHandler(w http.ResponseWriter, r *http.Request)
+	RetrieveAllHabitsHandler(w http.ResponseWriter, r *http.Request)
+	UpdateHabitsHandler(w http.ResponseWriter, r *http.Request)
+	DeleteHabitsHandler(w http.ResponseWriter, r *http.Request)
 }
 
 // Initialise the processOperations Goroutine
@@ -50,7 +50,7 @@ func (c *HabitsController) manageOps(logger logger.ILogger) {
 	}
 }
 
-func (c *HabitsController) CreateHandler(w http.ResponseWriter, r *http.Request) {
+func (c *HabitsController) CreateHabitsHandler(w http.ResponseWriter, r *http.Request) {
 	resultChan := make(chan struct {
 		data []byte
 		err  error
@@ -83,7 +83,7 @@ func (c *HabitsController) CreateHandler(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		if err := c.habitsModel.CreateHandler(newHabit); err != nil {
+		if err := c.habitsModel.CreateHabitsHandler(newHabit); err != nil {
 			resultChan <- struct {
 				data []byte
 				err  error
@@ -94,7 +94,7 @@ func (c *HabitsController) CreateHandler(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		result, err := c.habitsView.CreateHandler(newHabit)
+		result, err := c.habitsView.CreateHabitsHandler(newHabit)
 
 		if err != nil {
 			resultChan <- struct {
@@ -132,7 +132,7 @@ func (c *HabitsController) CreateHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (c *HabitsController) RetrieveHandler(w http.ResponseWriter, r *http.Request) {
+func (c *HabitsController) RetrieveHabitsHandler(w http.ResponseWriter, r *http.Request) {
 	resultChan := make(chan struct {
 		data []byte
 		err  error
@@ -154,7 +154,7 @@ func (c *HabitsController) RetrieveHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
-		habit, err := c.habitsModel.RetrieveHandler(id)
+		habit, err := c.habitsModel.RetrieveHabitsHandler(id)
 
 		if err != nil {
 			resultChan <- struct {
@@ -167,7 +167,7 @@ func (c *HabitsController) RetrieveHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
-		result, err := c.habitsView.RetrieveHandler(habit)
+		result, err := c.habitsView.RetrieveHabitsHandler(habit)
 
 		if err != nil {
 			resultChan <- struct {
@@ -205,7 +205,7 @@ func (c *HabitsController) RetrieveHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
-func (c *HabitsController) RetrieveAllHandler(w http.ResponseWriter, r *http.Request) {
+func (c *HabitsController) RetrieveAllHabitsHandler(w http.ResponseWriter, r *http.Request) {
 	resultChan := make(chan struct {
 		data []byte
 		err  error
@@ -214,7 +214,7 @@ func (c *HabitsController) RetrieveAllHandler(w http.ResponseWriter, r *http.Req
 	c.opsChan <- func() {
 		c.logger.InfoLog("habitsController.RetrieveAll")
 
-		habits, err := c.habitsModel.RetrieveAllHandler()
+		habits, err := c.habitsModel.RetrieveAllHabitsHandler()
 
 		if err != nil {
 			resultChan <- struct {
@@ -227,7 +227,7 @@ func (c *HabitsController) RetrieveAllHandler(w http.ResponseWriter, r *http.Req
 			return
 		}
 
-		result, err := c.habitsView.RetrieveAllHandler(habits)
+		result, err := c.habitsView.RetrieveAllHabitsHandler(habits)
 
 		if err != nil {
 			resultChan <- struct {
@@ -265,7 +265,7 @@ func (c *HabitsController) RetrieveAllHandler(w http.ResponseWriter, r *http.Req
 	}
 }
 
-func (c *HabitsController) UpdateHandler(w http.ResponseWriter, r *http.Request) {
+func (c *HabitsController) UpdateHabitsHandler(w http.ResponseWriter, r *http.Request) {
 	resultChan := make(chan struct {
 		data []byte
 		err  error
@@ -302,7 +302,7 @@ func (c *HabitsController) UpdateHandler(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		habit, err := c.habitsModel.RetrieveHandler(id)
+		habit, err := c.habitsModel.RetrieveHabitsHandler(id)
 
 		if err != nil {
 			resultChan <- struct {
@@ -327,7 +327,7 @@ func (c *HabitsController) UpdateHandler(w http.ResponseWriter, r *http.Request)
 			habit.DaysTarget = *updatedHabit.DaysTarget
 		}
 
-		err = c.habitsModel.UpdateHandler(habit, id)
+		err = c.habitsModel.UpdateHabitsHandler(habit, id)
 
 		if err != nil {
 			resultChan <- struct {
@@ -340,7 +340,7 @@ func (c *HabitsController) UpdateHandler(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		result, err := c.habitsView.UpdateHandler(habit)
+		result, err := c.habitsView.UpdateHabitsHandler(habit)
 
 		if err != nil {
 			resultChan <- struct {
@@ -378,7 +378,7 @@ func (c *HabitsController) UpdateHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (c *HabitsController) DeleteHandler(w http.ResponseWriter, r *http.Request) {
+func (c *HabitsController) DeleteHabitsHandler(w http.ResponseWriter, r *http.Request) {
 	resultChan := make(chan struct {
 		data []byte
 		err  error
@@ -400,7 +400,7 @@ func (c *HabitsController) DeleteHandler(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		err := c.habitsModel.DeleteHandler(id)
+		err := c.habitsModel.DeleteHabitsHandler(id)
 
 		if err != nil {
 			resultChan <- struct {
@@ -413,7 +413,7 @@ func (c *HabitsController) DeleteHandler(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		result, err := c.habitsView.DeleteHandler()
+		result, err := c.habitsView.DeleteHabitsHandler()
 
 		if err != nil {
 			resultChan <- struct {

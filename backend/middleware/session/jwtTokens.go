@@ -16,7 +16,7 @@ type JWTTokens struct {
 
 type IJWTTokens interface {
 	GetJWTKey() []byte
-	GenerateJSONWebTokens(username string) (string, error)
+	GenerateJSONWebTokens(username string) (string, string, error)
 	generateAccessJWT(username string) (string, error)
 	generateRefreshJWT(username string) (string, error)
 	RefreshJWTTokens(username string) (string, error)
@@ -31,7 +31,8 @@ func NewJWTTokens(jwtSecret string) *JWTTokens {
 	}
 }
 
-var refreshTokenFile = "refresh_token.txt" // Stored in txt file for now
+var refreshTokenPath = "data/mock_refresh_tokens"
+var refreshTokenFile = "mock_refresh_token.txt" // Stored in txt file for now
 
 // Claims represents the JWT claims
 type Claims struct {
@@ -44,20 +45,20 @@ func (sa *JWTTokens) GetJWTKey() []byte {
 }
 
 // GenerateJSONWebTokens generates the Access/Refresh JWT Tokens
-func (sa *JWTTokens) GenerateJSONWebTokens(username string) (string, error) {
+func (sa *JWTTokens) GenerateJSONWebTokens(username string) (string, string, error) {
 	accessToken, err := sa.generateAccessJWT(username) // username will be passed as query param
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	_, err = sa.generateRefreshJWT(username)
+	refreshToken, err := sa.generateRefreshJWT(username)
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return accessToken, err
+	return accessToken, refreshToken, err
 }
 
 // GenerateAccessJWT generates a new JWT for a given username
@@ -73,14 +74,14 @@ func (sa *JWTTokens) generateRefreshJWT(username string) (string, error) {
 
 	// Store the refresh token in a file - temp
 	if err == nil {
-		err = os.WriteFile(fmt.Sprintf("%s_%s", username, refreshTokenFile), []byte(tokenString), 0644)
+		err = os.WriteFile(fmt.Sprintf("%s/%s_%s", refreshTokenPath, username, refreshTokenFile), []byte(tokenString), 0644)
 	}
 
 	return tokenString, err
 }
 
 func (sa *JWTTokens) RefreshJWTTokens(username string) (string, error) {
-	refreshToken, err := os.ReadFile(fmt.Sprintf("%s_%s", username, refreshTokenFile))
+	refreshToken, err := os.ReadFile(fmt.Sprintf("%s/%s_%s", refreshTokenPath, username, refreshTokenFile))
 
 	if err != nil {
 		return "", err
@@ -96,7 +97,7 @@ func (sa *JWTTokens) RefreshJWTTokens(username string) (string, error) {
 	}
 
 	// Generate a new access token and refresh token
-	newJWTAccessToken, err := sa.GenerateJSONWebTokens(username)
+	newJWTAccessToken, _, err := sa.GenerateJSONWebTokens(username)
 
 	if err != nil {
 		return "", err
@@ -132,7 +133,7 @@ func (sa *JWTTokens) generateToken(username string, expirationTime time.Time) (s
 
 func (sa *JWTTokens) DestroyJWTRefreshToken(username string) error {
 	// Stored in file for now
-	if err := os.Remove(refreshTokenFile); err != nil {
+	if err := os.Remove(fmt.Sprintf("%s/%s_%s", refreshTokenPath, username, refreshTokenFile)); err != nil {
 		return err
 	}
 	return nil

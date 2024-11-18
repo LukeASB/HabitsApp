@@ -39,14 +39,14 @@ func AuthMiddleware(jwtTokens IJWTTokens, logger logger.ILogger) func(http.Handl
 				return
 			}
 
-			nwAccessToken, err := jwtTokens.RefreshJWTTokens(claims.Username)
+			newAccessToken, err := jwtTokens.RefreshJWTTokens(claims.Username)
 
 			if err != nil {
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
 
-			w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", nwAccessToken))
+			w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", newAccessToken))
 			ctx := context.WithValue(r.Context(), claimsKey, claims)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
