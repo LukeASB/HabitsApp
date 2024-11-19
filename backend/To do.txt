@@ -10,8 +10,10 @@ Note the JWT tokens currently work just for test-user, will extend these to mult
 Add a DEBUG Flag
 
 Session Management / Auth ✅
-- Register - Need test
+- Refresh ✅
+- Register ✅
 - Login ✅
 - Logout ✅ I think this wants a JWT Token and CSRF Token middleware check
-Cross-Site Request Forgery Token
+- Create unit tests
+Cross-Site Request Forgery Token ✅
 Database

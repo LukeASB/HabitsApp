@@ -120,27 +120,31 @@ func (ac *AuthController) LogoutHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write([]byte(response))
 }
 
+// Called by frontend when the Short-Lived JWT expires and receives a 401 from the protected habits endpoints. Refreshes the authToken, refreshToken
 func (ac *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request) {
-	// Called by frontend when the Short-Lived JWT expires and receives a 401 from the protected habits endpoints. Refreshes the authToken, refreshToken
-	newAccessToken, err := ac.jwtTokens.RefreshJWTTokens("username") // TO DO
+	userRefreshRequest := data.UserRefreshRequest{}
 
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&userRefreshRequest); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	// Move to view layer
-	response := map[string]interface{}{
-		"success": true,
-	}
-
-	jsonRes, err := json.Marshal(response)
+	newAccessToken, err := ac.authModel.RefreshHandler(&userRefreshRequest, ac.jwtTokens)
 
 	if err != nil {
+		ac.logger.DebugLog(fmt.Sprintf("authController.RefreshHandler - err: %s", err))
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	response, err := ac.authView.RefreshHandler(&userRefreshRequest, newAccessToken)
+
+	if err != nil {
+		ac.logger.DebugLog(fmt.Sprintf("authController.LogoutHandler - err: %s", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", newAccessToken))
-	w.Write(jsonRes)
+	w.Write(response)
 }

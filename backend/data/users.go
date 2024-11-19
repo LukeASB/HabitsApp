@@ -7,6 +7,15 @@ type UserAuth struct {
 	Password     string `json:"Password"`
 }
 
+type UserRefreshRequest struct {
+	EmailAddress string `json:"EmailAddress"`
+}
+
+type UserRefreshResponse struct {
+	Success      bool   `json:"Succcess"`
+	EmailAddress string `json:"EmailAddress"`
+	AccessToken  string `json:"AccessToken"`
+}
 type RegisterUserRequest struct {
 	EmailAddress string `json:"EmailAddress"`
 	Password     string `json:"Password"`

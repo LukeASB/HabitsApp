@@ -4,7 +4,6 @@ import (
 	"dohabits/data"
 	"dohabits/logger"
 	"encoding/json"
-	"net/http"
 	"time"
 )
 
@@ -16,7 +15,7 @@ type IAuthView interface {
 	RegisterUser(registeredUserData *data.RegisterUserResponse) ([]byte, error)
 	LoginHandler(loginData *data.UserLoggedIn) ([]byte, error)
 	LogoutHandler(logoutData *data.UserLoggedOutResponse) ([]byte, error)
-	RefreshHandler(w http.ResponseWriter, r *http.Request)
+	RefreshHandler(userRefreshRequest *data.UserRefreshRequest, accessToken string) ([]byte, error)
 }
 
 func NewAuthView(logger logger.ILogger) *AuthView {
@@ -113,6 +112,18 @@ func (ac *AuthView) LogoutHandler(logoutData *data.UserLoggedOutResponse) ([]byt
 	return jsonRes, err
 }
 
-func (ac *AuthView) RefreshHandler(w http.ResponseWriter, r *http.Request) {
+func (ac *AuthView) RefreshHandler(userRefreshRequest *data.UserRefreshRequest, accessToken string) ([]byte, error) {
 	ac.logger.InfoLog("authView.RefreshHandler")
+
+	jsonRes, err := json.Marshal(data.UserRefreshResponse{
+		Success:      true,
+		EmailAddress: userRefreshRequest.EmailAddress,
+		AccessToken:  accessToken,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonRes, err
 }

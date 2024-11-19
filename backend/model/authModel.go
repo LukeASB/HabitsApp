@@ -21,7 +21,7 @@ type IAuthModel interface {
 	RegisterUser(userRegisterRequest *data.RegisterUserRequest) (*data.RegisterUserResponse, error)
 	LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedIn, error)
 	LogoutHandler(w http.ResponseWriter, UserLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedOutResponse, error)
-	RefreshHandler(w http.ResponseWriter, r *http.Request)
+	RefreshHandler(userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens) (string, error)
 }
 
 func NewAuthModel(logger logger.ILogger, db db.IDB) *AuthModel {
@@ -177,7 +177,14 @@ func (am *AuthModel) LogoutHandler(w http.ResponseWriter, UserLoggedOutRequest *
 	}, nil
 }
 
-func (am *AuthModel) RefreshHandler(w http.ResponseWriter, r *http.Request) {
+func (am *AuthModel) RefreshHandler(userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens) (string, error) {
 	am.logger.InfoLog("authModel.RefreshHandler")
-	// if an API call fails returns forbidden/unauth, frontend calls this to re-issue a short-lived token. May not need as middleware should handle if subscribed.
+
+	newAccessToken, err := jwtTokens.RefreshJWTTokens(userRefreshRequest.EmailAddress)
+
+	if err != nil {
+		return "", err
+	}
+
+	return newAccessToken, nil
 }
