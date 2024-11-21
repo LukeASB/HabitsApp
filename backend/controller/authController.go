@@ -20,7 +20,7 @@ type AuthController struct {
 }
 
 type IAuthController interface {
-	RegisterUser(w http.ResponseWriter, r *http.Request)
+	RegisterUserHandler(w http.ResponseWriter, r *http.Request)
 	LoginHandler(w http.ResponseWriter, r *http.Request)
 	LogoutHandler(w http.ResponseWriter, r *http.Request)
 	RefreshHandler(w http.ResponseWriter, r *http.Request)
@@ -36,7 +36,7 @@ func NewAuthController(authModel model.IAuthModel, authView view.IAuthView, jwtT
 	}
 }
 
-func (ac *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
+func (ac *AuthController) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	userRegisterRequest := data.RegisterUserRequest{}
 
 	if err := json.NewDecoder(r.Body).Decode(&userRegisterRequest); err != nil {
@@ -44,18 +44,18 @@ func (ac *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	registeredUserData, err := ac.authModel.RegisterUser(&userRegisterRequest)
+	registeredUserData, err := ac.authModel.RegisterUserHandler(&userRegisterRequest)
 
 	if err != nil {
-		ac.logger.DebugLog(fmt.Sprintf("authController.RegisterUser - err: %s", err))
+		ac.logger.DebugLog(fmt.Sprintf("authController.RegisterUserHandler - err: %s", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	response, err := ac.authView.RegisterUser(registeredUserData)
+	response, err := ac.authView.RegisterUserHandler(registeredUserData)
 
 	if err != nil {
-		ac.logger.DebugLog(fmt.Sprintf("authController.RegisterUser - err: %s", err))
+		ac.logger.DebugLog(fmt.Sprintf("authController.RegisterUserHandler - err: %s", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}

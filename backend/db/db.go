@@ -3,7 +3,7 @@ package db
 type IDB interface {
 	Connect() error
 	Disconnect() error
-	RegisterUser(value interface{}) (interface{}, error)
+	RegisterUserHandler(value interface{}) (interface{}, error)
 	LoginUser(value interface{}) error
 	LogoutUser(value interface{}) error
 	GetUserDetails(value interface{}) (interface{}, error)

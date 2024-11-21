@@ -12,7 +12,7 @@ type AuthView struct {
 }
 
 type IAuthView interface {
-	RegisterUser(registeredUserData *data.RegisterUserResponse) ([]byte, error)
+	RegisterUserHandler(registeredUserData *data.RegisterUserResponse) ([]byte, error)
 	LoginHandler(loginData *data.UserLoggedIn) ([]byte, error)
 	LogoutHandler(logoutData *data.UserLoggedOutResponse) ([]byte, error)
 	RefreshHandler(userRefreshRequest *data.UserRefreshRequest, accessToken string) ([]byte, error)
@@ -24,8 +24,8 @@ func NewAuthView(logger logger.ILogger) *AuthView {
 	}
 }
 
-func (ac *AuthView) RegisterUser(registeredUserData *data.RegisterUserResponse) ([]byte, error) {
-	ac.logger.InfoLog("authView.RegisterUser")
+func (ac *AuthView) RegisterUserHandler(registeredUserData *data.RegisterUserResponse) ([]byte, error) {
+	ac.logger.InfoLog("authView.RegisterUserHandler")
 
 	jsonRes, err := json.Marshal(struct {
 		Success bool `json:"Succcess"`

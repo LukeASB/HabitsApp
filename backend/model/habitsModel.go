@@ -28,12 +28,6 @@ func NewHabitsModel(logger logger.ILogger, db db.IDB) *HabitsModel {
 	}
 }
 
-/*
- Need validate the habits in model layer before they hit the DB. Someone shouldn't be able to call the endpoint to:
- - Create Habits with random symbols/text
- - Enter negative days
-*/
-
 func (m *HabitsModel) CreateHabitsHandler(habit data.NewHabit) error {
 	m.logger.InfoLog("habitsModel.Create")
 

@@ -34,21 +34,21 @@ func (db *MyMockDB) Disconnect() error {
 	return nil
 }
 
-func (db *MyMockDB) RegisterUser(value interface{}) (interface{}, error) {
-	db.logger.InfoLog("mock_db.RegisterUser")
+func (db *MyMockDB) RegisterUserHandler(value interface{}) (interface{}, error) {
+	db.logger.InfoLog("mock_db.RegisterUserHandler")
 
 	newUser, ok := value.(*data.RegisterUserRequest)
 
 	if !ok {
-		db.logger.ErrorLog("mock_db.RegisterUser - value type is not data.UserData")
-		return nil, fmt.Errorf("mock_db.RegisterUser - value type is not data.UserData")
+		db.logger.ErrorLog("mock_db.RegisterUserHandler - value type is not data.UserData")
+		return nil, fmt.Errorf("mock_db.RegisterUserHandler - value type is not data.UserData")
 	}
 
 	latestUserID, err := strconv.Atoi(data.MockUsers[len(data.MockUsers)-1].UserID)
 
 	if err != nil {
-		db.logger.ErrorLog("mock_db.RegisterUser - get latestUserID and convert to int")
-		return nil, fmt.Errorf("mock_db.RegisterUser - couldn't get latestUserID and convert to int")
+		db.logger.ErrorLog("mock_db.RegisterUserHandler - get latestUserID and convert to int")
+		return nil, fmt.Errorf("mock_db.RegisterUserHandler - couldn't get latestUserID and convert to int")
 	}
 
 	registerUser := data.UserData{
