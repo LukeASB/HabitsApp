@@ -34,6 +34,16 @@ var MockUsers = []UserData{
 		LastLogin:    time.Date(2024, time.October, 10, 9, 0, 0, 0, time.UTC),
 		IsLoggedIn:   false,
 	},
+	{
+		UserID:       "4",
+		Password:     "$2a$10$jJ75MWcPyEOnwBUsg4g9I.wLdpPagwsNtb0i.mhwpNYqdt8mpmdI.", // secretPassword012!
+		FirstName:    "John",
+		LastName:     "LoggedIn",
+		EmailAddress: "john.loggedin@example.com",
+		CreatedAt:    time.Date(2024, time.October, 10, 9, 0, 0, 0, time.UTC),
+		LastLogin:    time.Date(2024, time.October, 10, 9, 0, 0, 0, time.UTC),
+		IsLoggedIn:   true,
+	},
 }
 
 var MockUserSession = []UserSession{}

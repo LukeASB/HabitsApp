@@ -52,6 +52,11 @@ func TestCreateHabitsHandler(t *testing.T) {
 
 			c.CreateHabitsHandler(w, req)
 
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				return
+			}
+
 			res := w.Result()
 
 			defer res.Body.Close()
@@ -104,6 +109,11 @@ func TestRetrieveHabitsHandler(t *testing.T) {
 
 			c.RetrieveHabitsHandler(w, req)
 
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				return
+			}
+
 			res := w.Result()
 
 			defer res.Body.Close()
@@ -152,6 +162,11 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			c.RetrieveAllHabitsHandler(w, req)
+
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				return
+			}
 
 			res := w.Result()
 
@@ -224,6 +239,11 @@ func TestUpdateHabitsHandler(t *testing.T) {
 
 			c.UpdateHabitsHandler(w, req)
 
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				return
+			}
+
 			res := w.Result()
 
 			defer res.Body.Close()
@@ -275,6 +295,11 @@ func TestDeleteHabitsHandler(t *testing.T) {
 			}
 
 			c.DeleteHabitsHandler(w, req)
+
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				return
+			}
 
 			res := w.Result()
 

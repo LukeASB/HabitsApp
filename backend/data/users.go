@@ -23,16 +23,36 @@ type RegisterUserRequest struct {
 	LastName     string `json:"LastName"`
 }
 
-type RegisterUserResponse struct {
+type RegisterUserData struct {
 	Success bool     `json:"Succcess"`
 	User    UserData `json:"User"`
 }
 
-type UserLoggedIn struct {
+type RegisterUserResponse struct {
+	Success bool             `json:"Succcess"`
+	User    UserDataResponse `json:"User"`
+}
+
+type UserDataResponse struct {
+	UserID       string    `json:"UserID"`
+	FirstName    string    `json:"FirstName"`
+	LastName     string    `json:"LastName"`
+	EmailAddress string    `json:"EmailAddress"`
+	CreatedAt    time.Time `json:"CreatedAt"`
+}
+
+type UserLoggedInData struct {
 	Success     bool      `json:"Succcess"`
 	User        UserData  `json:"User"`
 	AccessToken string    `json:"AccessToken"`
 	LoggedInAt  time.Time `json:"LoggedInAt"`
+}
+
+type UserLoggedInResponse struct {
+	Success     bool             `json:"Succcess"`
+	User        UserDataResponse `json:"User"`
+	AccessToken string           `json:"AccessToken"`
+	LoggedInAt  time.Time        `json:"LoggedInAt"`
 }
 
 type UserLoggedOutResponse struct {
