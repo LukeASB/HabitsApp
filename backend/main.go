@@ -5,6 +5,8 @@ import (
 	"dohabits/db"
 	"dohabits/internal"
 	"dohabits/logger"
+	"dohabits/middleware"
+	"dohabits/middleware/session"
 	"dohabits/model"
 	"dohabits/routes"
 	"dohabits/view"
@@ -19,27 +21,37 @@ var App *internal.App
 func init() {
 	if err := internal.LoadEnvVariables(); err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	logger := &logger.Logger{}
-	db := &db.MyMockDB{}
-	m := &model.HabitsModel{}
-	v := &view.HabitsView{}
-	c := controller.NewHabitsController(logger)
+
+	if err := logger.SetVerbosity(os.Getenv("LOG_VERBOSITY")); err != nil {
+		log.Fatal(err)
+	}
+
+	db := db.NewDB(logger)
+
+	if err := db.Connect(); err != nil {
+		log.Fatal(err)
+	}
+
+	jwtTokens := session.NewJWTTokens(os.Getenv("JWT_SECRET"))
+	csrfTokens := session.NewCSRFToken(logger)
+
+	authModel := model.NewAuthModel(logger, db)
+	habitsModel := model.NewHabitsModel(logger, db)
+	authView := view.NewAuthView(logger)
+	habitsView := view.NewHabitsView(logger)
+	authController := controller.NewAuthController(authModel, authView, jwtTokens, csrfTokens, logger)
+	habitsController := controller.NewHabitsController(habitsModel, habitsView, logger)
+
+	mw := middleware.NewMiddleware(jwtTokens, csrfTokens, logger)
 	apiName := os.Getenv("API_NAME")
 	apiVersion := os.Getenv("API_VERSION")
 	appVersion := os.Getenv("APP_VERSION")
 	port := os.Getenv("PORT")
 
-	if err := db.Connect(logger); err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	logger.SetVerbosity(2) // Will be set via env variable
-
-	App = internal.NewApp(m, v, c, db, logger, apiName, apiVersion, appVersion, port)
+	App = internal.NewApp(authController, habitsController, db, mw, logger, apiName, apiVersion, appVersion, port, jwtTokens)
 
 	App.GetLogger().DebugLog(fmt.Sprintf("main.init() - %s loaded successfully. App Version = %s, API Version = %s", App.GetAPIName(), App.GetAppVersion(), App.GetAPIVersion()))
 }
@@ -59,5 +71,5 @@ func main() {
 
 func cleanup() {
 	App.GetLogger().DebugLog("main.cleanup - Executed")
-	App.GetDB().Disconnect(App.GetLogger())
+	App.GetDB().Disconnect()
 }

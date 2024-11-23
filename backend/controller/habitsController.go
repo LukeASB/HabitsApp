@@ -2,7 +2,6 @@ package controller
 
 import (
 	"dohabits/data"
-	"dohabits/db"
 	"dohabits/logger"
 	"dohabits/model"
 	"dohabits/view"
@@ -12,23 +11,29 @@ import (
 )
 
 type HabitsController struct {
-	OpsChan chan func()
+	opsChan     chan func()
+	habitsModel model.IHabitsModel
+	habitsView  view.IHabitsView
+	logger      logger.ILogger
 }
 
 type IHabitsController interface {
-	Create(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger)
-	Retrieve(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger)
-	RetrieveAll(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger)
-	Update(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger)
-	Delete(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger)
+	CreateHabitsHandler(w http.ResponseWriter, r *http.Request)
+	RetrieveHabitsHandler(w http.ResponseWriter, r *http.Request)
+	RetrieveAllHabitsHandler(w http.ResponseWriter, r *http.Request)
+	UpdateHabitsHandler(w http.ResponseWriter, r *http.Request)
+	DeleteHabitsHandler(w http.ResponseWriter, r *http.Request)
 }
 
 // Initialise the processOperations Goroutine
-func NewHabitsController(logger logger.ILogger) *HabitsController {
+func NewHabitsController(habitsModel model.IHabitsModel, habitsView view.IHabitsView, logger logger.ILogger) *HabitsController {
 	logger.InfoLog("habitsController.NewHabitsController")
 
 	habitsController := &HabitsController{
-		OpsChan: make(chan func(), 1),
+		opsChan:     make(chan func(), 1),
+		habitsModel: habitsModel,
+		habitsView:  habitsView,
+		logger:      logger,
 	}
 
 	go habitsController.manageOps(logger) // Run the Goroutine to handle operations.
@@ -38,26 +43,21 @@ func NewHabitsController(logger logger.ILogger) *HabitsController {
 
 func (c *HabitsController) manageOps(logger logger.ILogger) {
 	logger.InfoLog("habitsController.manageOps")
-	// Wait and execute any function that get sent to OpsChan
-	for op := range c.OpsChan {
+	// Wait and execute any function that get sent to opsChan
+	for op := range c.opsChan {
 		logger.DebugLog("habitsController.manageOps - exec func passed to channel")
 		op() // Execute the function passed to the channel
 	}
 }
 
-func (c *HabitsController) Create(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger) {
-	if r.Method != http.MethodPost {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-
+func (c *HabitsController) CreateHabitsHandler(w http.ResponseWriter, r *http.Request) {
 	resultChan := make(chan struct {
 		data []byte
 		err  error
 	}, 1)
 
-	c.OpsChan <- func() {
-		logger.InfoLog("habitsController.Create")
+	c.opsChan <- func() {
+		c.logger.InfoLog("habitsController.Create")
 
 		if r.Body == nil {
 			resultChan <- struct {
@@ -72,9 +72,7 @@ func (c *HabitsController) Create(w http.ResponseWriter, r *http.Request, m mode
 
 		newHabit := data.NewHabit{}
 
-		err := json.NewDecoder(r.Body).Decode(&newHabit)
-
-		if err != nil {
+		if err := json.NewDecoder(r.Body).Decode(&newHabit); err != nil {
 			resultChan <- struct {
 				data []byte
 				err  error
@@ -85,7 +83,7 @@ func (c *HabitsController) Create(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		if err := m.Create(newHabit, db, logger); err != nil {
+		if err := c.habitsModel.CreateHabitsHandler(newHabit); err != nil {
 			resultChan <- struct {
 				data []byte
 				err  error
@@ -96,7 +94,7 @@ func (c *HabitsController) Create(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		result, err := v.Create(newHabit, logger)
+		result, err := c.habitsView.CreateHabitsHandler(newHabit)
 
 		if err != nil {
 			resultChan <- struct {
@@ -121,34 +119,29 @@ func (c *HabitsController) Create(w http.ResponseWriter, r *http.Request, m mode
 	res := <-resultChan
 
 	if res.err != nil {
-		logger.ErrorLog(fmt.Sprintf("%s", res.err))
+		c.logger.ErrorLog(fmt.Sprintf("%s", res.err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	logger.DebugLog(fmt.Sprintf("habitsController.Delete - Writing response: %s", res.data))
+	c.logger.DebugLog(fmt.Sprintf("habitsController.Delete - Writing response: %s", res.data))
 	numOfBytes, err := w.Write([]byte(res.data))
-	logger.DebugLog(fmt.Sprintf("habitsController.Delete - w.Write wrote %d bytes", numOfBytes))
+	c.logger.DebugLog(fmt.Sprintf("habitsController.Delete - w.Write wrote %d bytes", numOfBytes))
 	if err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsController.Delete - Error writing response: %s", err))
+		c.logger.ErrorLog(fmt.Sprintf("habitsController.Delete - Error writing response: %s", err))
 	}
 }
 
-func (c *HabitsController) Retrieve(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger) {
-	if r.Method != http.MethodGet {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-
+func (c *HabitsController) RetrieveHabitsHandler(w http.ResponseWriter, r *http.Request) {
 	resultChan := make(chan struct {
 		data []byte
 		err  error
 	}, 1)
 
-	c.OpsChan <- func() {
+	c.opsChan <- func() {
 		id := r.URL.Query().Get("id")
 
-		logger.InfoLog(fmt.Sprintf("habitsController.Retrieve - id=%s", id))
+		c.logger.InfoLog(fmt.Sprintf("habitsController.Retrieve - id=%s", id))
 
 		if len(id) == 0 {
 			resultChan <- struct {
@@ -161,7 +154,7 @@ func (c *HabitsController) Retrieve(w http.ResponseWriter, r *http.Request, m mo
 			return
 		}
 
-		habit, err := m.Retrieve(id, db, logger)
+		habit, err := c.habitsModel.RetrieveHabitsHandler(id)
 
 		if err != nil {
 			resultChan <- struct {
@@ -174,7 +167,7 @@ func (c *HabitsController) Retrieve(w http.ResponseWriter, r *http.Request, m mo
 			return
 		}
 
-		result, err := v.Retrieve(habit, logger)
+		result, err := c.habitsView.RetrieveHabitsHandler(habit)
 
 		if err != nil {
 			resultChan <- struct {
@@ -199,34 +192,29 @@ func (c *HabitsController) Retrieve(w http.ResponseWriter, r *http.Request, m mo
 	res := <-resultChan
 
 	if res.err != nil {
-		logger.ErrorLog(fmt.Sprintf("%s", res.err))
+		c.logger.ErrorLog(fmt.Sprintf("%s", res.err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	logger.DebugLog(fmt.Sprintf("habitsController.Retrieve - Writing response: %s", res.data))
+	c.logger.DebugLog(fmt.Sprintf("habitsController.Retrieve - Writing response: %s", res.data))
 	numOfBytes, err := w.Write([]byte(res.data))
-	logger.DebugLog(fmt.Sprintf("habitsController.Retrieve - w.Write wrote %d bytes", numOfBytes))
+	c.logger.DebugLog(fmt.Sprintf("habitsController.Retrieve - w.Write wrote %d bytes", numOfBytes))
 	if err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsController.Retrieve - Error writing response: %s", err))
+		c.logger.ErrorLog(fmt.Sprintf("habitsController.Retrieve - Error writing response: %s", err))
 	}
 }
 
-func (c *HabitsController) RetrieveAll(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger) {
-	if r.Method != http.MethodGet {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-
+func (c *HabitsController) RetrieveAllHabitsHandler(w http.ResponseWriter, r *http.Request) {
 	resultChan := make(chan struct {
 		data []byte
 		err  error
 	}, 1)
 
-	c.OpsChan <- func() {
-		logger.InfoLog("habitsController.RetrieveAll")
+	c.opsChan <- func() {
+		c.logger.InfoLog("habitsController.RetrieveAll")
 
-		habits, err := m.RetrieveAll(db, logger)
+		habits, err := c.habitsModel.RetrieveAllHabitsHandler()
 
 		if err != nil {
 			resultChan <- struct {
@@ -239,7 +227,7 @@ func (c *HabitsController) RetrieveAll(w http.ResponseWriter, r *http.Request, m
 			return
 		}
 
-		result, err := v.RetrieveAll(habits, logger)
+		result, err := c.habitsView.RetrieveAllHabitsHandler(habits)
 
 		if err != nil {
 			resultChan <- struct {
@@ -264,34 +252,29 @@ func (c *HabitsController) RetrieveAll(w http.ResponseWriter, r *http.Request, m
 	res := <-resultChan
 
 	if res.err != nil {
-		logger.ErrorLog(fmt.Sprintf("%s", res.err))
+		c.logger.ErrorLog(fmt.Sprintf("%s", res.err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	logger.DebugLog(fmt.Sprintf("habitsController.RetrieveAll - Writing response: %s", res.data))
+	c.logger.DebugLog(fmt.Sprintf("habitsController.RetrieveAll - Writing response: %s", res.data))
 	numOfBytes, err := w.Write([]byte(res.data))
-	logger.DebugLog(fmt.Sprintf("habitsController.RetrieveAll - w.Write wrote %d bytes", numOfBytes))
+	c.logger.DebugLog(fmt.Sprintf("habitsController.RetrieveAll - w.Write wrote %d bytes", numOfBytes))
 	if err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsController.RetrieveAll - Error writing response: %s", err))
+		c.logger.ErrorLog(fmt.Sprintf("habitsController.RetrieveAll - Error writing response: %s", err))
 	}
 }
 
-func (c *HabitsController) Update(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger) {
-	if r.Method != http.MethodPut {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-
+func (c *HabitsController) UpdateHabitsHandler(w http.ResponseWriter, r *http.Request) {
 	resultChan := make(chan struct {
 		data []byte
 		err  error
 	}, 1)
 
-	c.OpsChan <- func() {
+	c.opsChan <- func() {
 		id := r.URL.Query().Get("id")
 
-		logger.InfoLog(fmt.Sprintf("habitsController.Update - id=%s", id))
+		c.logger.InfoLog(fmt.Sprintf("habitsController.Update - id=%s", id))
 
 		if len(id) == 0 {
 			resultChan <- struct {
@@ -319,7 +302,7 @@ func (c *HabitsController) Update(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		habit, err := m.Retrieve(id, db, logger)
+		habit, err := c.habitsModel.RetrieveHabitsHandler(id)
 
 		if err != nil {
 			resultChan <- struct {
@@ -344,7 +327,7 @@ func (c *HabitsController) Update(w http.ResponseWriter, r *http.Request, m mode
 			habit.DaysTarget = *updatedHabit.DaysTarget
 		}
 
-		err = m.Update(habit, id, db, logger)
+		err = c.habitsModel.UpdateHabitsHandler(habit, id)
 
 		if err != nil {
 			resultChan <- struct {
@@ -357,7 +340,7 @@ func (c *HabitsController) Update(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		result, err := v.Update(habit, logger)
+		result, err := c.habitsView.UpdateHabitsHandler(habit)
 
 		if err != nil {
 			resultChan <- struct {
@@ -382,34 +365,29 @@ func (c *HabitsController) Update(w http.ResponseWriter, r *http.Request, m mode
 	res := <-resultChan
 
 	if res.err != nil {
-		logger.ErrorLog(fmt.Sprintf("%s", res.err))
+		c.logger.ErrorLog(fmt.Sprintf("%s", res.err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	logger.DebugLog(fmt.Sprintf("habitsController.Update - Writing response: %s", res.data))
+	c.logger.DebugLog(fmt.Sprintf("habitsController.Update - Writing response: %s", res.data))
 	numOfBytes, err := w.Write([]byte(res.data))
-	logger.DebugLog(fmt.Sprintf("habitsController.Update - w.Write wrote %d bytes", numOfBytes))
+	c.logger.DebugLog(fmt.Sprintf("habitsController.Update - w.Write wrote %d bytes", numOfBytes))
 	if err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsController.Update - Error writing response: %s", err))
+		c.logger.ErrorLog(fmt.Sprintf("habitsController.Update - Error writing response: %s", err))
 	}
 }
 
-func (c *HabitsController) Delete(w http.ResponseWriter, r *http.Request, m model.IHabitsModel, v view.IHabitsView, db db.IDB, logger logger.ILogger) {
-	if r.Method != http.MethodDelete {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-
+func (c *HabitsController) DeleteHabitsHandler(w http.ResponseWriter, r *http.Request) {
 	resultChan := make(chan struct {
 		data []byte
 		err  error
 	}, 1)
 
-	c.OpsChan <- func() {
+	c.opsChan <- func() {
 		id := r.URL.Query().Get("id")
 
-		logger.InfoLog(fmt.Sprintf("habitsController.Delete - id=%s", id))
+		c.logger.InfoLog(fmt.Sprintf("habitsController.Delete - id=%s", id))
 
 		if len(id) == 0 {
 			resultChan <- struct {
@@ -422,7 +400,7 @@ func (c *HabitsController) Delete(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		err := m.Delete(id, db, logger)
+		err := c.habitsModel.DeleteHabitsHandler(id)
 
 		if err != nil {
 			resultChan <- struct {
@@ -435,7 +413,7 @@ func (c *HabitsController) Delete(w http.ResponseWriter, r *http.Request, m mode
 			return
 		}
 
-		result, err := v.Delete(logger)
+		result, err := c.habitsView.DeleteHabitsHandler()
 
 		if err != nil {
 			resultChan <- struct {
@@ -460,15 +438,15 @@ func (c *HabitsController) Delete(w http.ResponseWriter, r *http.Request, m mode
 	res := <-resultChan
 
 	if res.err != nil {
-		logger.ErrorLog(fmt.Sprintf("%s", res.err))
+		c.logger.ErrorLog(fmt.Sprintf("%s", res.err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	logger.DebugLog(fmt.Sprintf("habitsController.Delete - Writing response: %s", res.data))
+	c.logger.DebugLog(fmt.Sprintf("habitsController.Delete - Writing response: %s", res.data))
 	numOfBytes, err := w.Write([]byte(res.data))
-	logger.DebugLog(fmt.Sprintf("habitsController.Delete - w.Write wrote %d bytes", numOfBytes))
+	c.logger.DebugLog(fmt.Sprintf("habitsController.Delete - w.Write wrote %d bytes", numOfBytes))
 	if err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsController.Delete - Error writing response: %s", err))
+		c.logger.ErrorLog(fmt.Sprintf("habitsController.Delete - Error writing response: %s", err))
 	}
 }

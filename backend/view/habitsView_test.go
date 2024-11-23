@@ -8,9 +8,9 @@ import (
 	"testing"
 )
 
-func Test_Create(t *testing.T) {
-	v := &HabitsView{}
+func Test_CreateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
+	v := NewHabitsView(logger)
 
 	newHabit := data.NewHabit{
 		Name:       "Test Create Habit",
@@ -36,7 +36,7 @@ func Test_Create(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.Create(newHabit, logger)
+			got, err := v.CreateHabitsHandler(newHabit)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -49,9 +49,9 @@ func Test_Create(t *testing.T) {
 	}
 }
 
-func Test_Retrieve(t *testing.T) {
-	v := &HabitsView{}
+func Test_RetrieveHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
+	v := NewHabitsView(logger)
 
 	habit := data.MockHabit[0]
 
@@ -73,7 +73,7 @@ func Test_Retrieve(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.Retrieve(habit, logger)
+			got, err := v.RetrieveHabitsHandler(habit)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -86,9 +86,9 @@ func Test_Retrieve(t *testing.T) {
 	}
 }
 
-func Test_RetrieveAll(t *testing.T) {
-	v := &HabitsView{}
+func Test_RetrieveAllHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
+	v := NewHabitsView(logger)
 
 	habits := data.MockHabit
 
@@ -110,7 +110,7 @@ func Test_RetrieveAll(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.RetrieveAll(habits, logger)
+			got, err := v.RetrieveAllHabitsHandler(habits)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -123,9 +123,9 @@ func Test_RetrieveAll(t *testing.T) {
 	}
 }
 
-func Test_Update(t *testing.T) {
-	v := &HabitsView{}
+func Test_UpdateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
+	v := NewHabitsView(logger)
 
 	habit := data.MockHabit[0]
 
@@ -147,7 +147,7 @@ func Test_Update(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.Update(habit, logger)
+			got, err := v.UpdateHabitsHandler(habit)
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
@@ -160,9 +160,9 @@ func Test_Update(t *testing.T) {
 	}
 }
 
-func Test_Delete(t *testing.T) {
-	v := &HabitsView{}
+func Test_DeleteHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
+	v := NewHabitsView(logger)
 
 	want, err := json.Marshal(map[string]bool{"success": true})
 
@@ -182,7 +182,7 @@ func Test_Delete(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			got, err := v.Delete(logger)
+			got, err := v.DeleteHabitsHandler()
 
 			if err != nil {
 				t.Errorf("Fail err: %s", err)
