@@ -34,6 +34,7 @@ env vars
 go run .
 
 Docker...
+https://github.com/LukeASB/HabitsApp/blob/main/Dockerfile
 
 ## Dependencies
 Required Go Modulesin `go.mod`
