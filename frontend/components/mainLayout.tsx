@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import Banner from "./banner";
-import Navbar from "./pages/navbar";
+import Navbar from "./navbar";
 import Link from "next/link";
 
 interface IMainLayout {

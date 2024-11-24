@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
 import Home from "./pages/home";
-import Login from "./login";
+import Login from "./pages/login";
 import Register from "./pages/register";
 import MainLayout from "./mainLayout";
 

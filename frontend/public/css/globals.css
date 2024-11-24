@@ -1,0 +1,29 @@
+/* styles/globals.css */
+html, body, #__next {
+  height: 100%;
+  margin: 0;
+}
+
+.mainLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background-color:white;
+}
+
+.content {
+  flex: 1;
+}
+
+.sectionBorder {
+  border-bottom:1px solid black;
+}
+
+.sectionMinHeight {
+  min-height: 100px;
+}
+
+.footer {
+  background-color: #f8f9fa;
+  padding: 10px 0;
+}
