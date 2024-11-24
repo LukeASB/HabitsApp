@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"dohabits/data"
 	"dohabits/internal"
 	"fmt"
 	"net/http"
@@ -11,23 +12,14 @@ func SetUpRoutes(app internal.IApp) {
 
 	app.GetLogger().InfoLog(fmt.Sprintf("routes.SetUpRoutes() - endpoint = %s", endpoint))
 
-	http.HandleFunc(fmt.Sprintf("/%s/CreateHabit", endpoint), func(w http.ResponseWriter, r *http.Request) {
-		app.GetController().Create(w, r, app.GetHabitsModel(), app.GetView(), app.GetDB(), app.GetLogger())
-	})
+	http.HandleFunc(fmt.Sprintf("/%s/register", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().RegisterUserHandler, data.Middleware{HTTPMethod: http.MethodPost}))
+	http.HandleFunc(fmt.Sprintf("/%s/login", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().LoginHandler, data.Middleware{HTTPMethod: http.MethodPost}))
+	http.HandleFunc(fmt.Sprintf("/%s/logout", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().LogoutHandler, data.Middleware{HTTPMethod: http.MethodPost}))
+	http.HandleFunc(fmt.Sprintf("/%s/refresh", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().RefreshHandler, data.Middleware{HTTPMethod: http.MethodPost}))
 
-	http.HandleFunc(fmt.Sprintf("/%s/RetrieveHabit", endpoint), func(w http.ResponseWriter, r *http.Request) {
-		app.GetController().Retrieve(w, r, app.GetHabitsModel(), app.GetView(), app.GetDB(), app.GetLogger())
-	})
-
-	http.HandleFunc(fmt.Sprintf("/%s/RetrieveAllHabits", endpoint), func(w http.ResponseWriter, r *http.Request) {
-		app.GetController().RetrieveAll(w, r, app.GetHabitsModel(), app.GetView(), app.GetDB(), app.GetLogger())
-	})
-
-	http.HandleFunc(fmt.Sprintf("/%s/UpdateHabit", endpoint), func(w http.ResponseWriter, r *http.Request) {
-		app.GetController().Update(w, r, app.GetHabitsModel(), app.GetView(), app.GetDB(), app.GetLogger())
-	})
-
-	http.HandleFunc(fmt.Sprintf("/%s/DeleteHabit", endpoint), func(w http.ResponseWriter, r *http.Request) {
-		app.GetController().Delete(w, r, app.GetHabitsModel(), app.GetView(), app.GetDB(), app.GetLogger())
-	})
+	http.HandleFunc(fmt.Sprintf("/%s/createhabit", endpoint), app.GetMiddleware().MiddlewareList(app.GetHabitsController().CreateHabitsHandler, data.Middleware{IsProtected: true, CSRFRequired: true, HTTPMethod: http.MethodPost}))
+	http.HandleFunc(fmt.Sprintf("/%s/retrievehabit", endpoint), app.GetMiddleware().MiddlewareList(app.GetHabitsController().RetrieveHabitsHandler, data.Middleware{IsProtected: true, HTTPMethod: http.MethodGet}))
+	http.HandleFunc(fmt.Sprintf("/%s/retrievehabits", endpoint), app.GetMiddleware().MiddlewareList(app.GetHabitsController().RetrieveAllHabitsHandler, data.Middleware{IsProtected: true, HTTPMethod: http.MethodGet}))
+	http.HandleFunc(fmt.Sprintf("/%s/updatehabit", endpoint), app.GetMiddleware().MiddlewareList(app.GetHabitsController().UpdateHabitsHandler, data.Middleware{IsProtected: true, HTTPMethod: http.MethodPut}))
+	http.HandleFunc(fmt.Sprintf("/%s/deletehabit", endpoint), app.GetMiddleware().MiddlewareList(app.GetHabitsController().DeleteHabitsHandler, data.Middleware{IsProtected: true, HTTPMethod: http.MethodDelete}))
 }

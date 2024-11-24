@@ -8,48 +8,52 @@ import (
 	"fmt"
 )
 
-type HabitsModel struct{}
-
-type IHabitsModel interface {
-	Create(habit data.NewHabit, db db.IDB, logger logger.ILogger) error
-	Retrieve(id string, db db.IDB, logger logger.ILogger) (data.Habit, error)
-	RetrieveAll(db db.IDB, logger logger.ILogger) ([]data.Habit, error)
-	Update(habit data.Habit, id string, db db.IDB, logger logger.ILogger) error
-	Delete(id string, db db.IDB, logger logger.ILogger) error
+type HabitsModel struct {
+	logger logger.ILogger
+	db     db.IDB
 }
 
-/*
- Need validate the habits in model layer before they hit the DB. Someone shouldn't be able to call the endpoint to:
- - Create Habits with random symbols/text
- - Enter negative days
-*/
+type IHabitsModel interface {
+	CreateHabitsHandler(habit data.NewHabit) error
+	RetrieveHabitsHandler(id string) (data.Habit, error)
+	RetrieveAllHabitsHandler() ([]data.Habit, error)
+	UpdateHabitsHandler(habit data.Habit, id string) error
+	DeleteHabitsHandler(id string) error
+}
 
-func (m *HabitsModel) Create(habit data.NewHabit, db db.IDB, logger logger.ILogger) error {
-	logger.InfoLog("habitsModel.Create")
+func NewHabitsModel(logger logger.ILogger, db db.IDB) *HabitsModel {
+	return &HabitsModel{
+		logger: logger,
+		db:     db,
+	}
+}
 
-	if err := validation.ValidateHabit(habit, logger); err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsModel.Create - err=%s", err))
+func (m *HabitsModel) CreateHabitsHandler(habit data.NewHabit) error {
+	m.logger.InfoLog("habitsModel.Create")
+
+	if err := validation.ValidateHabit(habit, m.logger); err != nil {
+		m.logger.ErrorLog(fmt.Sprintf("habitsModel.Create - err=%s", err))
 		return err
 	}
 
-	err := db.Create(logger, habit)
+	err := m.db.CreateHabitsHandler(habit)
 
 	if err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsModel.Create - db.Create - err=%s", err))
+		m.logger.ErrorLog(fmt.Sprintf("habitsModel.Create - db.Create - err=%s", err))
 		return err
 	}
 
 	return nil
 }
 
-func (m *HabitsModel) Retrieve(id string, db db.IDB, logger logger.ILogger) (data.Habit, error) {
-	logger.InfoLog(fmt.Sprintf("habitsModel.Retrieve - id=%s", id))
+func (m *HabitsModel) RetrieveHabitsHandler(id string) (data.Habit, error) {
+	m.logger.InfoLog(fmt.Sprintf("habitsModel.Retrieve - id=%s", id))
 	habit := data.Habit{}
 
-	result, err := db.Retrieve(logger, id)
+	result, err := m.db.RetrieveHabitsHandler(id)
 
 	if err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsModel.Retrieve - db.Retrieve - err=%s", err))
+		m.logger.ErrorLog(fmt.Sprintf("habitsModel.Retrieve - db.Retrieve - err=%s", err))
 		return habit, err
 	}
 
@@ -58,16 +62,16 @@ func (m *HabitsModel) Retrieve(id string, db db.IDB, logger logger.ILogger) (dat
 	if !ok {
 		return habit, fmt.Errorf("habitsModel.Retrieve - habits type is not data.Habit")
 	}
-	fmt.Printf("HabitsModel.Retrieve() returning habit id=%s\n", habit.ID)
+	fmt.Printf("HabitsModel.RetrieveHabitsHandler() returning habit id=%s\n", habit.ID)
 	return habit, nil
 }
 
-func (m *HabitsModel) RetrieveAll(db db.IDB, logger logger.ILogger) ([]data.Habit, error) {
-	logger.InfoLog("habitsModel.RetrieveAll")
-	result, err := db.RetrieveAll(logger)
+func (m *HabitsModel) RetrieveAllHabitsHandler() ([]data.Habit, error) {
+	m.logger.InfoLog("habitsModel.RetrieveAll")
+	result, err := m.db.RetrieveAllHabitsHandler()
 
 	if err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsModel.RetrieveAll - db.RetrieveAll - err=%s", err))
+		m.logger.ErrorLog(fmt.Sprintf("habitsModel.RetrieveAll - db.RetrieveAll - err=%s", err))
 		return nil, err
 	}
 
@@ -80,26 +84,26 @@ func (m *HabitsModel) RetrieveAll(db db.IDB, logger logger.ILogger) ([]data.Habi
 	return habits, nil
 }
 
-func (m *HabitsModel) Update(habit data.Habit, id string, db db.IDB, logger logger.ILogger) error {
-	logger.InfoLog(fmt.Sprintf("habitsModel.Update - id=%s", id))
+func (m *HabitsModel) UpdateHabitsHandler(habit data.Habit, id string) error {
+	m.logger.InfoLog(fmt.Sprintf("habitsModel.Update - id=%s", id))
 
-	if err := validation.ValidateHabit(habit, logger); err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsModel.Update - err=%s", err))
+	if err := validation.ValidateHabit(habit, m.logger); err != nil {
+		m.logger.ErrorLog(fmt.Sprintf("habitsModel.Update - err=%s", err))
 		return err
 	}
 
-	if err := db.Update(logger, id, habit); err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsModel.Update - db.Update - err=%s", err))
+	if err := m.db.UpdateHabitsHandler(id, habit); err != nil {
+		m.logger.ErrorLog(fmt.Sprintf("habitsModel.Update - db.Update - err=%s", err))
 		return err
 	}
 
 	return nil
 }
 
-func (m *HabitsModel) Delete(id string, db db.IDB, logger logger.ILogger) error {
-	logger.InfoLog(fmt.Sprintf("habitsModel.Delete - id=%s", id))
-	if err := db.Delete(logger, id); err != nil {
-		logger.ErrorLog(fmt.Sprintf("habitsModel.Delete - db.Delete - err=%s", err))
+func (m *HabitsModel) DeleteHabitsHandler(id string) error {
+	m.logger.InfoLog(fmt.Sprintf("habitsModel.Delete - id=%s", id))
+	if err := m.db.DeleteHabitsHandler(id); err != nil {
+		m.logger.ErrorLog(fmt.Sprintf("habitsModel.Delete - db.Delete - err=%s", err))
 		return err
 	}
 

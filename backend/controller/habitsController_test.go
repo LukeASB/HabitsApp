@@ -16,12 +16,12 @@ import (
 	"testing"
 )
 
-func TestCreate(t *testing.T) {
+func TestCreateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := &db.MyMockDB{}
-	m := &model.HabitsModel{}
-	v := &view.HabitsView{}
-	c := NewHabitsController(logger)
+	db := db.NewDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
@@ -40,7 +40,7 @@ func TestCreate(t *testing.T) {
 		want []byte
 	}{
 		{
-			name: "Test successful Insert",
+			name: "Test successful Create",
 			want: marshalledNewHabit,
 		},
 	}
@@ -50,7 +50,12 @@ func TestCreate(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/%s/CreateHabit", endpoint), io.NopCloser(bytes.NewBuffer(marshalledNewHabit)))
 			w := httptest.NewRecorder()
 
-			c.Create(w, req, m, v, db, logger)
+			c.CreateHabitsHandler(w, req)
+
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				return
+			}
 
 			res := w.Result()
 
@@ -69,12 +74,12 @@ func TestCreate(t *testing.T) {
 	}
 }
 
-func TestRetrieve(t *testing.T) {
+func TestRetrieveHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := &db.MyMockDB{}
-	m := &model.HabitsModel{}
-	v := &view.HabitsView{}
-	c := NewHabitsController(logger)
+	db := db.NewDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
@@ -102,7 +107,12 @@ func TestRetrieve(t *testing.T) {
 			q.Add("id", "1")
 			req.URL.RawQuery = q.Encode()
 
-			c.Retrieve(w, req, m, v, db, logger)
+			c.RetrieveHabitsHandler(w, req)
+
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				return
+			}
 
 			res := w.Result()
 
@@ -121,12 +131,12 @@ func TestRetrieve(t *testing.T) {
 	}
 }
 
-func TestRetrieveAll(t *testing.T) {
+func TestRetrieveAllHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := &db.MyMockDB{}
-	m := &model.HabitsModel{}
-	v := &view.HabitsView{}
-	c := NewHabitsController(logger)
+	db := db.NewDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
@@ -151,7 +161,12 @@ func TestRetrieveAll(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s/RetrieveAllHabits", endpoint), nil)
 			w := httptest.NewRecorder()
 
-			c.RetrieveAll(w, req, m, v, db, logger)
+			c.RetrieveAllHabitsHandler(w, req)
+
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				return
+			}
 
 			res := w.Result()
 
@@ -170,12 +185,12 @@ func TestRetrieveAll(t *testing.T) {
 	}
 }
 
-func TestUpdate(t *testing.T) {
+func TestUpdateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := &db.MyMockDB{}
-	m := &model.HabitsModel{}
-	v := &view.HabitsView{}
-	c := NewHabitsController(logger)
+	db := db.NewDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
@@ -222,7 +237,12 @@ func TestUpdate(t *testing.T) {
 			q.Add("id", "1")
 			req.URL.RawQuery = q.Encode()
 
-			c.Update(w, req, m, v, db, logger)
+			c.UpdateHabitsHandler(w, req)
+
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				return
+			}
 
 			res := w.Result()
 
@@ -241,12 +261,12 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestDeleteHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := &db.MyMockDB{}
-	m := &model.HabitsModel{}
-	v := &view.HabitsView{}
-	c := NewHabitsController(logger)
+	db := db.NewDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
@@ -274,7 +294,12 @@ func TestDelete(t *testing.T) {
 				t.Errorf("Fail err: %s", err)
 			}
 
-			c.Delete(w, req, m, v, db, logger)
+			c.DeleteHabitsHandler(w, req)
+
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				return
+			}
 
 			res := w.Result()
 

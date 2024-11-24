@@ -8,10 +8,10 @@ import (
 	"testing"
 )
 
-func TestCreate(t *testing.T) {
-	db := &db.MyMockDB{}
-	model := &HabitsModel{}
+func TestCreateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
+	db := db.NewDB(logger)
+	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
 		name     string
@@ -27,17 +27,17 @@ func TestCreate(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			if err := model.Create(val.newHabit, db, logger); err != nil {
+			if err := model.CreateHabitsHandler(val.newHabit); err != nil {
 				t.Errorf("TestCreate Failed - err=%s", err)
 			}
 		})
 	}
 }
 
-func TestRetrieve(t *testing.T) {
-	db := &db.MyMockDB{}
-	model := &HabitsModel{}
+func TestRetrieveHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
+	db := db.NewDB(logger)
+	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
 		name string
@@ -53,7 +53,7 @@ func TestRetrieve(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			habit, err := model.Retrieve(val.id, db, logger)
+			habit, err := model.RetrieveHabitsHandler(val.id)
 
 			if err != nil {
 				t.Errorf("TestRetrieve Failed - err=%s", err)
@@ -68,10 +68,10 @@ func TestRetrieve(t *testing.T) {
 	}
 }
 
-func TestRetrieveAll(t *testing.T) {
-	db := &db.MyMockDB{}
-	model := &HabitsModel{}
+func TestRetrieveAllHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
+	db := db.NewDB(logger)
+	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
 		name string
@@ -85,7 +85,7 @@ func TestRetrieveAll(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			habits, err := model.RetrieveAll(db, logger)
+			habits, err := model.RetrieveAllHabitsHandler()
 
 			if err != nil {
 				t.Errorf("TestRetrieve Failed - err=%s", err)
@@ -102,10 +102,10 @@ func TestRetrieveAll(t *testing.T) {
 	}
 }
 
-func TestUpdate(t *testing.T) {
-	db := &db.MyMockDB{}
-	model := &HabitsModel{}
+func TestUpdateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
+	db := db.NewDB(logger)
+	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
 		name        string
@@ -121,17 +121,17 @@ func TestUpdate(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			if err := model.Update(val.updateHabit, val.id, db, logger); err != nil {
+			if err := model.UpdateHabitsHandler(val.updateHabit, val.id); err != nil {
 				t.Errorf("TestUpdate Failed - err=%s", err)
 			}
 		})
 	}
 }
 
-func TestDelete(t *testing.T) {
-	db := &db.MyMockDB{}
-	model := &HabitsModel{}
+func TestDeleteHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
+	db := db.NewDB(logger)
+	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
 		name    string
@@ -153,7 +153,7 @@ func TestDelete(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			err := model.Delete(val.id, db, logger)
+			err := model.DeleteHabitsHandler(val.id)
 
 			if err != nil {
 				val.got = true
