@@ -27,6 +27,13 @@ Golang
 MongoDB
 
 ## Installation
+MongoDB...
+
+Locally...
+env vars
+go run .
+
+Docker...
 
 ## Dependencies
 Required Go Modulesin `go.mod`
