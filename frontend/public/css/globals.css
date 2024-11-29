@@ -42,3 +42,27 @@ button[aria-label="Toggle Sidebar"] {
   color: #fff;
   cursor: pointer;
 }
+
+.calendar {
+  padding: 10px;
+  margin: 0 auto;
+}
+
+.day-header {
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.day-cell {
+  border: 1px solid #ddd;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty {
+  background-color: #f8f9fa;
+}
