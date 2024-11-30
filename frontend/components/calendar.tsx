@@ -86,8 +86,9 @@ const Calendar: React.FC = () => {
         {weeks.map((week, rowIndex) => (
           <div key={rowIndex} className="d-flex">
             {week.map((day, colIndex) => {
-              if (!day) return;
-              return(
+              if (!day) return <div key={colIndex} className="day-cell flex-fill text-center p-2 empty" style={{ width: "calc(100% / 7)" }}></div>;
+
+              return (
                 <div
                   key={colIndex}
                   className={`day-cell flex-fill text-center p-2 ${day ? "day" : "empty"}`}

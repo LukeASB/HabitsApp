@@ -22,7 +22,7 @@ const Home: React.FC = () => {
             <div className="flex-grow-1 p-3">
                 <h1>{mainHeader}</h1>
                 <p>{mainContent}</p>
-                <Calendar />
+                <Calendar /> {/* Calendar needs to be controlled by state */}
             </div>
         </div>
     </div>);
