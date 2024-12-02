@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -10,12 +10,17 @@ interface CalendarProps {
 }
 
 const Calendar: React.FC<CalendarProps> = ({ selectedDays, counter, handleDaySelection, completionDates }) => {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+    const [currentDate, setCurrentDate] = useState(new Date()); // State to track the displayed month/year
 
     const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
     const getFirstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
+
+    // Handlers for navigating months
+    const prevMonth = () => setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    const nextMonth = () => setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
 
     const daysInMonth = getDaysInMonth(year, month);
     const firstDay = getFirstDayOfMonth(year, month);
@@ -40,11 +45,11 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDays, counter, handleDaySel
     return (
         <div className="calendar">
             <div className="calendar-header d-flex justify-content-between align-items-center mb-3">
-                <button className="btn btn-secondary">&larr;</button>
+                <button onClick={prevMonth} className="btn btn-secondary">&larr;</button>
                 <h4>
                     {currentDate.toLocaleString("default", { month: "long" })} {year}
                 </h4>
-                <button className="btn btn-secondary">&rarr;</button>
+                <button onClick={nextMonth} className="btn btn-secondary">&rarr;</button>
             </div>
 
             <div className="calendar-grid">
@@ -82,7 +87,7 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDays, counter, handleDaySel
                                     style={{
                                         width: "calc(100% / 7)",
                                         backgroundColor: isCompletedDay(day) || selectedDays[`${year}-${month}`]?.includes(day) ? "green" : "",
-                                        color: isCompletedDay(day) || selectedDays[`${year}-${month}`]?.includes(day)? "white" : "",
+                                        color: isCompletedDay(day) || selectedDays[`${year}-${month}`]?.includes(day) ? "white" : "",
                                         cursor: "pointer",
                                     }}
                                     onClick={() => day && handleDaySelection(year, month, day)}

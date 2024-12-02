@@ -16,6 +16,8 @@ const Home: React.FC = () => {
         setMainHeader(habit.name);
         setMainContent(habit.name);
         setCompletionDates(habit.completionDates);
+        debugger;
+        console.log(selectedDays);
         
         // Reset the selected Calendar Dates
         setSelectedDays({});
@@ -53,7 +55,7 @@ const Home: React.FC = () => {
                     <p>{mainContent}</p>
                     <Calendar
                 selectedDays={selectedDays}
-                counter={0}
+                counter={counter}
                 handleDaySelection={handleDaySelection}
                 completionDates={completionDates}
             />
