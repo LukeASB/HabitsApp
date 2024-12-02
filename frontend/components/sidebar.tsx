@@ -1,24 +1,14 @@
 import { useState, useEffect } from 'react';
+import IHabit from '../shared/interfaces/IHabit';
+import { mockhabits } from '../data/mock_habits';
 
 interface ISideBar {
   toggleSidebar: () => void;
   isCollapsed: boolean;
-  updateMain: (header: string, content: string) => void;
-}
-
-// Move to data layer
-interface IHabit {
-  id: string;
-  createdAt: number;
-  name: string;
-  days: number;
-  daysTarget: number;
-  numberOfDays: number;
+  updateMain: (habit: IHabit) => void;
 }
 
 // Move to mock_data
-const habits: IHabit[] = [{ id: "1", createdAt: Date.now(), name: "habit 1", days: 0, daysTarget: 30, numberOfDays: 1 }, { id: "1", createdAt: Date.now(), name: "habit 2", days: 0, daysTarget: 30, numberOfDays: 1 }]
-
 const Sidebar: React.FC<ISideBar> = ({ toggleSidebar, isCollapsed, updateMain }) => {
   const [habitsMenu, setHabitsMenu] = useState<IHabit[]>([]);
   const [renderHabitsMenu, setRenderHabitsMenu] = useState(!isCollapsed);
@@ -48,7 +38,7 @@ const Sidebar: React.FC<ISideBar> = ({ toggleSidebar, isCollapsed, updateMain })
         // if (!res.ok) throw new Error("Network response error");
         // const data = await res.json();
         // console.log(data);
-        setHabitsMenu(habits);
+        setHabitsMenu(mockhabits);
       } catch (err) {
         console.log("Sidebar - Error occured:", err);
 
@@ -105,7 +95,7 @@ const Sidebar: React.FC<ISideBar> = ({ toggleSidebar, isCollapsed, updateMain })
         {renderHabitsMenu && habitsMenu.map((habit: IHabit, i) => {
           return (
             <li key={`${habit.name}_${i}`} className={`${isCollapsed ? 'd-none' : 'nav-item '}`}>
-              <button className="btn btn-link nav-link text-white" onClick={() => updateMain(habit.name, habit.name)}><i className="bi bi-info-circle" /> {habit.name}</button>
+              <button className="btn btn-link nav-link text-white" onClick={() => updateMain(habit)}><i className="bi bi-info-circle" /> {habit.name}</button>
             </li>
             );
           })
