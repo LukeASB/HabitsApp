@@ -27,12 +27,12 @@ const Sidebar: React.FC<ISideBar> = ({ habitsMenu, toggleSidebar, isCollapsed, u
             </div>
             <ul className="nav flex-column mt-3">
                 <li key={`all_habits`} className={`${isCollapsed ? 'd-none' : 'nav-item '}`}>
-                    <button className="btn btn-link nav-link text-white" onClick={() => updateMain(null)}><i className="bi bi-info-circle" />All Habits</button>
+                    <button className="btn btn-link nav-link text-white" onClick={() => updateMain(null)}><i className="habit" />All Habits</button>
                 </li>
                 {renderHabitsMenu && habitsMenu.map((habit: IHabit, i) => {
                     return (
                         <li key={`${habit.name}_${i}`} className={`${isCollapsed ? 'd-none' : 'nav-item '}`}>
-                            <button className="btn btn-link nav-link text-white" onClick={() => updateMain(habit)}><i className="bi bi-info-circle" /> {habit.name}</button>
+                            <button className="btn btn-link nav-link text-white" onClick={() => updateMain(habit)}><i className={`${habit.name}_${i}`} /> {habit.name}</button>
                         </li>
                     );
                 })}

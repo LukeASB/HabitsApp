@@ -8,7 +8,7 @@ interface CalendarProps {
     completionDatesCounter: number;
     setCompletionDatesCompletionDatesCounter: Dispatch<SetStateAction<number>>;
     setCompletionDates: Dispatch<SetStateAction<string[]>>
-    completionDates: string[]; // New property
+    completionDates: string[];
 }
 
 const Calendar: React.FC<CalendarProps> = ({ currentSelectedHabit, completionDatesCounter, setCompletionDatesCompletionDatesCounter, setCompletionDates, completionDates }) => {
@@ -46,13 +46,13 @@ const Calendar: React.FC<CalendarProps> = ({ currentSelectedHabit, completionDat
             setCompletionDatesCompletionDatesCounter(completionDatesCounter - 1);
             habit.completionDates = habit.completionDates.filter(date => date !== completedDate);
             setCompletionDates(habit.completionDates);
-        }
+        };
 
         const addCompletedDay = () => {
             setCompletionDatesCompletionDatesCounter(completionDatesCounter + 1);
             habit.completionDates.push(completedDate);
             setCompletionDates(habit.completionDates);
-        }
+        };
 
         if (habit.completionDates.includes(completedDate)) {
             removeCompletedDay();
@@ -72,6 +72,7 @@ const Calendar: React.FC<CalendarProps> = ({ currentSelectedHabit, completionDat
 
     return (
         <div className="calendar">
+            {currentSelectedHabit && <h1>{currentSelectedHabit?.name}</h1>}
             <div className="calendar-header d-flex justify-content-between align-items-center mb-3">
                 <button onClick={prevMonth} className="btn btn-secondary">&larr;</button>
                 <h4>{currentDate.toLocaleString("default", { month: "long" })} {year}</h4>
