@@ -6,6 +6,8 @@ import { mockhabits } from '../../data/mock_habits';
 import HabitsNavbar from '../habitsNavbar';
 
 const Home: React.FC = () => {
+    const allHabits = "All Habits";
+
     const [habitNavbar, setHabitNavbar] = useState<IHabit | null>(null);
     const [habitsMenu, setHabitsMenu] = useState<IHabit[]>([]);
     const [currentSelectedHabit, setCurrentSelectedHabit] = useState<IHabit | null>(null);
@@ -76,7 +78,7 @@ const Home: React.FC = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-    const [mainHeader, setMainHeader] = useState<string>("Main Content");
+    const [mainHeader, setMainHeader] = useState<string>(allHabits);
     const [mainContent, setMainContent] = useState<string>("This is main content area...");
     const [completionDates, setCompletionDates] = useState<string[]>([]);
     const [completionDatesCounter, setCompletionDatesCompletionDatesCounter] = useState(0);
@@ -85,7 +87,7 @@ const Home: React.FC = () => {
         if (!habit) {
             setHabitNavbar(null);
             setCurrentSelectedHabit(null);
-            setMainHeader("Main Content");
+            setMainHeader(allHabits);
             setMainContent("This is main content area...");
             setCompletionDates([]);
             setCompletionDatesCompletionDatesCounter(0);
@@ -100,40 +102,16 @@ const Home: React.FC = () => {
         setCompletionDatesCompletionDatesCounter(habit.completionDates.length);
     };
 
-    const handleDaySelection = (habit: IHabit | null, year: number, month: number, day: number) => {
-        if (!habit) return;
-
-        const completedDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-
-        const removeCompletedDay = () => {
-            setCompletionDatesCompletionDatesCounter(completionDatesCounter - 1);
-            habit.completionDates = habit.completionDates.filter(date => date !== completedDate);
-            setCompletionDates(habit.completionDates);
-        }
-
-        const addCompletedDay = () => {
-            setCompletionDatesCompletionDatesCounter(completionDatesCounter + 1);
-            habit.completionDates.push(completedDate);
-            setCompletionDates(habit.completionDates);
-        }
-
-        if (habit.completionDates.includes(completedDate)) {
-            removeCompletedDay();
-            return;
-        }
-
-        addCompletedDay();
-    };
-
     return (
         <div className="home">
-            <div className={`d-flex ${isCollapsed ? 'sidebar-collapsed' : ''}`} style={{ height: '100vh' }}>
+            <div className={`d-flex ${isCollapsed ? 'sidebar-collapsed' : ''}`} style={ currentSelectedHabit ? { height: '100vh' } : {}}>
                 <Sidebar habitsMenu={habitsMenu} toggleSidebar={toggleSidebar} isCollapsed={isCollapsed} updateMain={updateMain} />
                 <div className="flex-grow-1">
                     <HabitsNavbar habit={habitNavbar}/>
                     <h1>{mainHeader}</h1>
                     <p>{mainContent}</p>
-                    <Calendar currentSelectedHabit={currentSelectedHabit} completionDatesCounter={completionDatesCounter} handleDaySelection={handleDaySelection} completionDates={completionDates}/>
+                    {currentSelectedHabit && <Calendar currentSelectedHabit={currentSelectedHabit} completionDatesCounter={completionDatesCounter} setCompletionDatesCompletionDatesCounter={setCompletionDatesCompletionDatesCounter} setCompletionDates={setCompletionDates} completionDates={completionDates}/>}
+                    {!currentSelectedHabit && habitsMenu.map((habit, i) => (<div key={`calendar_${i}`}><Calendar currentSelectedHabit={habit} completionDatesCounter={habit.completionDates.length} setCompletionDatesCompletionDatesCounter={setCompletionDatesCompletionDatesCounter} setCompletionDates={setCompletionDates} completionDates={habit.completionDates}/></div>))}
                 </div>
             </div>
         </div>

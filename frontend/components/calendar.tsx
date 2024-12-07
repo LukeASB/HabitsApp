@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import IHabit from "../shared/interfaces/IHabit";
 
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -6,11 +6,12 @@ const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Fri
 interface CalendarProps {
     currentSelectedHabit: IHabit | null;
     completionDatesCounter: number;
-    handleDaySelection: (habit: IHabit | null, year: number, month: number, day: number) => void;
+    setCompletionDatesCompletionDatesCounter: Dispatch<SetStateAction<number>>;
+    setCompletionDates: Dispatch<SetStateAction<string[]>>
     completionDates: string[]; // New property
 }
 
-const Calendar: React.FC<CalendarProps> = ({ currentSelectedHabit, completionDatesCounter, handleDaySelection, completionDates }) => {
+const Calendar: React.FC<CalendarProps> = ({ currentSelectedHabit, completionDatesCounter, setCompletionDatesCompletionDatesCounter, setCompletionDates, completionDates }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const GenerateCalendarGrid = (currentDate: Date) => {
@@ -34,6 +35,31 @@ const Calendar: React.FC<CalendarProps> = ({ currentSelectedHabit, completionDat
         }
     
         return { weeks, month, year };
+    };
+
+    const handleDaySelection = (habit: IHabit | null, year: number, month: number, day: number) => {
+        if (!habit) return;
+
+        const completedDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+        const removeCompletedDay = () => {
+            setCompletionDatesCompletionDatesCounter(completionDatesCounter - 1);
+            habit.completionDates = habit.completionDates.filter(date => date !== completedDate);
+            setCompletionDates(habit.completionDates);
+        }
+
+        const addCompletedDay = () => {
+            setCompletionDatesCompletionDatesCounter(completionDatesCounter + 1);
+            habit.completionDates.push(completedDate);
+            setCompletionDates(habit.completionDates);
+        }
+
+        if (habit.completionDates.includes(completedDate)) {
+            removeCompletedDay();
+            return;
+        }
+
+        addCompletedDay();
     };
 
     const isCompletedDay = (day: number) => completionDates.includes(`${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`);

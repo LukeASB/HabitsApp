@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
             <div className="container content">
             <strong>
                 <span className="navbar-brand text-light">
-                    Habits Apps
+                  <Link className="navbar-brand text-light" href="/">Habits Apps</Link>
                 </span>
             </strong>
             </div>
