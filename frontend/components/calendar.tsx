@@ -4,9 +4,9 @@ import IHabit from "../shared/interfaces/IHabit";
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 interface CalendarProps {
-    currentSelectedHabit: IHabit;
+    currentSelectedHabit: IHabit | null;
     completionDatesCounter: number;
-    handleDaySelection: (habit: IHabit, year: number, month: number, day: number) => void;
+    handleDaySelection: (habit: IHabit | null, year: number, month: number, day: number) => void;
     completionDates: string[]; // New property
 }
 

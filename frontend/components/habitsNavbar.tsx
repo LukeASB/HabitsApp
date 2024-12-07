@@ -2,27 +2,36 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import IHabit from '../shared/interfaces/IHabit';
 
+interface IHabitsNavbar {
+  habit: IHabit | null;
+}
+
 /**
+ * To Do:
+ * - Tidy
+ * - Hide Register/Login if user has session.
  * @returns
  */
-const Navbar: React.FC = () => {
+const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit }) => {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
     useEffect(() => sessionStorage.getItem("access-token") ? setIsLoggedIn(true) : setIsLoggedIn(false), [])
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-light bg-dark">
+        <nav className="navbar navbar-expand-lg navbar-light bg-primary">
             <div className="container content">
             <strong>
-                <span className="navbar-brand text-light">
-                    Habits Apps
-                </span>
+                <Link className="navbar-brand text-light" href="/">
+                    {habit ? habit.name : "All Habits"}
+                </Link>
             </strong>
             </div>
-        <div className="navbar" id="navbarNav">
+        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+        <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav">
-              <li className="nav-item">
-
+              <li className="nav-item active">
                 {!isLoggedIn && (
                   <>
                     <Link className="navbar-brand text-light" href="/register">Register</Link>
@@ -36,4 +45,4 @@ const Navbar: React.FC = () => {
     );
 };
 
-export default Navbar;
+export default HabitsNavbar;

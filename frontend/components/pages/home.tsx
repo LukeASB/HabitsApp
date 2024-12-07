@@ -3,10 +3,12 @@ import Calendar from "../calendar";
 import Sidebar from "../sidebar";
 import IHabit from '../../shared/interfaces/IHabit';
 import { mockhabits } from '../../data/mock_habits';
+import HabitsNavbar from '../habitsNavbar';
 
 const Home: React.FC = () => {
+    const [habitNavbar, setHabitNavbar] = useState<IHabit | null>(null);
     const [habitsMenu, setHabitsMenu] = useState<IHabit[]>([]);
-    const [currentSelectedHabit, setCurrentSelectedHabit] = useState<IHabit>(mockhabits[0]);
+    const [currentSelectedHabit, setCurrentSelectedHabit] = useState<IHabit | null>(null);
 
     useEffect(() => {
         console.log(`"http://localhost:8080/dohabitsapp/v1/retrievehabits`)
@@ -74,31 +76,43 @@ const Home: React.FC = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-    const [mainHeader, setMainHeader] = useState("Main Content");
-    const [mainContent, setMainContent] = useState("This is main content area...");
+    const [mainHeader, setMainHeader] = useState<string>("Main Content");
+    const [mainContent, setMainContent] = useState<string>("This is main content area...");
     const [completionDates, setCompletionDates] = useState<string[]>([]);
+    const [completionDatesCounter, setCompletionDatesCompletionDatesCounter] = useState(0);
 
-    const updateMain = (habit: IHabit) => {
+    const updateMain = (habit: IHabit | null) => {
+        if (!habit) {
+            setHabitNavbar(null);
+            setCurrentSelectedHabit(null);
+            setMainHeader("Main Content");
+            setMainContent("This is main content area...");
+            setCompletionDates([]);
+            setCompletionDatesCompletionDatesCounter(0);
+            return;
+        }
+
+        setHabitNavbar(habit);
         setCurrentSelectedHabit(habit);
         setMainHeader(habit.name);
         setMainContent(habit.name);
         setCompletionDates(habit.completionDates);
-        setCompletionDatescompletionDatesCounter(habit.completionDates.length);
+        setCompletionDatesCompletionDatesCounter(habit.completionDates.length);
     };
 
-    const [completionDatesCounter, setCompletionDatescompletionDatesCounter] = useState(0);
+    const handleDaySelection = (habit: IHabit | null, year: number, month: number, day: number) => {
+        if (!habit) return;
 
-    const handleDaySelection = (habit: IHabit, year: number, month: number, day: number) => {
         const completedDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
         const removeCompletedDay = () => {
-            setCompletionDatescompletionDatesCounter(completionDatesCounter - 1);
+            setCompletionDatesCompletionDatesCounter(completionDatesCounter - 1);
             habit.completionDates = habit.completionDates.filter(date => date !== completedDate);
             setCompletionDates(habit.completionDates);
         }
 
         const addCompletedDay = () => {
-            setCompletionDatescompletionDatesCounter(completionDatesCounter + 1);
+            setCompletionDatesCompletionDatesCounter(completionDatesCounter + 1);
             habit.completionDates.push(completedDate);
             setCompletionDates(habit.completionDates);
         }
@@ -115,7 +129,8 @@ const Home: React.FC = () => {
         <div className="home">
             <div className={`d-flex ${isCollapsed ? 'sidebar-collapsed' : ''}`} style={{ height: '100vh' }}>
                 <Sidebar habitsMenu={habitsMenu} toggleSidebar={toggleSidebar} isCollapsed={isCollapsed} updateMain={updateMain} />
-                <div className="flex-grow-1 p-3">
+                <div className="flex-grow-1">
+                    <HabitsNavbar habit={habitNavbar}/>
                     <h1>{mainHeader}</h1>
                     <p>{mainContent}</p>
                     <Calendar currentSelectedHabit={currentSelectedHabit} completionDatesCounter={completionDatesCounter} handleDaySelection={handleDaySelection} completionDates={completionDates}/>
