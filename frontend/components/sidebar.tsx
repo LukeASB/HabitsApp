@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react';
 import IHabit from '../shared/interfaces/IHabit';
+import ISideBar from '../shared/interfaces/ISideBar';
 
-interface ISideBar {
-    habitsMenu: IHabit[];
-    toggleSidebar: () => void;
-    isCollapsed: boolean;
-    updateMain: (habit: IHabit | null) => void;
-}
-
-// Move to mock_data
 const Sidebar: React.FC<ISideBar> = ({ habitsMenu, toggleSidebar, isCollapsed, updateMain }) => {
     const [renderHabitsMenu, setRenderHabitsMenu] = useState(!isCollapsed);
 

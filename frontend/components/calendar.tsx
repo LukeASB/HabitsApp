@@ -1,17 +1,10 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import IHabit from "../shared/interfaces/IHabit";
+import ICalendar from "../shared/interfaces/ICalendar";
 
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-interface CalendarProps {
-    currentSelectedHabit: IHabit | null;
-    completionDatesCounter: number;
-    setCompletionDatesCompletionDatesCounter: Dispatch<SetStateAction<number>>;
-    setCompletionDates: Dispatch<SetStateAction<string[]>>
-    completionDates: string[];
-}
-
-const Calendar: React.FC<CalendarProps> = ({ currentSelectedHabit, completionDatesCounter, setCompletionDatesCompletionDatesCounter, setCompletionDates, completionDates }) => {
+const Calendar: React.FC<ICalendar> = ({ currentSelectedHabit, completionDatesCounter, setCompletionDatesCompletionDatesCounter, setCompletionDates, completionDates }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const GenerateCalendarGrid = (currentDate: Date) => {

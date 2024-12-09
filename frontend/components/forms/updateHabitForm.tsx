@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import IHabit from "../../shared/interfaces/IHabit";
-
-interface IUpdateHabitForm {
-  habit: IHabit | null;
-  onSubmit: (updatedHabit: IHabit) => void;
-}
+import IUpdateHabitForm from "../../shared/interfaces/IUpdateHabitForm";
 
 const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -27,7 +22,6 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit }) => {
     const updatedHabit = { ...habit, ...formData };
     onSubmit(updatedHabit);
   };
-
 
   return (
     <>

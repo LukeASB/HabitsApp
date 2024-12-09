@@ -6,11 +6,7 @@ import HabitsButtons from './habitButtons';
 import CreateHabitForm from './forms/createHabitForm';
 import UpdateHabitForm from './forms/updateHabitForm';
 import DeleteHabitForm from './forms/deleteHabitForm';
-
-interface IHabitsNavbar {
-  habit: IHabit | null;
-  updateMain: (habit: IHabit | null, habitsUpdated?: boolean) => void;
-}
+import IHabitsNavbar from '../shared/interfaces/IHabitsNavbar';
 
 /**
  * @returns

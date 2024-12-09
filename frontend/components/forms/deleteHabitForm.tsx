@@ -1,11 +1,5 @@
 import React from "react";
-import IHabit from "../../shared/interfaces/IHabit";
-
-interface IDeleteHabitForm {
-  habit: IHabit;
-  modalId: string;
-  onSubmit: (updatedHabit: IHabit) => void;
-}
+import IDeleteHabitForm from "../../shared/interfaces/IDeleteHabitForm";
 
 const DeleteHabitForm: React.FC<IDeleteHabitForm> = ({ habit, modalId, onSubmit }) => {
   const handleConfirm = () => {

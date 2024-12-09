@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import IHabit from "../../shared/interfaces/IHabit";
 import { mockhabits } from "../../data/mock_habits";
-
-interface ICreateHabitForm {
-  onSubmit: (updatedHabit: IHabit) => void;
-}
+import ICreateHabitForm from "../../shared/interfaces/ICreateHabitForm";
 
 const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit }) => {
   let habit: IHabit={

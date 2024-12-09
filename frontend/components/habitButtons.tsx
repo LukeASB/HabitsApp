@@ -1,12 +1,5 @@
-import IHabit from "../shared/interfaces/IHabit";
-import IModal from "../shared/interfaces/IModal";
+import IHabitsButton from "../shared/interfaces/IHabitsButton";
 import Modal from "./modal/modal";
-
-interface IHabitsButton {
-    icon: string;
-    modal: IModal
-    onClick: (habit: IHabit) => void;
-}
 
 const HabitsButtons: React.FC<IHabitsButton> = ({ icon, modal, onClick}) => {
     return (
