@@ -12,7 +12,8 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit }) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: name === "days" || name === "daysTarget" ? parseInt(value) || 0 : value,
+      [name]:
+        name === "days" || name === "daysTarget" ? parseInt(value) || 0 : value,
     }));
   };
 
@@ -25,34 +26,39 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit }) => {
 
   return (
     <>
-        <div className="form-group">
-          <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Enter habit name"
-            className="form-control"
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="daysTarget">Days Target</label>
-          <input
-            type="number"
-            id="daysTarget"
-            name="daysTarget"
-            value={formData.daysTarget}
-            onChange={handleChange}
-            placeholder="Enter target days"
-            className="form-control"
-          />
-        </div>
-        <button type="submit" className="btn btn-primary" data-bs-dismiss="modal" onClick={handleSubmit}>
-          {`Update Habit`}
-        </button>
-      </>
+      <div className="form-group">
+        <label htmlFor="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Enter habit name"
+          className="form-control"
+        />
+      </div>
+      <div className="form-group">
+        <label htmlFor="daysTarget">Days Target</label>
+        <input
+          type="number"
+          id="daysTarget"
+          name="daysTarget"
+          value={formData.daysTarget}
+          onChange={handleChange}
+          placeholder="Enter target days"
+          className="form-control"
+        />
+      </div>
+      <button
+        type="submit"
+        className="btn btn-primary"
+        data-bs-dismiss="modal"
+        onClick={handleSubmit}
+      >
+        {`Update Habit`}
+      </button>
+    </>
   );
 };
 

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write \"pages/**/*.{js,jsx,ts,tsx,json,css,scss,md}\" \"components/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
@@ -21,6 +22,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.14",
+    "prettier": "^3.4.2",
     "typescript": "^5"
   }
 }

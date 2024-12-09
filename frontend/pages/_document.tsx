@@ -20,10 +20,7 @@ export default function Document() {
         <meta httpEquiv="content-style-type" content="text/css" />
         <meta httpEquiv="content-language" content="en-GB" />
         <meta name="author" content="Luke Sloane-Bulger" />
-        <meta
-          name="description"
-          content="Do Habits App"
-        />
+        <meta name="description" content="Do Habits App" />
         <meta name="keywords" content="Luke Sloane-Bulger, Do Habits App" />
         <meta property="og:title" content="Luke Sloane-Bulger Do Habits App" />
         <meta property="og:type" content="website" />
