@@ -2,7 +2,12 @@
     public static validateUser(habit: string): string[] {
       const errors: string[] = [];
   
+     
       return errors;
+    }
+
+    public static parseJWT() {
+      
     }
   }
   
