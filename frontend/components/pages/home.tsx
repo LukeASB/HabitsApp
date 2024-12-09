@@ -98,7 +98,7 @@ const Home: React.FC = () => {
 
     return (
         <div className="home">
-            <div className={`d-flex ${isCollapsed ? 'sidebar-collapsed' : ''}`} style={ currentSelectedHabit || habitsMenu.length === 1 ? { height: '90vh' } : {}}>
+            <div className={`d-flex ${isCollapsed ? 'sidebar-collapsed' : ''}`} style={ currentSelectedHabit || habitsMenu.length <= 1 ? { height: '90vh' } : {}}>
                 <Sidebar habitsMenu={habitsMenu} toggleSidebar={toggleSidebar} isCollapsed={isCollapsed} updateMain={updateMain} />
                 <div className="flex-grow-1">
                     <HabitsNavbar habit={habitNavbar} updateMain={updateMain}/>
