@@ -9,7 +9,7 @@ const Modal: React.FC<IModal> = (modal: IModal) => {
       aria-labelledby={`${modal.id}Label`}
       aria-hidden="true"
     >
-      <div className="modal-dialog" role="document">
+      <div className="modal-dialog modal-dialog-centered" role="document">
         <div className="modal-content">
           <div className="modal-header text-black">
             <h5 className="modal-title" id={`${modal.id}Label`}>

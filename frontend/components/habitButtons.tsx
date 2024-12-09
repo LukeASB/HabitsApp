@@ -1,17 +1,34 @@
-import { MouseEventHandler } from "react";
 import IHabit from "../shared/interfaces/IHabit";
+import IModal from "../shared/interfaces/IModal";
+import Modal from "./modal/modal";
 
 interface IHabitsButton {
     icon: string;
-    habit: IHabit;
+    modal: IModal
     onClick: (habit: IHabit) => void;
 }
 
-const HabitsButtons: React.FC<IHabitsButton> = ({ icon, habit, onClick}) => {
+const HabitsButtons: React.FC<IHabitsButton> = ({ icon, modal, onClick}) => {
     return (
-        <button className="btn btn-dark" onClick={() => onClick(habit)}>
-            <i className={`bi bi-${icon}`}></i>
-        </button>
+        <div>
+            <button
+                type="button"
+                className="btn btn-dark btn-custom robo popup-trigger popmake-680"
+                data-popup-id="680"
+                data-do-default="0"
+                data-bs-toggle="modal"
+                data-bs-target={`#${modal.id}`}
+            >
+                <i className={`bi bi-${icon}`}></i>
+            </button>
+            <Modal
+                id={`${modal.id}`}
+                title={`${modal.title}`}
+                body={modal.body}
+            />
+            
+        </div>
+
     );
 }
 
