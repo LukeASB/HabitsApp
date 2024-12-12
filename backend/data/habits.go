@@ -10,6 +10,7 @@ type Habit struct {
 	DaysTarget       int       `json:"daysTarget"`
 	NumberOfAttempts int       `json:"numOfAttempts"`
 	MaxDays          int       `json:"maxDays"`
+	CompletionDates  []string  `json:"completionDates"`
 }
 
 type NewHabit struct {

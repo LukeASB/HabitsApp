@@ -6,31 +6,31 @@ import Register from "./pages/register";
 import MainLayout from "./mainLayout";
 
 interface IApp {
-  page?: string;
+	page?: string;
 }
 
 const App: React.FC<IApp> = ({ page = "" }) => {
-  const {
-    query: { _id },
-  } = useRouter();
+	const {
+		query: { _id },
+	} = useRouter();
 
-  const renderPage = () => {
-    if (page === "home") {
-      return <Home />;
-    }
+	const renderPage = () => {
+		if (page === "home") {
+			return <Home />;
+		}
 
-    if (page === "register") {
-      return <Register />;
-    }
+		if (page === "register") {
+			return <Register />;
+		}
 
-    if (page === "login") {
-      return <Login />;
-    }
+		if (page === "login") {
+			return <Login />;
+		}
 
-    return <h3>No component for navigation value. {page} not found</h3>;
-  };
+		return <h3>No component for navigation value. {page} not found</h3>;
+	};
 
-  return <MainLayout>{renderPage()}</MainLayout>;
+	return <MainLayout>{renderPage()}</MainLayout>;
 };
 
 export default App;

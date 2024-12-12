@@ -12,6 +12,7 @@ var MockHabit = []Habit{
 		Days:             30,
 		DaysTarget:       66,
 		NumberOfAttempts: 0,
+		CompletionDates:  []string{"2024-12-20", "2024-12-02", "2024-12-03"},
 	},
 	{
 		ID:               "2",
@@ -20,6 +21,7 @@ var MockHabit = []Habit{
 		Days:             30,
 		DaysTarget:       66,
 		NumberOfAttempts: 0,
+		CompletionDates:  []string{"2024-12-20", "2024-12-02", "2024-12-11"},
 	},
 	{
 		ID:               "3",
@@ -28,6 +30,7 @@ var MockHabit = []Habit{
 		Days:             5,
 		DaysTarget:       365,
 		NumberOfAttempts: 0,
+		CompletionDates:  []string{"2024-12-20", "2024-12-11", "2024-12-11"},
 	},
 	{
 		ID:               "4",
@@ -36,6 +39,7 @@ var MockHabit = []Habit{
 		Days:             25,
 		DaysTarget:       30,
 		NumberOfAttempts: 0,
+		CompletionDates:  []string{"2024-12-20", "2024-12-12", "2024-12-11"},
 	},
 	{
 		ID:               "5",
@@ -44,6 +48,7 @@ var MockHabit = []Habit{
 		Days:             30,
 		DaysTarget:       30,
 		NumberOfAttempts: 0,
+		CompletionDates:  []string{"2024-12-20", "2024-12-02", "2024-12-11"},
 	},
 	{
 		ID:               "6",
@@ -52,5 +57,6 @@ var MockHabit = []Habit{
 		Days:             5,
 		DaysTarget:       60,
 		NumberOfAttempts: 0,
+		CompletionDates:  []string{"2024-12-20", "2024-12-02", "2024-12-11"},
 	},
 }
