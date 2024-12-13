@@ -8,13 +8,7 @@ import IHabit from "../shared/interfaces/IHabit";
 const Navbar: React.FC = () => {
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-	useEffect(
-		() =>
-			sessionStorage.getItem("access-token")
-				? setIsLoggedIn(true)
-				: setIsLoggedIn(false),
-		[],
-	);
+	useEffect(() => (sessionStorage.getItem("access-token") ? setIsLoggedIn(true) : setIsLoggedIn(false)), []);
 
 	return (
 		<nav className="navbar navbar-expand-lg navbar-light bg-dark">
@@ -32,16 +26,10 @@ const Navbar: React.FC = () => {
 					<li className="nav-item">
 						{!isLoggedIn && (
 							<>
-								<Link
-									className="navbar-brand text-light"
-									href="/register"
-								>
+								<Link className="navbar-brand text-light" href="/register">
 									Register
 								</Link>
-								<Link
-									className="navbar-brand text-light"
-									href="/login"
-								>
+								<Link className="navbar-brand text-light" href="/login">
 									Login
 								</Link>
 							</>

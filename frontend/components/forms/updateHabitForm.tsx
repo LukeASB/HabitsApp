@@ -12,10 +12,7 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit }) => {
 		const { name, value } = e.target;
 		setFormData((prevData) => ({
 			...prevData,
-			[name]:
-				name === "days" || name === "daysTarget"
-					? parseInt(value) || 0
-					: value,
+			[name]: name === "days" || name === "daysTarget" ? parseInt(value) || 0 : value,
 		}));
 	};
 
@@ -52,12 +49,7 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit }) => {
 					className="form-control"
 				/>
 			</div>
-			<button
-				type="submit"
-				className="btn btn-primary"
-				data-bs-dismiss="modal"
-				onClick={handleSubmit}
-			>
+			<button type="submit" className="btn btn-primary" data-bs-dismiss="modal" onClick={handleSubmit}>
 				{`Update Habit`}
 			</button>
 		</>

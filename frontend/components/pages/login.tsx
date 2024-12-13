@@ -22,10 +22,7 @@ const Login: React.FC = () => {
 
 							{/* Password Field */}
 							<div className="mb-3">
-								<label
-									htmlFor="password"
-									className="form-label"
-								>
+								<label htmlFor="password" className="form-label">
 									Password
 								</label>
 								<input
@@ -38,10 +35,7 @@ const Login: React.FC = () => {
 							</div>
 
 							{/* Submit Button */}
-							<button
-								type="submit"
-								className="btn btn-primary w-100"
-							>
+							<button type="submit" className="btn btn-primary w-100">
 								Login
 							</button>
 						</form>

@@ -14,11 +14,7 @@ const HabitsButtons: React.FC<IHabitsButton> = ({ icon, modal, onClick }) => {
 			>
 				<i className={`bi bi-${icon}`}></i>
 			</button>
-			<Modal
-				id={`${modal.id}`}
-				title={`${modal.title}`}
-				body={modal.body}
-			/>
+			<Modal id={`${modal.id}`} title={`${modal.title}`} body={modal.body} />
 		</div>
 	);
 };

@@ -8,10 +8,7 @@ const Register: React.FC = () => {
 						<form>
 							{/* First Name */}
 							<div className="mb-3">
-								<label
-									htmlFor="firstName"
-									className="form-label"
-								>
+								<label htmlFor="firstName" className="form-label">
 									First Name
 								</label>
 								<input
@@ -25,10 +22,7 @@ const Register: React.FC = () => {
 
 							{/* Last Name */}
 							<div className="mb-3">
-								<label
-									htmlFor="lastName"
-									className="form-label"
-								>
+								<label htmlFor="lastName" className="form-label">
 									Last Name
 								</label>
 								<input
@@ -56,10 +50,7 @@ const Register: React.FC = () => {
 
 							{/* Password */}
 							<div className="mb-3">
-								<label
-									htmlFor="password"
-									className="form-label"
-								>
+								<label htmlFor="password" className="form-label">
 									Password
 								</label>
 								<input
@@ -72,10 +63,7 @@ const Register: React.FC = () => {
 							</div>
 
 							{/* Submit Button */}
-							<button
-								type="submit"
-								className="btn btn-primary w-100"
-							>
+							<button type="submit" className="btn btn-primary w-100">
 								Register
 							</button>
 						</form>

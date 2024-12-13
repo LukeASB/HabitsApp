@@ -5,10 +5,7 @@ import ICreateHabitForm from "../../shared/interfaces/ICreateHabitForm";
 
 const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit }) => {
 	let habit: IHabit = {
-		id:
-			mockhabits.length > 0
-				? String(parseInt(mockhabits[mockhabits.length - 1]?.id) + 1)
-				: "1",
+		id: mockhabits.length > 0 ? String(parseInt(mockhabits[mockhabits.length - 1]?.id) + 1) : "1",
 		createdAt: Date.now(),
 		name:
 			mockhabits.length > 0
@@ -30,10 +27,7 @@ const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit }) => {
 		const { name, value } = e.target;
 		setFormData((prevData) => ({
 			...prevData,
-			[name]:
-				name === "days" || name === "daysTarget"
-					? parseInt(value) || 0
-					: value,
+			[name]: name === "days" || name === "daysTarget" ? parseInt(value) || 0 : value,
 		}));
 	};
 
@@ -81,12 +75,7 @@ const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit }) => {
 					className="form-control"
 				/>
 			</div>
-			<button
-				type="submit"
-				className="btn btn-primary"
-				data-bs-dismiss="modal"
-				onClick={handleSubmit}
-			>
+			<button type="submit" className="btn btn-primary" data-bs-dismiss="modal" onClick={handleSubmit}>
 				{`Create Habit`}
 			</button>
 		</>

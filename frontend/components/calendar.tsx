@@ -2,15 +2,7 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import IHabit from "../shared/interfaces/IHabit";
 import ICalendar from "../shared/interfaces/ICalendar";
 
-const daysOfWeek = [
-	"Sunday",
-	"Monday",
-	"Tuesday",
-	"Wednesday",
-	"Thursday",
-	"Friday",
-	"Saturday",
-];
+const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const Calendar: React.FC<ICalendar> = ({
 	currentSelectedHabit,
@@ -22,10 +14,8 @@ const Calendar: React.FC<ICalendar> = ({
 	const [currentDate, setCurrentDate] = useState(new Date());
 
 	const GenerateCalendarGrid = (currentDate: Date) => {
-		const getDaysInMonth = (year: number, month: number) =>
-			new Date(year, month + 1, 0).getDate();
-		const getFirstDayOfMonth = (year: number, month: number) =>
-			new Date(year, month, 1).getDay();
+		const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
+		const getFirstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
 
 		const year = currentDate.getFullYear();
 		const month = currentDate.getMonth();
@@ -46,30 +36,19 @@ const Calendar: React.FC<ICalendar> = ({
 		return { weeks, month, year };
 	};
 
-	const handleDaySelection = (
-		habit: IHabit | null,
-		year: number,
-		month: number,
-		day: number,
-	) => {
+	const handleDaySelection = (habit: IHabit | null, year: number, month: number, day: number) => {
 		if (!habit) return;
 
 		const completedDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
 		const removeCompletedDay = () => {
-			setCompletionDatesCompletionDatesCounter(
-				completionDatesCounter - 1,
-			);
-			habit.completionDates = habit.completionDates.filter(
-				(date) => date !== completedDate,
-			);
+			setCompletionDatesCompletionDatesCounter(completionDatesCounter - 1);
+			habit.completionDates = habit.completionDates.filter((date) => date !== completedDate);
 			setCompletionDates(habit.completionDates);
 		};
 
 		const addCompletedDay = () => {
-			setCompletionDatesCompletionDatesCounter(
-				completionDatesCounter + 1,
-			);
+			setCompletionDatesCompletionDatesCounter(completionDatesCounter + 1);
 			habit.completionDates.push(completedDate);
 			setCompletionDates(habit.completionDates);
 		};
@@ -83,19 +62,11 @@ const Calendar: React.FC<ICalendar> = ({
 	};
 
 	const isCompletedDay = (day: number) =>
-		completionDates.includes(
-			`${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
-		);
+		completionDates.includes(`${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`);
 
 	// Handlers for navigating months
-	const prevMonth = () =>
-		setCurrentDate(
-			(prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1),
-		);
-	const nextMonth = () =>
-		setCurrentDate(
-			(prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1),
-		);
+	const prevMonth = () => setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+	const nextMonth = () => setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
 
 	const { weeks, month, year } = GenerateCalendarGrid(currentDate);
 
@@ -107,8 +78,7 @@ const Calendar: React.FC<ICalendar> = ({
 					&larr;
 				</button>
 				<h4>
-					{currentDate.toLocaleString("default", { month: "long" })}{" "}
-					{year}
+					{currentDate.toLocaleString("default", { month: "long" })} {year}
 				</h4>
 				<button onClick={nextMonth} className="btn btn-secondary">
 					&rarr;
@@ -146,23 +116,11 @@ const Calendar: React.FC<ICalendar> = ({
 									className={`day-cell flex-fill text-center p-2 ${day ? "day" : "empty"}`}
 									style={{
 										width: "calc(100% / 7)",
-										backgroundColor: isCompletedDay(day)
-											? "green"
-											: "transparent",
-										color: isCompletedDay(day)
-											? "white"
-											: "inherit",
+										backgroundColor: isCompletedDay(day) ? "green" : "transparent",
+										color: isCompletedDay(day) ? "white" : "inherit",
 										cursor: "pointer",
 									}}
-									onClick={() =>
-										day &&
-										handleDaySelection(
-											currentSelectedHabit,
-											year,
-											month,
-											day,
-										)
-									}
+									onClick={() => day && handleDaySelection(currentSelectedHabit, year, month, day)}
 								>
 									{day || ""}
 								</div>

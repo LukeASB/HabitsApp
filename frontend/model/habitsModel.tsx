@@ -24,10 +24,7 @@ export class HabitsModel {
 		return habit;
 	}
 
-	public static updateHabit(
-		existingHabit: IHabit,
-		updates: Partial<IHabit>,
-	): IHabit {
+	public static updateHabit(existingHabit: IHabit, updates: Partial<IHabit>): IHabit {
 		// Update the habit fields while maintaining existing ones
 		return { ...existingHabit, ...updates };
 	}

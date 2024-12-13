@@ -1,17 +1,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import IHabit from "../shared/interfaces/IHabit";
-import {
-	mockhabits,
-	createMockHabit,
-	updateMockHabit,
-	deleteMockHabit,
-} from "../data/mock_habits";
+import { mockhabits, createMockHabit, updateMockHabit, deleteMockHabit } from "../data/mock_habits";
 import HabitsButtons from "./habitButtons";
 import CreateHabitForm from "./forms/createHabitForm";
 import UpdateHabitForm from "./forms/updateHabitForm";
 import DeleteHabitForm from "./forms/deleteHabitForm";
 import IHabitsNavbar from "../shared/interfaces/IHabitsNavbar";
+import { HabitsService } from "../services/habitsService";
 
 /**
  * @returns
@@ -19,27 +15,22 @@ import IHabitsNavbar from "../shared/interfaces/IHabitsNavbar";
 const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 	const test = "debug";
-	useEffect(
-		() =>
-			sessionStorage.getItem("access-token") || test
-				? setIsLoggedIn(true)
-				: setIsLoggedIn(false),
-		[],
-	);
+	useEffect(() => (sessionStorage.getItem("access-token") || test ? setIsLoggedIn(true) : setIsLoggedIn(false)), []);
 
-	const createHabit = (habit: IHabit) => {
-		createMockHabit(habit);
+	const createHabit = async (habit: IHabit) => {
+		await HabitsService.createHabit(habit);
 		updateMain(habit, true);
 	};
 
-	const updateHabit = (habit: IHabit) => {
-		updateMockHabit(habit);
-		updateMain(habit, true);
+	const updateHabit = async (habit: IHabit) => {
+		const data = await HabitsService.updateHabit(habit);
+
+		updateMain(data, true);
 	};
 
-	const deleteHabit = (habit: IHabit | null) => {
+	const deleteHabit = async (habit: IHabit | null) => {
 		if (!habit) return;
-		habit.id && deleteMockHabit(habit.id);
+        const data = await HabitsService.deleteHabit(habit.id);
 		updateMain(null, true);
 	};
 
@@ -63,11 +54,7 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 									modal={{
 										id: "createHabitModal",
 										title: "Create Habit",
-										body: (
-											<CreateHabitForm
-												onSubmit={createHabit}
-											/>
-										),
+										body: <CreateHabitForm onSubmit={createHabit} />,
 									}}
 									onClick={createHabit}
 								/>
@@ -87,11 +74,7 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 														days: 3,
 														daysTarget: 30,
 														numberOfDays: 1,
-														completionDates: [
-															"2024-12-01",
-															"2024-12-19",
-															"2024-12-14",
-														],
+														completionDates: ["2024-12-01", "2024-12-19", "2024-12-14"],
 													}}
 													onSubmit={updateHabit}
 												/>

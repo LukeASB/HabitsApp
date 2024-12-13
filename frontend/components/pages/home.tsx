@@ -9,14 +9,10 @@ import { HabitsService } from "../../services/habitsService";
 const Home: React.FC = () => {
 	const [habitNavbar, setHabitNavbar] = useState<IHabit | null>(null);
 	const [habitsMenu, setHabitsMenu] = useState<IHabit[]>([]);
-	const [currentSelectedHabit, setCurrentSelectedHabit] =
-		useState<IHabit | null>(null);
+	const [currentSelectedHabit, setCurrentSelectedHabit] = useState<IHabit | null>(null);
 
 	useEffect(() => {
-		const retrieveHabits = async () => {
-			const data = await HabitsService.retrieveHabits();
-			setHabitsMenu(data);
-		};
+		const retrieveHabits = async () => setHabitsMenu(await HabitsService.retrieveHabits());
 
 		retrieveHabits();
 	}, []); // Dependency - would need to be called whenever a habits added/removed.
@@ -25,8 +21,7 @@ const Home: React.FC = () => {
 	const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
 	const [completionDates, setCompletionDates] = useState<string[]>([]);
-	const [completionDatesCounter, setCompletionDatesCompletionDatesCounter] =
-		useState(0);
+	const [completionDatesCounter, setCompletionDatesCompletionDatesCounter] = useState(0);
 
 	const updateMain = (habit: IHabit | null, habitsUpdated = false) => {
 		if (!habit) {
@@ -49,11 +44,7 @@ const Home: React.FC = () => {
 		<div className="home">
 			<div
 				className={`d-flex ${isCollapsed ? "sidebar-collapsed" : ""}`}
-				style={
-					currentSelectedHabit || habitsMenu.length <= 1
-						? { height: "90vh" }
-						: {}
-				}
+				style={currentSelectedHabit || habitsMenu.length <= 1 ? { height: "90vh" } : {}}
 			>
 				<Sidebar
 					habitsMenu={habitsMenu}
@@ -67,9 +58,7 @@ const Home: React.FC = () => {
 						<Calendar
 							currentSelectedHabit={currentSelectedHabit}
 							completionDatesCounter={completionDatesCounter}
-							setCompletionDatesCompletionDatesCounter={
-								setCompletionDatesCompletionDatesCounter
-							}
+							setCompletionDatesCompletionDatesCounter={setCompletionDatesCompletionDatesCounter}
 							setCompletionDates={setCompletionDates}
 							completionDates={completionDates}
 						/>
@@ -79,12 +68,8 @@ const Home: React.FC = () => {
 							<div key={`calendar_${i}`}>
 								<Calendar
 									currentSelectedHabit={habit}
-									completionDatesCounter={
-										habit.completionDates.length
-									}
-									setCompletionDatesCompletionDatesCounter={
-										setCompletionDatesCompletionDatesCounter
-									}
+									completionDatesCounter={habit.completionDates.length}
+									setCompletionDatesCompletionDatesCounter={setCompletionDatesCompletionDatesCounter}
 									setCompletionDates={setCompletionDates}
 									completionDates={habit.completionDates}
 								/>
