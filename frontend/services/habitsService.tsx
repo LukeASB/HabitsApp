@@ -1,14 +1,12 @@
 import { mockhabits, createMockHabit, retrieveMockHabit, updateMockHabit, deleteMockHabit } from "../data/mock_habits";
 import { HabitsModel } from "../model/habitsModel";
 import IHabit from "../shared/interfaces/IHabit";
+import { HabitsValidation } from "../validation/habitsValidation";
 import { AuthService } from "./authService";
 
 export class HabitsService {
 	public static async createHabit(habit: IHabit) {
 		if (process.env.ENVIRONMENT === "DEV") return createMockHabit(habit);
-
-		const validationErrors = HabitsModel.validateHabit(habit);
-		if (validationErrors.length > 0) throw new Error(validationErrors.join(", "));
 
 		try {
 			const csrfToken = sessionStorage.getItem("csrf-token");
@@ -103,6 +101,7 @@ export class HabitsService {
 					"X-CSRF-Token": csrfToken || "",
 					Authorization: `Bearer ${shortlivedJWTAccessToken || ""}`,
 				},
+                body: JSON.stringify(habit),
 			});
 
 			if (response.status === 403) await AuthService.refresh(HabitsService.updateHabit);

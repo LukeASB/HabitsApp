@@ -7,15 +7,24 @@ import HabitsNavbar from "../habitsNavbar";
 import { HabitsService } from "../../services/habitsService";
 
 const Home: React.FC = () => {
+    const [hasHabitsBeenUpdated, setHasHabitsBeenUpdated] = useState<boolean>(true);
 	const [habitNavbar, setHabitNavbar] = useState<IHabit | null>(null);
 	const [habitsMenu, setHabitsMenu] = useState<IHabit[]>([]);
 	const [currentSelectedHabit, setCurrentSelectedHabit] = useState<IHabit | null>(null);
 
 	useEffect(() => {
+        if (!hasHabitsBeenUpdated) return;
+        if (process.env.ENVIRONMENT === "DEV") {
+            setHabitsMenu(mockhabits);
+            
+            return;
+        }
+
 		const retrieveHabits = async () => setHabitsMenu(await HabitsService.retrieveHabits());
 
 		retrieveHabits();
-	}, []); // Dependency - would need to be called whenever a habits added/removed.
+        setHasHabitsBeenUpdated(false);
+	}, [hasHabitsBeenUpdated]);
 
 	const [isCollapsed, setIsCollapsed] = useState(false);
 	const toggleSidebar = () => setIsCollapsed(!isCollapsed);
@@ -29,7 +38,7 @@ const Home: React.FC = () => {
 			setCurrentSelectedHabit(null);
 			setCompletionDates([]);
 			setCompletionDatesCompletionDatesCounter(0);
-			habitsUpdated && setHabitsMenu(mockhabits); // This would become a dependency on useEffect to recall /retrievehabits
+			habitsUpdated && setHasHabitsBeenUpdated(true);
 			return;
 		}
 
@@ -37,7 +46,7 @@ const Home: React.FC = () => {
 		setCurrentSelectedHabit(habit);
 		setCompletionDates(habit.completionDates);
 		setCompletionDatesCompletionDatesCounter(habit.completionDates.length);
-		habitsUpdated && setHabitsMenu(mockhabits); // This would become a dependency on useEffect to recall /retrievehabits
+		habitsUpdated && setHasHabitsBeenUpdated(true);
 	};
 
 	return (

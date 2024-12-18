@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import IHabit from "../shared/interfaces/IHabit";
-import { mockhabits, createMockHabit, updateMockHabit, deleteMockHabit } from "../data/mock_habits";
 import HabitsButtons from "./habitButtons";
 import CreateHabitForm from "./forms/createHabitForm";
 import UpdateHabitForm from "./forms/updateHabitForm";
@@ -24,7 +23,6 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 
 	const updateHabit = async (habit: IHabit) => {
 		const data = await HabitsService.updateHabit(habit);
-
 		updateMain(data, true);
 	};
 
