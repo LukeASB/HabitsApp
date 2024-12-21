@@ -66,7 +66,7 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 									modal={{
 										id: "createHabitModal",
 										title: "Create Habit",
-										body: <CreateHabitForm onSubmit={createHabit} onModalOpen={handleOpenModal} onModalClose={handleCloseModal} />,
+										body: <CreateHabitForm onSubmit={createHabit} onModalClose={handleCloseModal} />,
                                         modalType: ModalTypeEnum.CreateHabitModal,
                                         showModal: showModal.createHabitModal,
                                         onModalOpen: handleOpenModal,

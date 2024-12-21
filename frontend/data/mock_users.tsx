@@ -1,3 +1,3 @@
-import IRegisterUserRequest from "../shared/interfaces/IRegisterUserRequest";
+import IRegisterUser from "../shared/interfaces/IRegisterUser";
 
-export const registerUsers: IRegisterUserRequest[] = [{ EmailAddress: "johndoe1@example.com", Password: "secretPassword012!", FirstName: "John", LastName: "Doe"}];
+export const registerUsers: IRegisterUser[] = [{ EmailAddress: "johndoe1@example.com", Password: "secretPassword012!", FirstName: "John", LastName: "Doe"}];

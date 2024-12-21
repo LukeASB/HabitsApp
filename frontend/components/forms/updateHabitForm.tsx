@@ -47,6 +47,7 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit, onModalC
 		const updatedHabit = { ...habit, ...formData };
 		onSubmit(updatedHabit);
         onModalClose(ModalTypeEnum.UpdateHabitModal);
+        setFormData({name: "", daysTarget: 0});
 	};
 
 	return (
