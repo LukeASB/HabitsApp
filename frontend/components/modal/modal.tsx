@@ -1,4 +1,3 @@
-import { useState } from "react";
 import IModal from "../../shared/interfaces/IModal";
   
 
@@ -21,7 +20,7 @@ const Modal: React.FC<IModal> = (modal: IModal) => {
                 <button
                   type="button"
                   className="btn-close"
-                  onClick={modal.onModalClose} // Handle modal close
+                  onClick={() => modal.onModalClose(modal.modalType)} // Handle modal close
                   aria-label="Close"
                 ></button>
               </div>

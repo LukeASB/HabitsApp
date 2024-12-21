@@ -16,7 +16,7 @@ const Home: React.FC = () => {
         if (!hasHabitsBeenUpdated) return;
         if (process.env.ENVIRONMENT === "DEV") {
             setHabitsMenu(mockhabits);
-            
+            setHasHabitsBeenUpdated(false);    
             return;
         }
 

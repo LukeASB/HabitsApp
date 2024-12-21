@@ -3,14 +3,13 @@ import ICreateHabitForm from "../../shared/interfaces/ICreateHabitForm";
 import IHabit from "../../shared/interfaces/IHabit";
 import { HabitsModel } from "../../model/habitsModel";
 import ICreateHabitFormData from "../../shared/interfaces/ICreateHabitFormData";
-import IHabitFormError from "../../shared/interfaces/IHabitFormError";
-import bootstrap from "bootstrap";
+import { ModalTypeEnum } from "../../shared/enum/modalTypeEnum";
+import ICreateHabitFormError from "../../shared/interfaces/ICreateHabitFormError";
 
 const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, onModalOpen, onModalClose/* error state */ }) => {
     const form: ICreateHabitFormData = {name: "", days: 0, daysTarget: 0};
-
 	const [formData, setFormData] = useState<ICreateHabitFormData>(form);
-    const [errors, setErrors] = useState<IHabitFormError>({name: "", days: "", daysTarget: ""});
+    const [errors, setErrors] = useState<ICreateHabitFormError>({name: "", days: "", daysTarget: ""});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -22,8 +21,8 @@ const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, onModalOpen, on
 
     const validateForm = () => {
         let isValid = true;
-        let newErrors: IHabitFormError = {name: "", days: "", daysTarget: ""};
-        const habitErrors = HabitsModel.processHabit({ ...formData });
+        let newErrors: ICreateHabitFormError = {name: "", days: "", daysTarget: ""};
+        const habitErrors = HabitsModel.processCreateHabit({ ...formData });
 
         habitErrors.forEach(error => {
             if (error.name) {
@@ -42,7 +41,7 @@ const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, onModalOpen, on
             }
         });
 
-        !isValid && setErrors({ ...newErrors });
+        !isValid ? setErrors({ ...newErrors }) : setErrors({name: "", days: "", daysTarget: ""});
 
         return isValid;
     }
@@ -50,17 +49,10 @@ const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, onModalOpen, on
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
         if (!validateForm()) return;
-        try {
-            onModalClose();
-            // const modal = bootstrap.Modal.getInstance("createHabitModal");
-            // modal?.hide(); // Programmatically hide the modal if condition passes
 
-        } catch(ex) {
-
-        }
-
-		const updatedHabit: IHabit = { id: "", createdAt: 0, numberOfDays: 0, completionDates: [], ...formData };
-		onSubmit(updatedHabit);
+		const createdHabit: IHabit = { id: "", createdAt: 0, numberOfDays: 0, completionDates: [], ...formData };
+		onSubmit(createdHabit);
+        onModalClose(ModalTypeEnum.CreateHabitModal);
 	};
 
 	return (

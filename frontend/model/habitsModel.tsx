@@ -1,10 +1,9 @@
+import ICreateHabitFormError from "../shared/interfaces/ICreateHabitFormError";
 import IHabit from "../shared/interfaces/IHabit";
-import IHabitFormError from "../shared/interfaces/IHabitFormError";
+import IUpdateHabitFormError from "../shared/interfaces/IUpdateHabitFormError";
 import { HabitsValidation } from "../validation/habitsValidation";
 
 export class HabitsModel {
-	public static processHabit(habit: Partial<IHabit>): Partial<IHabitFormError>[] {
-        const validationErrors = HabitsValidation.validateHabit(habit);
-		return validationErrors;
-	}
+	public static processCreateHabit = (habit: Partial<IHabit>): Partial<ICreateHabitFormError>[] => HabitsValidation.validateCreateHabit(habit);
+    public static processUpdateHabit = (habit: Partial<IHabit>): Partial<IUpdateHabitFormError>[] => HabitsValidation.validateUpdateHabit(habit);
 }

@@ -7,10 +7,13 @@ import UpdateHabitForm from "./forms/updateHabitForm";
 import DeleteHabitForm from "./forms/deleteHabitForm";
 import IHabitsNavbar from "../shared/interfaces/IHabitsNavbar";
 import { HabitsService } from "../services/habitsService";
+import IModalTypes from "../shared/interfaces/IModalTypes";
+import { ModalTypeEnum } from "../shared/enum/modalTypeEnum";
+
 
 const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState<IModalTypes>({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: false });
 
 	const test = "debug";
 	useEffect(() => (sessionStorage.getItem("access-token") || test ? setIsLoggedIn(true) : setIsLoggedIn(false)), []);
@@ -27,12 +30,21 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 
 	const deleteHabit = async (habit: IHabit | null) => {
 		if (!habit) return;
-        const data = await HabitsService.deleteHabit(habit.id);
+        await HabitsService.deleteHabit(habit.id);
 		updateMain(null, true);
 	};
 
-    const handleOpenModal = () => setShowModal(true);
-    const handleCloseModal = () => setShowModal(false);
+    const handleOpenModal = (modalType: ModalTypeEnum) => {
+        if (modalType === ModalTypeEnum.CreateHabitModal) return setShowModal({ createHabitModal: true, updateHabitModal: false, deleteHabitModal: false });
+        if (modalType === ModalTypeEnum.UpdateHabitModal) return setShowModal({ createHabitModal: false, updateHabitModal: true, deleteHabitModal: false });
+        if (modalType === ModalTypeEnum.DeleteHabitModal) return setShowModal({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: true });
+    };
+
+    const handleCloseModal = (modalType: ModalTypeEnum) => {
+        if (modalType === ModalTypeEnum.CreateHabitModal) return setShowModal({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: false });
+        if (modalType === ModalTypeEnum.UpdateHabitModal) return setShowModal({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: false });
+        if (modalType === ModalTypeEnum.DeleteHabitModal) return setShowModal({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: false });
+    };
 
 	return (
 		<nav className="navbar navbar-expand-lg navbar-light bg-primary">
@@ -55,7 +67,8 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 										id: "createHabitModal",
 										title: "Create Habit",
 										body: <CreateHabitForm onSubmit={createHabit} onModalOpen={handleOpenModal} onModalClose={handleCloseModal} />,
-                                        showModal: showModal,
+                                        modalType: ModalTypeEnum.CreateHabitModal,
+                                        showModal: showModal.createHabitModal,
                                         onModalOpen: handleOpenModal,
                                         onModalClose: handleCloseModal
 									}}
@@ -70,21 +83,13 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 											title: "Update Habit",
 											body: (
 												<UpdateHabitForm
-													habit={{
-														id: habit.id,
-														createdAt: Date.now(),
-														name: `Updated Habit_${habit.id}`,
-														days: 3,
-														daysTarget: 30,
-														numberOfDays: 1,
-														completionDates: ["2024-12-01", "2024-12-19", "2024-12-14"],
-													}}
+                                                    habit={habit}
 													onSubmit={updateHabit}
-                                                    onModalOpen={handleOpenModal}
                                                     onModalClose={handleCloseModal}
 												/>
 											),
-                                            showModal: showModal,
+                                            modalType: ModalTypeEnum.UpdateHabitModal,
+                                            showModal: showModal.updateHabitModal,
                                             onModalOpen: handleOpenModal,
                                             onModalClose: handleCloseModal
 										}}
@@ -101,13 +106,12 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 											body: (
 												<DeleteHabitForm
 													habit={habit}
-													modalId={"deleteHabitModal"}
 													onSubmit={deleteHabit}
-                                                    onModalOpen={handleOpenModal}
                                                     onModalClose={handleCloseModal}
 												/>
 											),
-                                            showModal: showModal,
+                                            modalType: ModalTypeEnum.DeleteHabitModal,
+                                            showModal: showModal.deleteHabitModal,
                                             onModalOpen: handleOpenModal,
                                             onModalClose: handleCloseModal
 										}}

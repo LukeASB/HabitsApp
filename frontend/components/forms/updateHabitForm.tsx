@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import IUpdateHabitForm from "../../shared/interfaces/IUpdateHabitForm";
+import IUpdateHabitFormData from "../../shared/interfaces/IUpdateHabitFormData";
+import IUpdateHabitFormError from "../../shared/interfaces/IUpdateHabitFormError";
+import { HabitsModel } from "../../model/habitsModel";
+import { ModalTypeEnum } from "../../shared/enum/modalTypeEnum";
 
-const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit }) => {
-	const [formData, setFormData] = useState({
-		name: habit?.name || "",
-		days: habit?.days || 0,
-		daysTarget: habit?.daysTarget || 0,
-	});
+const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit, onModalClose }) => {
+    const form: IUpdateHabitFormData = {name: "", daysTarget: 0};
+    const [formData, setFormData] = useState<IUpdateHabitFormData>(form);
+    const [errors, setErrors] = useState<IUpdateHabitFormError>({name: "", daysTarget: ""});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -16,11 +18,35 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit }) => {
 		}));
 	};
 
+    const validateForm = () => {
+        let isValid = true;
+        let newErrors: IUpdateHabitFormError = {name: "", daysTarget: ""};
+        const habitErrors = HabitsModel.processUpdateHabit({ ...formData });
+
+        habitErrors.forEach(error => {
+            if (error.name) {
+                isValid = false;
+                return newErrors.name = error.name;
+            }
+
+            if (error.daysTarget) {
+                isValid = false;
+                return newErrors.daysTarget = error.daysTarget;
+            }
+        });
+
+        !isValid ? setErrors({ ...newErrors }) : setErrors({name: "", daysTarget: ""});
+
+        return isValid;
+    }
+
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!habit) return;
+        if (!validateForm()) return;
+
 		const updatedHabit = { ...habit, ...formData };
 		onSubmit(updatedHabit);
+        onModalClose(ModalTypeEnum.UpdateHabitModal);
 	};
 
 	return (
@@ -36,6 +62,7 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit }) => {
 					placeholder="Enter habit name"
 					className="form-control"
 				/>
+                <div className="error text-danger">{errors.name}</div>
 			</div>
 			<div className="form-group">
 				<label htmlFor="daysTarget">Days Target</label>
@@ -48,6 +75,7 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit }) => {
 					placeholder="Enter target days"
 					className="form-control"
 				/>
+                <div className="error text-danger">{errors.daysTarget}</div>
 			</div>
 			<button type="submit" className="btn btn-primary" data-bs-dismiss="modal" onClick={handleSubmit}>
 				{`Update Habit`}

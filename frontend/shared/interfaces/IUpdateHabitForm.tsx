@@ -1,8 +1,8 @@
+import { ModalTypeEnum } from "../enum/modalTypeEnum";
 import IHabit from "./IHabit";
 
 export default interface IUpdateHabitForm {
-    habit: IHabit | null;
+    habit: IHabit;
     onSubmit: (updatedHabit: IHabit) => void;
-    onModalOpen: () => void;
-    onModalClose: () => void;
+    onModalClose: (modalType: ModalTypeEnum) => void;
 }

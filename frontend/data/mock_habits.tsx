@@ -19,6 +19,6 @@ export const updateMockHabit = (habit: IHabit) => {
     return habit;
 };
 export const deleteMockHabit = (id: string): boolean => {
-    mockhabits.filter(mockHabit => mockHabit.id !== id);
+    mockhabits = mockhabits.filter(mockHabit => mockHabit.id !== id);
     return true;
 }
