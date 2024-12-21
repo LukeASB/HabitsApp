@@ -6,7 +6,7 @@ import ICreateHabitFormData from "../../shared/interfaces/ICreateHabitFormData";
 import IHabitFormError from "../../shared/interfaces/IHabitFormError";
 import bootstrap from "bootstrap";
 
-const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, /* error state */ }) => {
+const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, onModalOpen, onModalClose/* error state */ }) => {
     const form: ICreateHabitFormData = {name: "", days: 0, daysTarget: 0};
 
 	const [formData, setFormData] = useState<ICreateHabitFormData>(form);
@@ -51,11 +51,10 @@ const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, /* error state 
 		e.preventDefault();
         if (!validateForm()) return;
         try {
+            onModalClose();
             // const modal = bootstrap.Modal.getInstance("createHabitModal");
             // modal?.hide(); // Programmatically hide the modal if condition passes
 
-            Need hide modal dynamically
-            $('#exampleModal').modal('show')
         } catch(ex) {
 
         }
@@ -105,7 +104,7 @@ const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, /* error state 
 				/>
                 <div className="error text-danger">{errors.daysTarget}</div>
 			</div>
-			<button type="submit" className="btn btn-primary" /*data-bs-dismiss="modal"*/ onClick={handleSubmit}>
+			<button type="submit" className="btn btn-primary" onClick={handleSubmit}>
 				{`Create Habit`}
 			</button>
 		</>

@@ -8,11 +8,10 @@ import DeleteHabitForm from "./forms/deleteHabitForm";
 import IHabitsNavbar from "../shared/interfaces/IHabitsNavbar";
 import { HabitsService } from "../services/habitsService";
 
-/**
- * @returns
- */
 const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [showModal, setShowModal] = useState(false);
+
 	const test = "debug";
 	useEffect(() => (sessionStorage.getItem("access-token") || test ? setIsLoggedIn(true) : setIsLoggedIn(false)), []);
 
@@ -31,6 +30,9 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
         const data = await HabitsService.deleteHabit(habit.id);
 		updateMain(null, true);
 	};
+
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
 
 	return (
 		<nav className="navbar navbar-expand-lg navbar-light bg-primary">
@@ -52,7 +54,10 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 									modal={{
 										id: "createHabitModal",
 										title: "Create Habit",
-										body: <CreateHabitForm onSubmit={createHabit} />,
+										body: <CreateHabitForm onSubmit={createHabit} onModalOpen={handleOpenModal} onModalClose={handleCloseModal} />,
+                                        showModal: showModal,
+                                        onModalOpen: handleOpenModal,
+                                        onModalClose: handleCloseModal
 									}}
 									onClick={createHabit}
 								/>
@@ -75,8 +80,13 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 														completionDates: ["2024-12-01", "2024-12-19", "2024-12-14"],
 													}}
 													onSubmit={updateHabit}
+                                                    onModalOpen={handleOpenModal}
+                                                    onModalClose={handleCloseModal}
 												/>
 											),
+                                            showModal: showModal,
+                                            onModalOpen: handleOpenModal,
+                                            onModalClose: handleCloseModal
 										}}
 										onClick={updateHabit}
 									/>
@@ -93,8 +103,13 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
 													habit={habit}
 													modalId={"deleteHabitModal"}
 													onSubmit={deleteHabit}
+                                                    onModalOpen={handleOpenModal}
+                                                    onModalClose={handleCloseModal}
 												/>
 											),
+                                            showModal: showModal,
+                                            onModalOpen: handleOpenModal,
+                                            onModalClose: handleCloseModal
 										}}
 										onClick={deleteHabit}
 									/>

@@ -4,5 +4,7 @@ export default interface IDeleteHabitForm {
     habit: IHabit;
     modalId: string;
     onSubmit: (updatedHabit: IHabit) => void;
+    onModalOpen: () => void;
+    onModalClose: () => void;
 }
   
