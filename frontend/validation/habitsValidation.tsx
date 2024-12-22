@@ -3,8 +3,8 @@ import IHabit from "../shared/interfaces/IHabit";
 import IUpdateHabitFormError from "../shared/interfaces/IUpdateHabitFormError";
 
 export class HabitsValidation {
-    private static maxCharacterLength: number = 255;
-    private static matchUpperLowerCaseLettersOnly = /^[a-zA-Z ]*$/;
+    private static readonly maxCharacterLength: number = 255;
+    private static readonly matchUpperLowerCaseLettersOnly = /^[a-zA-Z ]*$/;
 
     public static validateCreateHabit(habit: Partial<IHabit>): Partial<ICreateHabitFormError>[] {
         const errors: Partial<ICreateHabitFormError>[] = [];
@@ -15,7 +15,7 @@ export class HabitsValidation {
         const days = HabitsValidation.validateHabitDays(habit.days);
         days && errors.push({ days: days });
 
-        const daysTarget = HabitsValidation.validateHabitDays(habit.daysTarget);
+        const daysTarget = HabitsValidation.validateHabitDaysTarget(habit.daysTarget);
         daysTarget && errors.push({ daysTarget: daysTarget });
 
         return errors;
