@@ -1,6 +1,4 @@
-export default interface IRegisterUserFormError {
-    firstName: string;
-    lastName: string;
+export default interface ILoginUserFormError {
     emailAddress: string;
     password: string;
     [key: string]: string

@@ -1,19 +1,11 @@
+import ILoginUser from "../shared/interfaces/ILoginUser";
 import IRegisterUser from "../shared/interfaces/IRegisterUser";
+import ILoginUserFormError from "../shared/interfaces/IRegisterUserFormError";
+import IRegisterUserFormError from "../shared/interfaces/IRegisterUserFormError";
+import { UsersValidation } from "../validation/usersValidation";
 export class AuthModel {
-    private static readonly minPassword = 8;
-    private static readonly maxPassword = 72;
-    private static EmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    private static PasswordRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,20}$/;
-
-    public static validateRegister(registerUser: IRegisterUser): string[] {
-        if (AuthModel.EmailRegex.test(registerUser.EmailAddress) === false) return ["Invalid email address"];
-
-        if (registerUser.Password.length < AuthModel.minPassword) return ["Password must be at least 8 characters"];
-        if (registerUser.Password.length > AuthModel.maxPassword) return ["Password must be less than 72 characters"];
-        if (AuthModel.PasswordRegex.test(registerUser.EmailAddress) === false) return ["Invalid password"];
-
-        return [];
-    }
+    public static processRegisterUser = (registerUser: IRegisterUser): Partial<IRegisterUserFormError>[] => UsersValidation.validateRegisterUser(registerUser);
+    public static processLoginUser = (loginUser: ILoginUser): Partial<ILoginUserFormError>[] => UsersValidation.validateLoginUser(loginUser);
 
 	public static parseJWT(token: string) {
 		try {

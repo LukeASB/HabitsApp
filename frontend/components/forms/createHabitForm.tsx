@@ -6,7 +6,7 @@ import ICreateHabitFormData from "../../shared/interfaces/ICreateHabitFormData";
 import { ModalTypeEnum } from "../../shared/enum/modalTypeEnum";
 import ICreateHabitFormError from "../../shared/interfaces/ICreateHabitFormError";
 
-const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, onModalClose/* error state */ }) => {
+const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, onModalClose }) => {
     const form: ICreateHabitFormData = {name: "", days: 0, daysTarget: 0};
 	const [formData, setFormData] =useState<ICreateHabitFormData>(form);
     const [errors, setErrors] = useState<ICreateHabitFormError>({name: "", days: "", daysTarget: ""});
