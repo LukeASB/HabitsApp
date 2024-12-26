@@ -23,16 +23,20 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
         // sessionStorage.getItem("access-token") || test ? setIsLoggedIn(true) : setIsLoggedIn(false);
 
         const jwt = sessionStorage.getItem("access-token");
+        if (!jwt) {
+            setIsLoggedIn(false);
+            router.push("/login");
+            return;
+        }
+
         if (jwt) {
-            const parsedToken = AuthModel.parseJWT(jwt);
-            if (!parsedToken) {
+            if (!AuthModel.parseJWT(jwt)) {
                 setIsLoggedIn(false);
                 router.push("/login");
                 return;
             }
         }
-
-        setIsLoggedIn(true)
+        setIsLoggedIn(true);
     }, []);
 
 	const createHabit = async (habit: IHabit) => {

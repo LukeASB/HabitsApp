@@ -1,8 +1,11 @@
+import { ErrorsEnum } from "../shared/enum/errorsEnum";
 import ICreateHabitFormError from "../shared/interfaces/ICreateHabitFormError";
 import IHabit from "../shared/interfaces/IHabit";
 import IUpdateHabitFormError from "../shared/interfaces/IUpdateHabitFormError";
 
 export class HabitsValidation {
+    private static readonly minHabitsDays: number = 0;
+    private static readonly maxHabitsDays: number = 9999;
     private static readonly maxCharacterLength: number = 255;
     private static readonly matchUpperLowerCaseLettersOnly = /^[a-zA-Z ]*$/;
 
@@ -34,9 +37,9 @@ export class HabitsValidation {
     }
 
     private static validateHabitName(name?: string): string {
-        if (name?.trim().length === 0) return "Habit name is required.";
-        if (name && name.trim().length >= HabitsValidation.maxCharacterLength) return `Habit Name exceeds max character length of ${HabitsValidation.maxCharacterLength}`;
-        if (name && !HabitsValidation.matchUpperLowerCaseLettersOnly.test(name)) return "Habit name is invalid.";
+        if (name?.trim().length === 0) return ErrorsEnum.Required;
+        if (name && name.trim().length >= HabitsValidation.maxCharacterLength) return ErrorsEnum.HabitNameMax.replace("{0}", `${HabitsValidation.maxCharacterLength}`);
+        if (name && !HabitsValidation.matchUpperLowerCaseLettersOnly.test(name)) return ErrorsEnum.Invalid;
 
         return "";
     }
@@ -46,8 +49,8 @@ export class HabitsValidation {
     private static validateHabitDaysTarget = (days?: number): string => HabitsValidation.validateDay(days);
 
     private static validateDay(day?: number): string {
-        if (day && day < 0) return "Habit Days cannot be less than 0";
-        if (day && day >= 9999) return "Habit Days cannot be more than 9999 days";
+        if (day && day < 0) return ErrorsEnum.HabitDaysMin.replace("{0}", `${HabitsValidation.minHabitsDays}`);
+        if (day && day >= 9999) return ErrorsEnum.HabitDaysMax.replace("{0}", `${HabitsValidation.maxHabitsDays}`);
 
         return "";
     }

@@ -1,4 +1,5 @@
 
+import { ErrorsEnum } from "../shared/enum/errorsEnum";
 import ILoginUser from "../shared/interfaces/ILoginUser";
 import IRegisterUser from "../shared/interfaces/IRegisterUser";
 import ILoginUserFormError from "../shared/interfaces/IRegisterUserFormError";
@@ -43,23 +44,23 @@ export class UsersValidation {
     }
 
     private static validateName(name?: string): string {
-        if (name?.trim().length === 0) return "Required.";
-        if (name && name.trim().length >= UsersValidation.maxName) return `Name exceeds max character length of ${UsersValidation.maxName}`;
-        if (name && !UsersValidation.matchUpperLowerCaseLettersOnly.test(name)) return "Invalid.";
+        if (name?.trim().length === 0) return ErrorsEnum.Required;
+        if (name && name.trim().length >= UsersValidation.maxName) return ErrorsEnum.NameMax.replace("{0}", `${UsersValidation.maxName}`);
+        if (name && !UsersValidation.matchUpperLowerCaseLettersOnly.test(name)) return ErrorsEnum.Invalid;
         return "";
     }
 
     private static validateUserEmail(email?: string): string {
-        if (email?.trim().length === 0) return "Email address is required";
-        if (email && UsersValidation.EmailRegex.test(email) === false) return "Invalid email address";
+        if (email?.trim().length === 0) return ErrorsEnum.Required;
+        if (email && UsersValidation.EmailRegex.test(email) === false) return ErrorsEnum.Invalid;
         return "";
     }
 
     private static validateUserPassword(password?: string): string {
-        if (password?.trim().length === 0) return "Required.";
-        if (password && password.length < UsersValidation.minPassword) return "Password must be at least 8 characters";
-        if (password && password.length > UsersValidation.maxPassword) return "Password must be less than 72 characters";
-        if (password && UsersValidation.PasswordRegex.test(password) === false) return "Invalid.";
+        if (password?.trim().length === 0) return ErrorsEnum.Required;
+        if (password && password.length < UsersValidation.minPassword) return ErrorsEnum.PasswordMin.replace("{0}", `${UsersValidation.minPassword}`);
+        if (password && password.length > UsersValidation.maxPassword) return ErrorsEnum.PasswordMax.replace("{0}", `${UsersValidation.maxPassword}`);
+        if (password && UsersValidation.PasswordRegex.test(password) === false) return ErrorsEnum.Invalid;
         return "";
     }
 
