@@ -34,7 +34,7 @@ func TestRegisterUserHandler(t *testing.T) {
 		userRegisterRequest *data.RegisterUserRequest
 	}{
 		{
-			name: "Succcessfully create a user",
+			name: "Successfully create a user",
 			want: true,
 			userRegisterRequest: &data.RegisterUserRequest{
 				EmailAddress: "controlller@test.com",
@@ -123,7 +123,7 @@ func TestLoginHandler(t *testing.T) {
 		userAuth *data.UserAuth
 	}{
 		{
-			name: "Succcessfully login",
+			name: "Successfully login",
 			want: true,
 			userAuth: &data.UserAuth{
 				EmailAddress: "johndoe1@example.com",
@@ -201,7 +201,7 @@ func TestLogoutHandler(t *testing.T) {
 		userLoggedOutRequest *data.UserLoggedOutRequest
 	}{
 		{
-			name: "Succcessfully logout",
+			name: "Successfully logout",
 			want: true,
 			userLoggedOutRequest: &data.UserLoggedOutRequest{
 				UserID:       "4",

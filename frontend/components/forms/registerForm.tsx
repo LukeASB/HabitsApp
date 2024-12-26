@@ -1,4 +1,80 @@
+import { useRouter } from "next/router";
+import IRegisterUserFormData from "../../shared/interfaces/IRegisterUserFormData";
+import { useState } from "react";
+import { AuthModel } from "../../model/authModel";
+import { AuthService } from "../../services/authService";
+import ILoggedInUser from "../../shared/interfaces/ILoggedInUser";
+import ILoginUser from "../../shared/interfaces/ILoginUser";
+
 const RegisterForm: React.FC = () => {
+    const router = useRouter();
+    const form: IRegisterUserFormData = { firstName: "", lastName: "", emailAddress: "", password: "" };
+    const [formData, setFormData] = useState<IRegisterUserFormData>(form);
+    const [errors, setErrors] = useState<IRegisterUserFormData>({ firstName: "", lastName: "", emailAddress: "", password: "" });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const validateForm = () => {
+        let isValid = true;
+        let newErrors: IRegisterUserFormData = { firstName: "", lastName: "", emailAddress: "", password: "" };
+        const userErrors = AuthModel.processRegisterUser({ ...formData });
+
+        userErrors.forEach(error => {
+            if (error.firstName) {
+                isValid = false;
+                return (newErrors.firstName = error.firstName);
+            }
+
+            if (error.lastName) {
+                isValid = false;
+                return (newErrors.lastName = error.lastName);
+            }
+
+            if (error.emailAddress) {
+                isValid = false;
+                return (newErrors.emailAddress = error.emailAddress);
+            }
+
+            if (error.password) {
+                isValid = false;
+                return (newErrors.password = error.password);
+            }
+        });
+
+        !isValid ? setErrors({ ...newErrors }) : setErrors({ firstName: "", lastName: "", emailAddress: "", password: "" });
+
+        return isValid;
+    };
+
+    const onSubmit = async (registerUser: IRegisterUserFormData) => {
+        const registeredUser = await AuthService.register(registerUser);
+        if (!registeredUser.Success) return; // show generic error modal...
+
+        const loginUser: ILoginUser = {
+            emailAddress: registerUser.emailAddress,
+            password: registerUser.password,
+        };
+
+        const loggedInUser = await AuthService.login(loginUser);
+        if (!loggedInUser.Success) return; // show generic error modal...
+
+        router.push("/");
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+        onSubmit({ ...formData });
+        setFormData({ firstName: "", lastName: "", emailAddress: "", password: "" });
+    };
+
 	return (
 		<div className="register">
 			<div className="container mt-5">
@@ -15,11 +91,14 @@ const RegisterForm: React.FC = () => {
 									type="text"
 									className="form-control"
 									id="firstName"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
 									placeholder="Enter your first name"
 									required
 								/>
+                                <div className="error text-danger">{errors.firstName}</div>
 							</div>
-
 							{/* Last Name */}
 							<div className="mb-3">
 								<label htmlFor="lastName" className="form-label">
@@ -29,9 +108,13 @@ const RegisterForm: React.FC = () => {
 									type="text"
 									className="form-control"
 									id="lastName"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
 									placeholder="Enter your last name"
 									required
 								/>
+                                <div className="error text-danger">{errors.lastName}</div>
 							</div>
 
 							{/* Email Address */}
@@ -43,9 +126,13 @@ const RegisterForm: React.FC = () => {
 									type="email"
 									className="form-control"
 									id="email"
+                                    name="emailAddress"
+                                    value={formData.emailAddress}
+                                    onChange={handleChange}
 									placeholder="Enter your email"
 									required
 								/>
+                                <div className="error text-danger">{errors.emailAddress}</div>
 							</div>
 
 							{/* Password */}
@@ -57,13 +144,17 @@ const RegisterForm: React.FC = () => {
 									type="password"
 									className="form-control"
 									id="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
 									placeholder="Enter your password"
 									required
 								/>
+                                <div className="error text-danger">{errors.password}</div>
 							</div>
 
 							{/* Submit Button */}
-							<button type="submit" className="btn btn-primary w-100">
+							<button type="submit" className="btn btn-primary w-100" onClick={handleSubmit}>
 								Register
 							</button>
 						</form>

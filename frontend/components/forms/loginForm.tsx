@@ -1,9 +1,13 @@
 import { useState } from "react";
 import ILoginUserFormData from "../../shared/interfaces/ILoginUserFormData";
-import ILoginUserFormError from "../../shared/interfaces/IRegisterUserFormError";
+import ILoginUserFormError from "../../shared/interfaces/ILoginUserFormError";
 import { AuthModel } from "../../model/authModel";
+import ILoginUser from "../../shared/interfaces/ILoginUser";
+import { AuthService } from "../../services/authService";
+import { useRouter } from "next/router";
 
 const LoginForm: React.FC = () => {
+    const router = useRouter();
     const form: ILoginUserFormData = { emailAddress: "", password: "" };
     const [formData, setFormData] = useState<ILoginUserFormData>(form);
     const [errors, setErrors] = useState<ILoginUserFormError>({ emailAddress: "", password: "" });
@@ -21,7 +25,7 @@ const LoginForm: React.FC = () => {
         let newErrors: ILoginUserFormError = { emailAddress: "", password: "" };
         const userErrors = AuthModel.processLoginUser({ ...formData });
 
-        userErrors.forEach((error) => {
+        userErrors.forEach(error => {
             if (error.emailAddress) {
                 isValid = false;
                 return (newErrors.emailAddress = error.emailAddress);
@@ -38,14 +42,20 @@ const LoginForm: React.FC = () => {
         return isValid;
     };
 
+    const onSubmit = async (loginUser: ILoginUser) => {
+        const loggedInUser = await AuthService.login(loginUser);
+        if (!loggedInUser.Success) return; // show generic error modal...
+        router.push("/");
+        // call endpoint. If successful, store the access-token in session. Redirect User to Habits Page.
+    }
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        // onsubmit(); // call endpoint. If successful, store the access-token in session. Redirect User to Habits Page.
+        onSubmit({ ...formData });
         setFormData({ emailAddress: "", password: "" });
     };
-
 
 	return (
 		<div className="login">
@@ -63,7 +73,7 @@ const LoginForm: React.FC = () => {
 									type="email"
 									className="form-control"
 									id="email"
-                                    name="days"
+                                    name="emailAddress"
                                     value={formData.emailAddress}
                                     onChange={handleChange}
 									placeholder="Enter your email"
@@ -81,6 +91,9 @@ const LoginForm: React.FC = () => {
 									type="password"
 									className="form-control"
 									id="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
 									placeholder="Enter your password"
 									required
 								/>

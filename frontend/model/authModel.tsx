@@ -7,14 +7,14 @@ export class AuthModel {
     public static processRegisterUser = (registerUser: IRegisterUser): Partial<IRegisterUserFormError>[] => UsersValidation.validateRegisterUser(registerUser);
     public static processLoginUser = (loginUser: ILoginUser): Partial<ILoginUserFormError>[] => UsersValidation.validateLoginUser(loginUser);
 
-	public static parseJWT(token: string) {
+	public static parseJWT(token: string = "") {
 		try {
+            if (!token) throw new Error("No token provided");
 			const base64Url = token.split(".")[1];
 			const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
 			return JSON.parse(atob(base64));
 		} catch (err) {
 			console.error("Invalid JWT:", err);
-			return null;
 		}
 	}
 }

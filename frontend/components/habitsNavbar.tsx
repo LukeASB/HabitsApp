@@ -9,14 +9,31 @@ import IHabitsNavbar from "../shared/interfaces/IHabitsNavbar";
 import { HabitsService } from "../services/habitsService";
 import IModalTypes from "../shared/interfaces/IModalTypes";
 import { ModalTypeEnum } from "../shared/enum/modalTypeEnum";
+import { useRouter } from "next/router";
+import { AuthModel } from "../model/authModel";
 
 
 const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
+    const router = useRouter();
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [showModal, setShowModal] = useState<IModalTypes>({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: false });
 
 	const test = "debug";
-	useEffect(() => (sessionStorage.getItem("access-token") || test ? setIsLoggedIn(true) : setIsLoggedIn(false)), []);
+	useEffect(() => {
+        // sessionStorage.getItem("access-token") || test ? setIsLoggedIn(true) : setIsLoggedIn(false);
+
+        const jwt = sessionStorage.getItem("access-token");
+        if (jwt) {
+            const parsedToken = AuthModel.parseJWT(jwt);
+            if (!parsedToken) {
+                setIsLoggedIn(false);
+                router.push("/login");
+                return;
+            }
+        }
+
+        setIsLoggedIn(true)
+    }, []);
 
 	const createHabit = async (habit: IHabit) => {
 		await HabitsService.createHabit(habit);

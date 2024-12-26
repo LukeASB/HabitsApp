@@ -20,7 +20,7 @@ func TestRegisterUserHandler(t *testing.T) {
 		userRegisterRequest *data.RegisterUserRequest
 	}{
 		{
-			name: "Succcessfully create a user",
+			name: "Successfully create a user",
 			want: true,
 			userRegisterRequest: &data.RegisterUserRequest{
 				EmailAddress: "test@test.com",
