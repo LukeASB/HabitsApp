@@ -88,7 +88,13 @@ func (ac *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", userLoggedIn.AccessToken))
-	w.Write(response)
+
+	ac.logger.DebugLog(fmt.Sprintf("authController.LoginHandler - Writing response: %s", response))
+	numOfBytes, err := w.Write([]byte(response))
+	ac.logger.DebugLog(fmt.Sprintf("authController.LoginHandler - w.Write wrote %d bytes", numOfBytes))
+	if err != nil {
+		ac.logger.ErrorLog(fmt.Sprintf("authController.LoginHandler - Error writing response: %s", err))
+	}
 }
 
 func (ac *AuthController) LogoutHandler(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +123,12 @@ func (ac *AuthController) LogoutHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	w.Write([]byte(response))
+	ac.logger.DebugLog(fmt.Sprintf("authController.LogoutHandler - Writing response: %s", response))
+	numOfBytes, err := w.Write([]byte(response))
+	ac.logger.DebugLog(fmt.Sprintf("authController.LogoutHandler - w.Write wrote %d bytes", numOfBytes))
+	if err != nil {
+		ac.logger.ErrorLog(fmt.Sprintf("authController.LogoutHandler - Error writing response: %s", err))
+	}
 }
 
 // Called by frontend when the Short-Lived JWT expires and receives a 401 from the protected habits endpoints. Refreshes the authToken, refreshToken
@@ -146,5 +157,10 @@ func (ac *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", newAccessToken))
-	w.Write(response)
+	ac.logger.DebugLog(fmt.Sprintf("authController.RefreshHandler - Writing response: %s", response))
+	numOfBytes, err := w.Write([]byte(response))
+	ac.logger.DebugLog(fmt.Sprintf("authController.RefreshHandler - w.Write wrote %d bytes", numOfBytes))
+	if err != nil {
+		ac.logger.ErrorLog(fmt.Sprintf("authController.RefreshHandler - Error writing response: %s", err))
+	}
 }

@@ -35,7 +35,7 @@ func (mw *Middleware) MiddlewareList(handler http.HandlerFunc, dependencies data
 
 	if dependencies.IsProtected {
 		mw.logger.DebugLog("middleware.MiddlewareList - Auth commented out for debug")
-		// middlewares = append(middlewares, mw.protectedMiddlewareList()...)
+		middlewares = append(middlewares, mw.protectedMiddlewareList()...)
 	}
 
 	if dependencies.CSRFRequired {

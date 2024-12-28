@@ -134,7 +134,6 @@ const RegisterForm: React.FC = () => {
 								/>
                                 <div className="error text-danger">{errors.emailAddress}</div>
 							</div>
-
 							{/* Password */}
 							<div className="mb-3">
 								<label htmlFor="password" className="form-label">
@@ -152,7 +151,6 @@ const RegisterForm: React.FC = () => {
 								/>
                                 <div className="error text-danger">{errors.password}</div>
 							</div>
-
 							{/* Submit Button */}
 							<button type="submit" className="btn btn-primary w-100" onClick={handleSubmit}>
 								Register

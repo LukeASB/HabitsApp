@@ -60,7 +60,7 @@ func TestRegisterUserHandler(t *testing.T) {
 			authController.RegisterUserHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				t.Errorf("TestRegisterUserHandler - HTTP Status Code = %d", status)
 				return
 			}
 
@@ -250,17 +250,17 @@ func TestLogoutHandler(t *testing.T) {
 			}
 
 			if userLoggedOutResponse.UserID != val.userLoggedOutRequest.UserID {
-				t.Errorf("TestLoginHandler - userId does not match logged out user. got=%s want=%s", userLoggedOutResponse.UserID, val.userLoggedOutRequest.UserID)
+				t.Errorf("TestLogoutHandler - userId does not match logged out user. got=%s want=%s", userLoggedOutResponse.UserID, val.userLoggedOutRequest.UserID)
 				return
 			}
 
 			if userLoggedOutResponse.EmailAddress != val.userLoggedOutRequest.EmailAddress {
-				t.Errorf("TestLoginHandler - email does not match logged out  user. got=%s want=%s", userLoggedOutResponse.EmailAddress, val.userLoggedOutRequest.EmailAddress)
+				t.Errorf("TestLogoutHandler - email does not match logged out  user. got=%s want=%s", userLoggedOutResponse.EmailAddress, val.userLoggedOutRequest.EmailAddress)
 				return
 			}
 
 			if userLoggedOutResponse.Success != val.want {
-				t.Errorf("TestRegisterUser Failed - got=%v, want=%v", userLoggedOutResponse.Success, val.want)
+				t.Errorf("TestLogoutHandler Failed - got=%v, want=%v", userLoggedOutResponse.Success, val.want)
 			}
 		})
 	}

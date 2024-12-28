@@ -3,6 +3,7 @@ package data
 import "time"
 
 type UserAuth struct {
+	UserID       string `json:"UserID"`
 	EmailAddress string `json:"EmailAddress"`
 	Password     string `json:"Password"`
 }

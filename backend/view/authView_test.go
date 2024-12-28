@@ -53,17 +53,17 @@ func TestRegisterUserHandler(t *testing.T) {
 			marshalledRegisterUserResponse, err := json.Marshal(val.want)
 
 			if err != nil {
-				t.Errorf("TestLoginHandler - Fail err: %s", err)
+				t.Errorf("TestRegisterUserHandler - Fail err: %s", err)
 			}
 
 			got, err := authView.RegisterUserHandler(val.registerUserData)
 
 			if err != nil {
-				t.Errorf("TestLoginHandler - Fail err: %s", err)
+				t.Errorf("TestRegisterUserHandler - Fail err: %s", err)
 			}
 
 			if !bytes.Equal(marshalledRegisterUserResponse, got) {
-				t.Errorf("TestLoginHandler - Fail want doesn't match got")
+				t.Errorf("TestRegisterUserHandler - Fail want doesn't match got")
 			}
 		})
 	}

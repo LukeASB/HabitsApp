@@ -42,7 +42,7 @@ export class AuthService {
         if (process.env.ENVIRONMENT === "DEV") return mockRegisteredUser;
 
         try {
-            const response = await fetch(`api/${process.env.API_URL}/register`, {
+            const response = await fetch(`/api/${process.env.API_URL}/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -64,6 +64,7 @@ export class AuthService {
 		try {
 			const shortlivedJWTAccessToken = sessionStorage.getItem("access-token");
 			const userData = shortlivedJWTAccessToken ? AuthModel.parseJWT(shortlivedJWTAccessToken) : null;
+
 			const response = await fetch(`/api/${process.env.API_URL}/refresh`, {
 				method: "POST",
 				body: JSON.stringify({ EmailAddress: userData.Email }),

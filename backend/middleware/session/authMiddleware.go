@@ -12,7 +12,7 @@ import (
 
 type contextKey string
 
-const claimsKey = contextKey("claims")
+const ClaimsKey = contextKey("claims")
 
 func AuthMiddleware(jwtTokens IJWTTokens, logger logger.ILogger) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
@@ -47,7 +47,7 @@ func AuthMiddleware(jwtTokens IJWTTokens, logger logger.ILogger) func(http.Handl
 			}
 
 			w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", newAccessToken))
-			ctx := context.WithValue(r.Context(), claimsKey, claims)
+			ctx := context.WithValue(r.Context(), ClaimsKey, claims)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
 	}

@@ -2,9 +2,11 @@ package controller
 
 import (
 	"bytes"
+	"context"
 	"dohabits/data"
 	"dohabits/db"
 	"dohabits/logger"
+	"dohabits/middleware/session"
 	"dohabits/model"
 	"dohabits/view"
 	"encoding/json"
@@ -47,13 +49,20 @@ func TestCreateHabitsHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
+
 			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/%s/CreateHabit", endpoint), io.NopCloser(bytes.NewBuffer(marshalledNewHabit)))
 			w := httptest.NewRecorder()
+
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
 
 			c.CreateHabitsHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				t.Errorf("TestCreateHabitsHandler - HTTP Status Code = %d", status)
 				return
 			}
 
@@ -104,13 +113,19 @@ func TestRetrieveHabitsHandler(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s/RetrieveAllHabits", endpoint), nil)
 			w := httptest.NewRecorder()
 			q := req.URL.Query()
-			q.Add("id", "1")
+			q.Add("habitId", "1")
 			req.URL.RawQuery = q.Encode()
+
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
 
 			c.RetrieveHabitsHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				t.Errorf("TestRetrieveHabitsHandler - HTTP Status Code = %d", status)
 				return
 			}
 
@@ -140,7 +155,15 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
-	marshalledAllHabits, err := json.Marshal(data.MockHabit)
+	userMockHabits := []data.Habit{}
+
+	for _, val := range data.MockHabit {
+		if val.UserID == "1" {
+			userMockHabits = append(userMockHabits, val)
+		}
+	}
+
+	marshalledAllHabits, err := json.Marshal(userMockHabits)
 
 	if err != nil {
 		t.Errorf("Fail err: %s", err)
@@ -161,10 +184,16 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s/RetrieveAllHabits", endpoint), nil)
 			w := httptest.NewRecorder()
 
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
+
 			c.RetrieveAllHabitsHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				t.Errorf("TestRetrieveAllHabitsHandler - HTTP Status Code = %d", status)
 				return
 			}
 
@@ -195,12 +224,13 @@ func TestUpdateHabitsHandler(t *testing.T) {
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
 	marshalledHabit, err := json.Marshal(data.Habit{
-		ID:               data.MockHabit[0].ID,
-		CreatedAt:        data.MockHabit[0].CreatedAt,
-		Name:             "Test Update Habit",
-		Days:             30,
-		DaysTarget:       50,
-		NumberOfAttempts: 0,
+		HabitID:         data.MockHabit[0].HabitID,
+		UserID:          "1",
+		CreatedAt:       data.MockHabit[0].CreatedAt,
+		Name:            "Test Update Habit",
+		Days:            30,
+		DaysTarget:      50,
+		CompletionDates: data.MockHabit[0].CompletionDates,
 	})
 
 	if err != nil {
@@ -234,13 +264,19 @@ func TestUpdateHabitsHandler(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/%s/UpdateHabit", endpoint), io.NopCloser(bytes.NewBuffer(marshalledNewHabit)))
 			w := httptest.NewRecorder()
 			q := req.URL.Query()
-			q.Add("id", "1")
+			q.Add("habitId", "1")
 			req.URL.RawQuery = q.Encode()
+
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
 
 			c.UpdateHabitsHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				t.Errorf("TestUpdateHabitsHandler - HTTP Status Code = %d", status)
 				return
 			}
 
@@ -285,8 +321,14 @@ func TestDeleteHabitsHandler(t *testing.T) {
 			req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/%s/DeleteHabit", endpoint), nil)
 			w := httptest.NewRecorder()
 			q := req.URL.Query()
-			q.Add("id", "1")
+			q.Add("habitId", "1")
 			req.URL.RawQuery = q.Encode()
+
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
 
 			expect, err := json.Marshal(map[string]bool{"success": true})
 
@@ -297,7 +339,7 @@ func TestDeleteHabitsHandler(t *testing.T) {
 			c.DeleteHabitsHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				t.Errorf("TestDeleteHabitsHandler - HTTP Status Code = %d", status)
 				return
 			}
 
