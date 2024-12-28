@@ -223,14 +223,18 @@ func TestUpdateHabitsHandler(t *testing.T) {
 
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
-	marshalledHabit, err := json.Marshal(data.Habit{
-		HabitID:         data.MockHabit[0].HabitID,
-		UserID:          "1",
-		CreatedAt:       data.MockHabit[0].CreatedAt,
+	habit := data.Habit{
 		Name:            "Test Update Habit",
 		Days:            30,
 		DaysTarget:      50,
-		CompletionDates: data.MockHabit[0].CompletionDates,
+		CompletionDates: append(data.MockHabit[0].CompletionDates, []string{"2021-09-01", "2021-09-02", "2021-09-03"}...),
+	}
+
+	marshalledUpdatedHabit, err := json.Marshal(data.UpdateHabit{
+		Name:            &habit.Name,
+		Days:            &habit.Days,
+		DaysTarget:      &habit.DaysTarget,
+		CompletionDates: &habit.CompletionDates,
 	})
 
 	if err != nil {
@@ -238,21 +242,24 @@ func TestUpdateHabitsHandler(t *testing.T) {
 	}
 
 	testCases := []struct {
-		name string
-		want []byte
+		name        string
+		updateHabit data.Habit
+		want        []byte
 	}{
 		{
-			name: "Test successful Update",
-			want: marshalledHabit,
+			name:        "Test successful Update",
+			updateHabit: data.Habit{Name: "Test Update Habit", Days: 30, DaysTarget: 50, CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"}},
+			want:        marshalledUpdatedHabit,
 		},
 	}
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			newHabit := data.NewHabit{
-				Name:       "Test Update Habit",
-				Days:       30,
-				DaysTarget: 50,
+			newHabit := data.UpdateHabit{
+				Name:            &val.updateHabit.Name,
+				Days:            &val.updateHabit.Days,
+				DaysTarget:      &val.updateHabit.DaysTarget,
+				CompletionDates: &val.updateHabit.CompletionDates,
 			}
 
 			marshalledNewHabit, err := json.Marshal(newHabit)

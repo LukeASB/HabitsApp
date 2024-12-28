@@ -238,6 +238,8 @@ func (db *MyMockDB) UpdateHabitsHandler(userId, habitId string, value interface{
 			data.MockHabit[i].Name = newHabit.Name
 			data.MockHabit[i].Days = newHabit.Days
 			data.MockHabit[i].DaysTarget = newHabit.DaysTarget
+			data.MockHabit[i].CompletionDates = newHabit.CompletionDates //append(data.MockHabit[i].CompletionDates, newHabit.CompletionDates...)
+
 			return nil
 		}
 	}

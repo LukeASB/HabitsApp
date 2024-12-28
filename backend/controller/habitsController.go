@@ -432,6 +432,10 @@ func (c *HabitsController) UpdateHabitsHandler(w http.ResponseWriter, r *http.Re
 			habit.DaysTarget = *updatedHabit.DaysTarget
 		}
 
+		if updatedHabit.CompletionDates != nil {
+			habit.CompletionDates = append(habit.CompletionDates, *updatedHabit.CompletionDates...)
+		}
+
 		err = c.habitsModel.UpdateHabitsHandler(username, habit, habitId)
 
 		if err != nil {
