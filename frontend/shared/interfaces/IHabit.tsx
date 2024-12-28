@@ -1,5 +1,5 @@
 export default interface IHabit {
-    id: string;
+    habitId: string;
     createdAt: number;
     name: string;
     days: number;

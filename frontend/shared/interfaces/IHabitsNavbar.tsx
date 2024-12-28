@@ -2,5 +2,10 @@ import IHabit from "./IHabit";
 
 export default interface IHabitsNavbar {
     habit: IHabit | null;
-    updateMain: (habit: IHabit | null, habitsUpdated?: boolean) => void;
+    habitOps: {
+        createHabit: (habit: IHabit) => Promise<void>;
+        updateHabit: (habit: IHabit) => Promise<void>;
+        deleteHabit: (habit: IHabit | null) => Promise<void>;
+    }
 }
+

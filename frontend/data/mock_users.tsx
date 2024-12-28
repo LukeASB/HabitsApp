@@ -11,7 +11,6 @@ export const createUser = (user: IRegisterUser) => {
 export const mockRegisteredUser: IRegisteredUser = {
     Success: true,
     User: {
-        UserID: "5",
         FirstName: "TestUser123",
         LastName: "TestUser123",
         EmailAddress: "test222@example.com",
@@ -22,7 +21,6 @@ export const mockRegisteredUser: IRegisteredUser = {
 export const mockLoggedInUser: ILoggedInUser = {
     Success: true,
     User: {
-        UserID: "1",
         FirstName: "John",
         LastName: "Doe",
         EmailAddress: "johndoe1@example.com",

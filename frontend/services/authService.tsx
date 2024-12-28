@@ -1,6 +1,7 @@
 import { mockLoggedInUser, mockRegisteredUser } from "../data/mock_users";
 import { AuthModel } from "../model/authModel";
 import ILoggedInUser from "../shared/interfaces/ILoggedInUser";
+import ILoggedOutUser from "../shared/interfaces/ILoggedOutUser";
 import ILoginUser from "../shared/interfaces/ILoginUser";
 import IRegisteredUser from "../shared/interfaces/IRegisteredUser";
 import IRegisterUser from "../shared/interfaces/IRegisterUser";
@@ -29,6 +30,7 @@ export class AuthService {
             sessionStorage.setItem("access-token", newAccessToken);
 
             const loggedInUser: ILoggedInUser = await response.json();
+            sessionStorage.setItem("user-data", JSON.stringify({ emailAddress: loggedInUser?.User?.EmailAddress, firstName: loggedInUser?.User?.FirstName, lastName: loggedInUser?.User?.LastName }));
 
             return loggedInUser;
         } catch (ex) {
@@ -58,6 +60,35 @@ export class AuthService {
         }
 
         return { Success: false }; // on false, return an error modal
+    }
+
+    public static async logout(emailAddress: string): Promise<Partial<ILoggedOutUser>> {
+        if (process.env.ENVIRONMENT === "DEV") {
+            sessionStorage.removeItem("access-token");
+            sessionStorage.removeItem("csrf-token");
+            sessionStorage.removeItem("user-data");
+            return { Success: true };
+        }
+
+        try {
+            const response = await fetch(`/api/${process.env.API_URL}/logout`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ EmailAddress: emailAddress }),
+            });
+
+            if (!response.ok) throw new Error("Failed to logout.");
+
+            const loggedOutUser: ILoggedInUser = await response.json();
+
+            return loggedOutUser;
+        } catch (ex) {
+            console.log(ex);
+        }
+
+        return { Success: false };
     }
 
 	public static async refresh(callback: Function) {

@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import { AuthModel } from "../model/authModel";
 
 
-const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
+const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, habitOps: {createHabit, updateHabit, deleteHabit}}) => {
     const router = useRouter();
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [showModal, setShowModal] = useState<IModalTypes>({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: false });
@@ -38,22 +38,6 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ habit, updateMain }) => {
         }
         setIsLoggedIn(true);
     }, []);
-
-	const createHabit = async (habit: IHabit) => {
-		await HabitsService.createHabit(habit);
-		updateMain(habit, true);
-	};
-
-	const updateHabit = async (habit: IHabit) => {
-		const data = await HabitsService.updateHabit(habit);
-		updateMain(data, true);
-	};
-
-	const deleteHabit = async (habit: IHabit | null) => {
-		if (!habit) return;
-        await HabitsService.deleteHabit(habit.id);
-		updateMain(null, true);
-	};
 
     const handleOpenModal = (modalType: ModalTypeEnum) => {
         if (modalType === ModalTypeEnum.CreateHabitModal) return setShowModal({ createHabitModal: true, updateHabitModal: false, deleteHabitModal: false });

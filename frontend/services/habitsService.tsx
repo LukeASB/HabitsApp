@@ -17,7 +17,7 @@ export class HabitsService {
 				headers: {
 					"Content-Type": "application/json",
 					"X-CSRF-Token": csrfToken || "",
-					Authorization: `Bearer ${shortlivedJWTAccessToken || ""}`,
+					Authorization: shortlivedJWTAccessToken || "",
 				},
 				body: JSON.stringify(habit),
 			});
@@ -25,7 +25,6 @@ export class HabitsService {
 			if (response.status === 403) await AuthService.refresh(HabitsService.createHabit);
 			if (!response.ok) throw new Error("Failed to fetch habits.");
 
-            
 		} catch (ex) {
 			console.log(ex);
 		}
@@ -43,7 +42,7 @@ export class HabitsService {
 				headers: {
 					"Content-Type": "application/json",
 					"X-CSRF-Token": csrfToken || "",
-					Authorization: `Bearer ${shortlivedJWTAccessToken || ""}`,
+					Authorization: shortlivedJWTAccessToken || "",
 				},
 			});
 
@@ -66,12 +65,12 @@ export class HabitsService {
 			const csrfToken = sessionStorage.getItem("csrf-token");
 			const shortlivedJWTAccessToken = sessionStorage.getItem("access-token");
 
-			const response = await fetch(`/api/${process.env.API_URL}/retrievehabit?id=${habitId}`, {
+			const response = await fetch(`/api/${process.env.API_URL}/retrievehabit?habitId=${habitId}`, {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
 					"X-CSRF-Token": csrfToken || "",
-					Authorization: `Bearer ${shortlivedJWTAccessToken || ""}`,
+					Authorization: shortlivedJWTAccessToken || "",
 				},
 			});
 
@@ -94,12 +93,12 @@ export class HabitsService {
 			const csrfToken = sessionStorage.getItem("csrf-token");
 			const shortlivedJWTAccessToken = sessionStorage.getItem("access-token");
 
-			const response = await fetch(`/api/${process.env.API_URL}/updatehabit?id=${habit.id}`, {
+			const response = await fetch(`/api/${process.env.API_URL}/updatehabit?habitId=${habit.habitId}`, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 					"X-CSRF-Token": csrfToken || "",
-					Authorization: `Bearer ${shortlivedJWTAccessToken || ""}`,
+					Authorization: shortlivedJWTAccessToken || "",
 				},
                 body: JSON.stringify(habit),
 			});
@@ -123,12 +122,12 @@ export class HabitsService {
 			const csrfToken = sessionStorage.getItem("csrf-token");
 			const shortlivedJWTAccessToken = sessionStorage.getItem("access-token");
 
-			const response = await fetch(`/api/${process.env.API_URL}/deletehabit?id=${habitId}`, {
+			const response = await fetch(`/api/${process.env.API_URL}/deletehabit?habitId=${habitId}`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
 					"X-CSRF-Token": csrfToken || "",
-					Authorization: `Bearer ${shortlivedJWTAccessToken || ""}`,
+					Authorization: shortlivedJWTAccessToken || "",
 				},
 			});
 

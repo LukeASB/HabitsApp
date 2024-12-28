@@ -44,12 +44,14 @@ const Calendar: React.FC<ICalendar> = ({
 		const removeCompletedDay = () => {
 			setCompletionDatesCompletionDatesCounter(completionDatesCounter - 1);
 			habit.completionDates = habit.completionDates.filter((date) => date !== completedDate);
+
 			setCompletionDates(habit.completionDates);
 		};
 
 		const addCompletedDay = () => {
 			setCompletionDatesCompletionDatesCounter(completionDatesCounter + 1);
 			habit.completionDates.push(completedDate);
+
 			setCompletionDates(habit.completionDates);
 		};
 

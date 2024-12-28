@@ -34,7 +34,7 @@ const Sidebar: React.FC<ISideBar> = ({ habitsMenu, toggleSidebar, isCollapsed, u
 					</button>
 				</li>
 				{renderHabitsMenu &&
-					habitsMenu.map((habit: IHabit, i) => {
+					habitsMenu?.map((habit: IHabit, i) => {
 						return (
 							<li key={`${habit.name}_${i}`} className={`${isCollapsed ? "d-none" : "nav-item "}`}>
 								<button className="btn btn-link nav-link text-white" onClick={() => updateMain(habit)}>
