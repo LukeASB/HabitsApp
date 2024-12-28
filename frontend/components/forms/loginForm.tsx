@@ -46,7 +46,6 @@ const LoginForm: React.FC = () => {
         const loggedInUser = await AuthService.login(loginUser);
         if (!loggedInUser.Success) return; // show generic error modal...
         router.push("/");
-        // call endpoint. If successful, store the access-token in session. Redirect User to Habits Page.
     }
 
     const handleSubmit = (e: React.FormEvent) => {

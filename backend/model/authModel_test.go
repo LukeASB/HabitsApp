@@ -106,7 +106,7 @@ func TestLogoutHandler(t *testing.T) {
 	}{
 		{
 			name:                 "Successfully logout",
-			userLoggedOutRequest: &data.UserLoggedOutRequest{UserID: "4", EmailAddress: "john.loggedin@example.com"},
+			userLoggedOutRequest: &data.UserLoggedOutRequest{EmailAddress: "john.loggedin@example.com"},
 			want:                 true,
 		},
 	}

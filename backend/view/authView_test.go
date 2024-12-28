@@ -38,7 +38,6 @@ func TestRegisterUserHandler(t *testing.T) {
 			want: &data.RegisterUserResponse{
 				Success: true,
 				User: data.UserDataResponse{
-					UserID:       "1",
 					FirstName:    "first",
 					LastName:     "last",
 					EmailAddress: "email@email.com",
@@ -100,14 +99,12 @@ func TestLoginHandler(t *testing.T) {
 			want: &data.UserLoggedInResponse{
 				Success: true,
 				User: data.UserDataResponse{
-					UserID:       "1",
 					FirstName:    "first",
 					LastName:     "last",
 					EmailAddress: "email@email.com",
 					CreatedAt:    fixedTime,
 				},
-				AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UxQGV4YW1wbGUuY29tIiwiZXhwIjoxNzMyMjU5NjUzfQ.vu2Vv_2z--i3p8TLYIHRmyKX9xjyICr_esCGrGYs2Es",
-				LoggedInAt:  fixedTime,
+				LoggedInAt: fixedTime,
 			},
 		},
 	}
@@ -145,7 +142,6 @@ func TestLogoutHandler(t *testing.T) {
 			name: "Test Logout Response",
 			want: &data.UserLoggedOutResponse{
 				Success:      true,
-				UserID:       "1",
 				EmailAddress: "test@test.com",
 				LoggedOutAt:  time.Now(),
 			},
@@ -179,20 +175,17 @@ func TestRefreshHandler(t *testing.T) {
 
 	testCases := []struct {
 		name               string
-		accessToken        string
 		userRefreshRequest *data.UserRefreshRequest
 		want               *data.UserRefreshResponse
 	}{
 		{
-			name:        "Test User Refresh Response",
-			accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UxQGV4YW1wbGUuY29tIiwiZXhwIjoxNzMyMjU5NjUzfQ.vu2Vv_2z--i3p8TLYIHRmyKX9xjyICr_esCGrGYs2Es",
+			name: "Test User Refresh Response",
 			userRefreshRequest: &data.UserRefreshRequest{
 				EmailAddress: "test@email.com",
 			},
 			want: &data.UserRefreshResponse{
 				Success:      true,
 				EmailAddress: "test@email.com",
-				AccessToken:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UxQGV4YW1wbGUuY29tIiwiZXhwIjoxNzMyMjU5NjUzfQ.vu2Vv_2z--i3p8TLYIHRmyKX9xjyICr_esCGrGYs2Es",
 			},
 		},
 	}
@@ -205,7 +198,7 @@ func TestRefreshHandler(t *testing.T) {
 				t.Errorf("TestRefreshHandler - Fail err: %s", err)
 			}
 
-			got, err := authView.RefreshHandler(val.userRefreshRequest, val.accessToken)
+			got, err := authView.RefreshHandler(val.userRefreshRequest)
 
 			if err != nil {
 				t.Errorf("TestRefreshHandler - Fail err: %s", err)

@@ -103,7 +103,7 @@ func (db *MyMockDB) LoginUser(value interface{}) error {
 
 func (db *MyMockDB) LogoutUser(value interface{}) error {
 	db.logger.InfoLog("mock_db.LogoutUser")
-	userLoggedOut, ok := value.(*data.UserLoggedOutRequest)
+	userLoggedOut, ok := value.(*data.UserData)
 
 	if !ok {
 		db.logger.ErrorLog("mock_db.LogoutUser - value type is not data.UserLoggedOutRequest")
@@ -238,7 +238,7 @@ func (db *MyMockDB) UpdateHabitsHandler(userId, habitId string, value interface{
 			data.MockHabit[i].Name = newHabit.Name
 			data.MockHabit[i].Days = newHabit.Days
 			data.MockHabit[i].DaysTarget = newHabit.DaysTarget
-			data.MockHabit[i].CompletionDates = newHabit.CompletionDates //append(data.MockHabit[i].CompletionDates, newHabit.CompletionDates...)
+			data.MockHabit[i].CompletionDates = newHabit.CompletionDates
 
 			return nil
 		}

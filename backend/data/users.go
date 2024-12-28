@@ -15,7 +15,6 @@ type UserRefreshRequest struct {
 type UserRefreshResponse struct {
 	Success      bool   `json:"Success"`
 	EmailAddress string `json:"EmailAddress"`
-	AccessToken  string `json:"AccessToken"`
 }
 type RegisterUserRequest struct {
 	EmailAddress string `json:"EmailAddress"`
@@ -35,7 +34,6 @@ type RegisterUserResponse struct {
 }
 
 type UserDataResponse struct {
-	UserID       string    `json:"UserID"`
 	FirstName    string    `json:"FirstName"`
 	LastName     string    `json:"LastName"`
 	EmailAddress string    `json:"EmailAddress"`
@@ -50,21 +48,18 @@ type UserLoggedInData struct {
 }
 
 type UserLoggedInResponse struct {
-	Success     bool             `json:"Success"`
-	User        UserDataResponse `json:"User"`
-	AccessToken string           `json:"AccessToken"`
-	LoggedInAt  time.Time        `json:"LoggedInAt"`
+	Success    bool             `json:"Success"`
+	User       UserDataResponse `json:"User"`
+	LoggedInAt time.Time        `json:"LoggedInAt"`
 }
 
 type UserLoggedOutResponse struct {
 	Success      bool      `json:"Success"`
-	UserID       string    `json:"UserID"`
 	EmailAddress string    `json:"EmailAddress"`
 	LoggedOutAt  time.Time `json:"LoggedOutAt"`
 }
 
 type UserLoggedOutRequest struct {
-	UserID       string `json:"UserID"`
 	EmailAddress string `json:"EmailAddress"`
 }
 

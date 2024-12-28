@@ -165,13 +165,12 @@ func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *
 	jwtTokens.DestroyJWTRefreshToken(userLoggedOutRequest.EmailAddress)
 	csrfTokens.DestroyCSRFToken(w)
 
-	if err := am.db.LogoutUser(userLoggedOutRequest); err != nil {
+	if err := am.db.LogoutUser(&userData); err != nil {
 		return nil, err
 	}
 
 	return &data.UserLoggedOutResponse{
 		Success:      true,
-		UserID:       userLoggedOutRequest.UserID,
 		EmailAddress: userLoggedOutRequest.EmailAddress,
 		LoggedOutAt:  time.Now(),
 	}, nil

@@ -204,7 +204,6 @@ func TestLogoutHandler(t *testing.T) {
 			name: "Successfully logout",
 			want: true,
 			userLoggedOutRequest: &data.UserLoggedOutRequest{
-				UserID:       "4",
 				EmailAddress: "john.loggedin@example.com",
 			},
 		},
@@ -249,11 +248,6 @@ func TestLogoutHandler(t *testing.T) {
 				return
 			}
 
-			if userLoggedOutResponse.UserID != val.userLoggedOutRequest.UserID {
-				t.Errorf("TestLogoutHandler - userId does not match logged out user. got=%s want=%s", userLoggedOutResponse.UserID, val.userLoggedOutRequest.UserID)
-				return
-			}
-
 			if userLoggedOutResponse.EmailAddress != val.userLoggedOutRequest.EmailAddress {
 				t.Errorf("TestLogoutHandler - email does not match logged out  user. got=%s want=%s", userLoggedOutResponse.EmailAddress, val.userLoggedOutRequest.EmailAddress)
 				return
@@ -279,12 +273,12 @@ func TestRefreshHandler(t *testing.T) {
 
 	testCases := []struct {
 		name               string
-		want               string
+		want               bool
 		userRefreshRequest *data.UserRefreshRequest
 	}{
 		{
 			name: "Successfully Get a Refresh Token",
-			want: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UxQGV4YW1wbGUuY29tIiwiZXhwIjoxNzMyMjU5NjUzfQ.vu2Vv_2z--i3p8TLYIHRmyKX9xjyICr_esCGrGYs2Es",
+			want: true,
 			userRefreshRequest: &data.UserRefreshRequest{
 				EmailAddress: "johndoe1@example.com",
 			},
@@ -330,8 +324,8 @@ func TestRefreshHandler(t *testing.T) {
 				return
 			}
 
-			if userRefreshResponse.AccessToken != val.want {
-				t.Errorf("TestRefreshHandler Failed - got=%v, want=%v", userRefreshResponse.AccessToken, val.want)
+			if userRefreshResponse.Success != val.want {
+				t.Errorf("TestRefreshHandler Failed")
 			}
 		})
 	}

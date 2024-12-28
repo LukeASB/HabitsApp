@@ -148,7 +148,7 @@ func (ac *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	response, err := ac.authView.RefreshHandler(&userRefreshRequest, newAccessToken)
+	response, err := ac.authView.RefreshHandler(&userRefreshRequest)
 
 	if err != nil {
 		ac.logger.DebugLog(fmt.Sprintf("authController.LogoutHandler - err: %s", err))

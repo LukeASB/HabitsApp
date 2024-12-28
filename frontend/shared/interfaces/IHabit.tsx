@@ -1,4 +1,3 @@
-// Move to data layer
 export default interface IHabit {
     id: string;
     createdAt: number;
