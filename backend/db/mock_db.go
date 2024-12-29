@@ -180,12 +180,13 @@ func (db *MyMockDB) CreateHabitsHandler(userId string, value interface{}) error 
 	}
 
 	habit := data.Habit{
-		HabitID:    fmt.Sprintf("%v", id+1),
-		UserID:     userId,
-		CreatedAt:  time.Now(),
-		Name:       newHabit.Name,
-		Days:       newHabit.Days,
-		DaysTarget: newHabit.DaysTarget,
+		HabitID:         fmt.Sprintf("%v", id+1),
+		UserID:          userId,
+		CreatedAt:       time.Now(),
+		Name:            newHabit.Name,
+		Days:            newHabit.Days,
+		DaysTarget:      newHabit.DaysTarget,
+		CompletionDates: []string{},
 	}
 
 	data.MockHabit = append(data.MockHabit, habit)

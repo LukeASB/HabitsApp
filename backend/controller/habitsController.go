@@ -68,7 +68,7 @@ func (c *HabitsController) CreateHabitsHandler(w http.ResponseWriter, r *http.Re
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Retrieve - JWT Token claims not found"),
+				err:  fmt.Errorf("habitsController.Create - JWT Token claims not found"),
 			}
 			return
 		}
@@ -81,7 +81,7 @@ func (c *HabitsController) CreateHabitsHandler(w http.ResponseWriter, r *http.Re
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Retrieve - JWT Token claims username is empty"),
+				err:  fmt.Errorf("habitsController.Create - JWT Token claims username is empty"),
 			}
 			return
 		}
@@ -273,7 +273,7 @@ func (c *HabitsController) RetrieveAllHabitsHandler(w http.ResponseWriter, r *ht
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Retrieve - JWT Token claims not found"),
+				err:  fmt.Errorf("habitsController.RetrieveAll - JWT Token claims not found"),
 			}
 			return
 		}
@@ -286,7 +286,7 @@ func (c *HabitsController) RetrieveAllHabitsHandler(w http.ResponseWriter, r *ht
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Retrieve - JWT Token claims username is empty"),
+				err:  fmt.Errorf("habitsController.RetrieveAll - JWT Token claims username is empty"),
 			}
 			return
 		}
@@ -359,7 +359,7 @@ func (c *HabitsController) UpdateHabitsHandler(w http.ResponseWriter, r *http.Re
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Retrieve - JWT Token claims not found"),
+				err:  fmt.Errorf("habitsController.Update - JWT Token claims not found"),
 			}
 			return
 		}
@@ -372,7 +372,7 @@ func (c *HabitsController) UpdateHabitsHandler(w http.ResponseWriter, r *http.Re
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Retrieve - JWT Token claims username is empty"),
+				err:  fmt.Errorf("habitsController.Update - JWT Token claims username is empty"),
 			}
 			return
 		}
@@ -433,7 +433,7 @@ func (c *HabitsController) UpdateHabitsHandler(w http.ResponseWriter, r *http.Re
 		}
 
 		if updatedHabit.CompletionDates != nil {
-			habit.CompletionDates = append(habit.CompletionDates, *updatedHabit.CompletionDates...)
+			habit.CompletionDates = *updatedHabit.CompletionDates
 		}
 
 		err = c.habitsModel.UpdateHabitsHandler(username, habit, habitId)
@@ -502,7 +502,7 @@ func (c *HabitsController) DeleteHabitsHandler(w http.ResponseWriter, r *http.Re
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Retrieve - JWT Token claims not found"),
+				err:  fmt.Errorf("habitsController.Delete - JWT Token claims not found"),
 			}
 			return
 		}
@@ -515,7 +515,7 @@ func (c *HabitsController) DeleteHabitsHandler(w http.ResponseWriter, r *http.Re
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Retrieve - JWT Token claims username is empty"),
+				err:  fmt.Errorf("habitsController.Delete - JWT Token claims username is empty"),
 			}
 			return
 		}

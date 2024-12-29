@@ -1,18 +1,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import IHabit from "../shared/interfaces/IHabit";
 
-/**
- * @returns
- */
 const Navbar: React.FC = () => {
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
 	useEffect(() => (sessionStorage.getItem("access-token") ? setIsLoggedIn(true) : setIsLoggedIn(false)), []);
 
 	return (
-		<nav className="navbar navbar-expand-lg navbar-light bg-dark">
-			<div className="container content">
+		<nav className="navbar navbar-expand-lg navbar-light bg-dark w-100">
+			<div className="container-fluid">
 				<strong>
 					<span className="navbar-brand text-light">
 						<Link className="navbar-brand text-light" href="/">

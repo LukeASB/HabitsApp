@@ -63,7 +63,8 @@ func (sa *JWTTokens) GenerateJSONWebTokens(username string) (string, string, err
 
 // GenerateAccessJWT generates a new JWT for a given username
 func (sa *JWTTokens) generateAccessJWT(username string) (string, error) {
-	shortLivedJWT := time.Now().Add(5 * time.Minute)
+	// shortLivedJWT := time.Now().Add(5 * time.Minute)
+	shortLivedJWT := time.Now().Add(24 * time.Hour) // debug
 	return sa.generateToken(username, shortLivedJWT)
 }
 

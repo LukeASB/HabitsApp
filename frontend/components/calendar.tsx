@@ -63,8 +63,7 @@ const Calendar: React.FC<ICalendar> = ({
 		addCompletedDay();
 	};
 
-	const isCompletedDay = (day: number) =>
-		completionDates.includes(`${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`);
+	const isCompletedDay = (day: number) => completionDates.includes(`${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`);
 
 	// Handlers for navigating months
 	const prevMonth = () => setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));

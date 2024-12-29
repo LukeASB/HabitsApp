@@ -4,5 +4,6 @@ export default interface ISideBar {
     habitsMenu: IHabit[];
     toggleSidebar: () => void;
     isCollapsed: boolean;
-    updateMain: (habit: IHabit | null) => void;
+    currentSelectedHabit: IHabit | null; 
+    updateMain: (habit: IHabit | null, currentSelectedHabit: IHabit | null, habitsUpdated?: boolean) => Promise<void>;
 }

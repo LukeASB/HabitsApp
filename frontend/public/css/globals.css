@@ -1,14 +1,25 @@
 /* styles/globals.css */
 html, body, #__next {
   height: 100%;
+  width: 100%;
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .mainLayout {
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  width: 100%;
   background-color:white;
+}
+
+/* Ensure mainLayout spans full width on mobile */
+@media (max-width: 767px) {
+    .mainLayout {
+        width: 100%; /* Use viewport width to ensure full width */
+    }
 }
 
 .content {

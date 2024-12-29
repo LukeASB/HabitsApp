@@ -16,7 +16,7 @@ const Home: React.FC = () => {
         if (!hasHabitsBeenUpdated) return;
         if (process.env.ENVIRONMENT === "DEV") {
             setHabitsMenu(mockhabits);
-            setHasHabitsBeenUpdated(false);    
+            setHasHabitsBeenUpdated(false);
             return;
         }
 
@@ -34,39 +34,57 @@ const Home: React.FC = () => {
 
     const createHabit = async (habit: IHabit) => {
         await HabitsService.createHabit(habit);
-        updateMain(habit, true);
+        setHasHabitsBeenUpdated(true);
+        setHabitNavbar(habit);
+		setCompletionDates(habit.completionDates);
+		setCompletionDatesCompletionDatesCounter(habit.completionDates.length);
+        setCurrentSelectedHabit(habit);
     };
 
     const updateHabit = async (habit: IHabit) => {
         const data = await HabitsService.updateHabit(habit);
-        updateMain(data, true);
+        setHasHabitsBeenUpdated(true);
+        setHabitNavbar(habit);
+		setCompletionDates(habit.completionDates);
+		setCompletionDatesCompletionDatesCounter(habit.completionDates.length);
+        setCurrentSelectedHabit(habit);
     };
 
     const deleteHabit = async (habit: IHabit | null) => {
         if (!habit) return;
         await HabitsService.deleteHabit(habit.habitId);
-        updateMain(null, true);
+        updateMain(null, null, true);
     };
 
-	const updateMain = (habit: IHabit | null, habitsUpdated = false) => {
+	const updateMain = async (habit: IHabit | null, currentSelectedHabit: IHabit | null, habitsUpdated = false) => {
 		if (!habit) {
 			setHabitNavbar(null);
-			setCurrentSelectedHabit(null);
 			setCompletionDates([]);
 			setCompletionDatesCompletionDatesCounter(0);
-			if (habitsUpdated) {
+            if (habitsUpdated) {
                 setHasHabitsBeenUpdated(true);
             }
+            setCurrentSelectedHabit(null);
 			return;
 		}
 
-		setHabitNavbar(habit);
-		setCurrentSelectedHabit(habit);
-		setCompletionDates(habit.completionDates);
-		setCompletionDatesCompletionDatesCounter(habit.completionDates.length);
-        if (habitsUpdated) {
+        if (currentSelectedHabit && habitsUpdated) {
+            await HabitsService.updateHabit(currentSelectedHabit);
             setHasHabitsBeenUpdated(true);
         }
+
+        if (!currentSelectedHabit && habitsUpdated) {
+            // Come from "All Habits" page. Update all the habits that have been changed.
+            for (const habit of habitsMenu) {
+                await HabitsService.updateHabit(habit);
+            }
+            setHasHabitsBeenUpdated(true);
+        }
+
+        setHabitNavbar(habit);
+		setCompletionDates(habit.completionDates);
+		setCompletionDatesCompletionDatesCounter(habit.completionDates.length);
+        setCurrentSelectedHabit(habit);
 	};
 
 	return (
@@ -79,6 +97,7 @@ const Home: React.FC = () => {
 					habitsMenu={habitsMenu}
 					toggleSidebar={toggleSidebar}
 					isCollapsed={isCollapsed}
+                    currentSelectedHabit={currentSelectedHabit}
 					updateMain={updateMain}
 				/>
 				<div className="flex-grow-1">

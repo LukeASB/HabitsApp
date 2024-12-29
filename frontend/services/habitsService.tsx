@@ -1,7 +1,5 @@
 import { mockhabits, createMockHabit, retrieveMockHabit, updateMockHabit, deleteMockHabit } from "../data/mock_habits";
-import { HabitsModel } from "../model/habitsModel";
 import IHabit from "../shared/interfaces/IHabit";
-import { HabitsValidation } from "../validation/habitsValidation";
 import { AuthService } from "./authService";
 
 export class HabitsService {
@@ -22,7 +20,7 @@ export class HabitsService {
 				body: JSON.stringify(habit),
 			});
 
-			if (response.status === 403) await AuthService.refresh(HabitsService.createHabit);
+			if (response.status === 401) await AuthService.refresh(HabitsService.createHabit);
 			if (!response.ok) throw new Error("Failed to fetch habits.");
 
 		} catch (ex) {
@@ -46,7 +44,7 @@ export class HabitsService {
 				},
 			});
 
-			if (response.status === 403) await AuthService.refresh(HabitsService.retrieveHabits);
+			if (response.status === 401) await AuthService.refresh(HabitsService.retrieveHabits);
 			if (!response.ok) throw new Error("Failed to fetch habits.");
 
 			const data: IHabit[] = await response.json();
@@ -74,7 +72,7 @@ export class HabitsService {
 				},
 			});
 
-			if (response.status === 403) await AuthService.refresh(HabitsService.retrieveHabit);
+			if (response.status === 401) await AuthService.refresh(HabitsService.retrieveHabit);
 			if (!response.ok) throw new Error("Failed to fetch habit.");
 
 			const data: IHabit[] = await response.json();
@@ -103,7 +101,7 @@ export class HabitsService {
                 body: JSON.stringify(habit),
 			});
 
-			if (response.status === 403) await AuthService.refresh(HabitsService.updateHabit);
+			if (response.status === 401) await AuthService.refresh(HabitsService.updateHabit);
 			if (!response.ok) throw new Error("Failed to fetch habit.");
 
 			const data: IHabit = await response.json();
@@ -131,7 +129,7 @@ export class HabitsService {
 				},
 			});
 
-			if (response.status === 403) await AuthService.refresh(HabitsService.deleteHabit);
+			if (response.status === 401) await AuthService.refresh(HabitsService.deleteHabit);
 			if (!response.ok) throw new Error("Failed to delete habit.");
 
 			const data = await response.json();
