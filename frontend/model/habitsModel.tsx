@@ -5,5 +5,5 @@ import { HabitsValidation } from "../validation/habitsValidation";
 
 export class HabitsModel {
 	public static processCreateHabit = (habit: Partial<IHabit>): Partial<ICreateHabitFormError>[] => HabitsValidation.validateCreateHabit(habit);
-    public static processUpdateHabit = (habit: Partial<IHabit>): Partial<IUpdateHabitFormError>[] => HabitsValidation.validateUpdateHabit(habit);
+	public static processUpdateHabit = (habit: Partial<IHabit>): Partial<IUpdateHabitFormError>[] => HabitsValidation.validateUpdateHabit(habit);
 }

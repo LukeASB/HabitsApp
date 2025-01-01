@@ -4,13 +4,7 @@ import ICalendar from "../shared/interfaces/ICalendar";
 
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-const Calendar: React.FC<ICalendar> = ({
-	currentSelectedHabit,
-	completionDatesCounter,
-	setCompletionDatesCompletionDatesCounter,
-	setCompletionDates,
-	completionDates,
-}) => {
+const Calendar: React.FC<ICalendar> = ({ currentSelectedHabit, completionDatesCounter, setCompletionDatesCompletionDatesCounter, setCompletionDates, completionDates }) => {
 	const [currentDate, setCurrentDate] = useState(new Date());
 
 	const GenerateCalendarGrid = (currentDate: Date) => {
@@ -89,11 +83,7 @@ const Calendar: React.FC<ICalendar> = ({
 			<div className="calendar-grid">
 				<div id="weekday-headers" className="d-flex">
 					{daysOfWeek.map((day) => (
-						<div
-							className="day-header flex-fill text-center fw-bold"
-							key={day}
-							style={{ width: "calc(100% / 7)" }}
-						>
+						<div className="day-header flex-fill text-center fw-bold" key={day} style={{ width: "calc(100% / 7)" }}>
 							{day}
 						</div>
 					))}
@@ -102,14 +92,7 @@ const Calendar: React.FC<ICalendar> = ({
 				{weeks.map((week, rowIndex) => (
 					<div id="calendar-row" key={rowIndex} className="d-flex">
 						{week.map((day, colIndex) => {
-							if (!day)
-								return (
-									<div
-										key={colIndex}
-										className="day-cell flex-fill text-center p-2 empty"
-										style={{ width: "calc(100% / 7)" }}
-									></div>
-								);
+							if (!day) return <div key={colIndex} className="day-cell flex-fill text-center p-2 empty" style={{ width: "calc(100% / 7)" }}></div>;
 
 							return (
 								<div

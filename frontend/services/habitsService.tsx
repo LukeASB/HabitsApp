@@ -22,7 +22,6 @@ export class HabitsService {
 
 			if (response.status === 401) await AuthService.refresh(HabitsService.createHabit);
 			if (!response.ok) throw new Error("Failed to fetch habits.");
-
 		} catch (ex) {
 			console.log(ex);
 		}
@@ -98,7 +97,7 @@ export class HabitsService {
 					"X-CSRF-Token": csrfToken || "",
 					Authorization: shortlivedJWTAccessToken || "",
 				},
-                body: JSON.stringify(habit),
+				body: JSON.stringify(habit),
 			});
 
 			if (response.status === 401) await AuthService.refresh(HabitsService.updateHabit);

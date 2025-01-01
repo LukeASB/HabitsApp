@@ -7,14 +7,8 @@ export default function Document() {
 			<Head>
 				<meta charSet="utf-8" />
 				<meta name="robots" content="index, follow" />
-				<meta
-					name="googlebot"
-					content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
-				/>
-				<meta
-					name="bingbot"
-					content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
-				/>
+				<meta name="googlebot" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+				<meta name="bingbot" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
 				{/* <link rel="canonical" href="https://lukeasb.github.io/" /> */}
 				<meta httpEquiv="content-script-type" content="text/javascript" />
 				<meta httpEquiv="content-style-type" content="text/css" />
@@ -27,11 +21,7 @@ export default function Document() {
 				<meta property="og:site_name" content="Luke Sloane-Bulger" />
 				<meta property="og:locale" content="en_GB" />
 				<link rel="shortcut icon" href="../assets/favicon.png" type="image/x-icon" />
-				<link
-					rel="stylesheet"
-					href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-					crossOrigin="anonymous"
-				/>
+				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossOrigin="anonymous" />
 				<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
 				<Script
 					src="https://code.jquery.com/jquery-3.5.1.slim.min.js"

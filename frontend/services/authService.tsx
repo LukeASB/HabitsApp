@@ -8,88 +8,88 @@ import IRegisterUser from "../shared/interfaces/IRegisterUser";
 
 export class AuthService {
 	public static async login(loginUser: ILoginUser): Promise<Partial<ILoggedInUser>> {
-        if (process.env.ENVIRONMENT === "DEV") {
-            sessionStorage.setItem("access-token", mockLoggedInUser.AccessToken);
-            return mockLoggedInUser;
-        }
+		if (process.env.ENVIRONMENT === "DEV") {
+			sessionStorage.setItem("access-token", mockLoggedInUser.AccessToken);
+			return mockLoggedInUser;
+		}
 
-        try {
-            const response = await fetch(`/api/${process.env.API_URL}/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(loginUser),
-            });
+		try {
+			const response = await fetch(`/api/${process.env.API_URL}/login`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(loginUser),
+			});
 
-            if (!response.ok) throw new Error("Failed to login.");
+			if (!response.ok) throw new Error("Failed to login.");
 
-            const newAccessToken = response.headers.get("Authorization");
-            if (!newAccessToken) throw new Error("No access token provided.");
-            
-            sessionStorage.setItem("access-token", newAccessToken);
+			const newAccessToken = response.headers.get("Authorization");
+			if (!newAccessToken) throw new Error("No access token provided.");
 
-            const loggedInUser: ILoggedInUser = await response.json();
-            sessionStorage.setItem("user-data", JSON.stringify({ emailAddress: loggedInUser?.User?.EmailAddress, firstName: loggedInUser?.User?.FirstName, lastName: loggedInUser?.User?.LastName }));
+			sessionStorage.setItem("access-token", newAccessToken);
 
-            return loggedInUser;
-        } catch (ex) {
-            console.log(ex);
-        }
+			const loggedInUser: ILoggedInUser = await response.json();
+			sessionStorage.setItem("user-data", JSON.stringify({ emailAddress: loggedInUser?.User?.EmailAddress, firstName: loggedInUser?.User?.FirstName, lastName: loggedInUser?.User?.LastName }));
 
-        return { Success: false };
-    }
+			return loggedInUser;
+		} catch (ex) {
+			console.log(ex);
+		}
+
+		return { Success: false };
+	}
 
 	public static async register(registerUser: IRegisterUser): Promise<Partial<IRegisteredUser>> {
-        if (process.env.ENVIRONMENT === "DEV") return mockRegisteredUser;
+		if (process.env.ENVIRONMENT === "DEV") return mockRegisteredUser;
 
-        try {
-            const response = await fetch(`/api/${process.env.API_URL}/register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(registerUser),
-            });
+		try {
+			const response = await fetch(`/api/${process.env.API_URL}/register`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(registerUser),
+			});
 
-            const registeredUser: IRegisteredUser = await response.json();
+			const registeredUser: IRegisteredUser = await response.json();
 
-            return registeredUser;
-        } catch (ex) {
-            console.log(ex);
-        }
+			return registeredUser;
+		} catch (ex) {
+			console.log(ex);
+		}
 
-        return { Success: false }; // on false, return an error modal
-    }
+		return { Success: false }; // on false, return an error modal
+	}
 
-    public static async logout(emailAddress: string): Promise<Partial<ILoggedOutUser>> {
-        if (process.env.ENVIRONMENT === "DEV") {
-            sessionStorage.removeItem("access-token");
-            sessionStorage.removeItem("csrf-token");
-            sessionStorage.removeItem("user-data");
-            return { Success: true };
-        }
+	public static async logout(emailAddress: string): Promise<Partial<ILoggedOutUser>> {
+		if (process.env.ENVIRONMENT === "DEV") {
+			sessionStorage.removeItem("access-token");
+			sessionStorage.removeItem("csrf-token");
+			sessionStorage.removeItem("user-data");
+			return { Success: true };
+		}
 
-        try {
-            const response = await fetch(`/api/${process.env.API_URL}/logout`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ EmailAddress: emailAddress }),
-            });
+		try {
+			const response = await fetch(`/api/${process.env.API_URL}/logout`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ EmailAddress: emailAddress }),
+			});
 
-            if (!response.ok) throw new Error("Failed to logout.");
+			if (!response.ok) throw new Error("Failed to logout.");
 
-            const loggedOutUser: ILoggedInUser = await response.json();
+			const loggedOutUser: ILoggedInUser = await response.json();
 
-            return loggedOutUser;
-        } catch (ex) {
-            console.log(ex);
-        }
+			return loggedOutUser;
+		} catch (ex) {
+			console.log(ex);
+		}
 
-        return { Success: false };
-    }
+		return { Success: false };
+	}
 
 	public static async refresh(callback: Function) {
 		try {

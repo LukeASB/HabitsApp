@@ -2,49 +2,51 @@ import { useState, useEffect } from "react";
 import IHabit from "../shared/interfaces/IHabit";
 import ISideBar from "../shared/interfaces/ISideBar";
 
-const Sidebar: React.FC<ISideBar> = ({ habitsMenu, toggleSidebar, isCollapsed, currentSelectedHabit, updateMain }) => {
-	const [renderHabitsMenu, setRenderHabitsMenu] = useState(!isCollapsed);
+const Sidebar: React.FC<ISideBar> = ({ habitsMenu, showSidebar, setShowSidebar, currentSelectedHabit, updateMain }) => {
+	// MAY NOT NEED RENDERHABITSMENU
 
-	useEffect(() => {
-		if (isCollapsed) return setRenderHabitsMenu(false);
-
-		const timer = setTimeout(() => setRenderHabitsMenu(true), 100);
-		return () => clearTimeout(timer);
-	}, [isCollapsed]);
+	const handleHabitClick = (habit: IHabit | null) => {
+		updateMain(habit, currentSelectedHabit, true);
+		setShowSidebar(false); // Close the sidebar
+	};
 
 	return (
-		<div
-			className={`bg-dark text-white p-3 ${isCollapsed ? "collapsed-width" : "full-width"}`}
-			style={{
-				width: isCollapsed ? "60px" : "400px",
-				transition: "width 0.s",
-			}}
-		>
-			<div className="d-flex justify-content-between align-items-center">
-				<h5 className={`${isCollapsed ? "d-none" : ""}`}>Habits</h5>
-				<button className="btn btn-sm btn-light" onClick={toggleSidebar} aria-label="Toggle Sidebar">
-					{isCollapsed ? "→" : "←"}
-				</button>
+		<>
+			<div
+				className={`offcanvas offcanvas-start bg-dark text-white ${showSidebar ? "show d-block" : ""}`}
+				id="offcanvasSidebar"
+				aria-labelledby="offcanvasSidebarLabel"
+				tabIndex={-1}
+				style={{ visibility: showSidebar ? "visible" : "hidden" }}
+			>
+				<div className="offcanvas-header">
+					<h5 className="offcanvas-title" id="offcanvasSidebarLabel">
+						Habits
+					</h5>
+					<button type="button" className="btn-close text-reset" onClick={() => setShowSidebar(false)} aria-label="Close"></button>
+				</div>
+
+				<div className="offcanvas-body">
+					<ul className="nav flex-column">
+						<li key={`all_habits`} className="nav-item">
+							<button className="btn btn-link nav-link text-white" onClick={() => handleHabitClick(null)}>
+								<i className="habit" /> All Habits
+							</button>
+						</li>
+						{
+							habitsMenu?.map((habit: IHabit, i) => {
+								return (
+									<li key={`${habit.name}_${i}`} className="nav-item">
+										<button className="btn btn-link nav-link text-white" onClick={() => handleHabitClick(habit)}>
+											<i className={`${habit.name}_${i}`} /> {habit.name}
+										</button>
+									</li>
+								);
+							})}
+					</ul>
+				</div>
 			</div>
-			<ul className="nav flex-column mt-3">
-				<li key={`all_habits`} className={`${isCollapsed ? "d-none" : "nav-item "}`}>
-					<button className="btn btn-link nav-link text-white" onClick={() => updateMain(null, null, true)}>
-						<i className="habit" />
-						All Habits
-					</button>
-				</li>
-				{renderHabitsMenu &&
-					habitsMenu?.map((habit: IHabit, i) => {
-						return (
-							<li key={`${habit.name}_${i}`} className={`${isCollapsed ? "d-none" : "nav-item "}`}>
-								<button className="btn btn-link nav-link text-white" onClick={() => updateMain(habit, currentSelectedHabit, true)}>
-									<i className={`${habit.name}_${i}`} /> {habit.name}
-								</button>
-							</li>
-						);
-					})}
-			</ul>
-		</div>
+		</>
 	);
 };
 

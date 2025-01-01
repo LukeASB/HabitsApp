@@ -7,20 +7,13 @@ html, body, #__next {
   box-sizing: border-box;
 }
 
-.mainLayout {
+/* .mainLayout {
   display: flex;
   flex-direction: column;
   min-height: 100%;
   width: 100%;
   background-color:white;
-}
-
-/* Ensure mainLayout spans full width on mobile */
-@media (max-width: 767px) {
-    .mainLayout {
-        width: 100%; /* Use viewport width to ensure full width */
-    }
-}
+} */
 
 .content {
   flex: 1;
@@ -39,20 +32,20 @@ html, body, #__next {
   padding: 10px 0;
 }
 
-.sidebar-collapsed .nav-link span {
+/* .sidebar-collapsed .nav-link span {
   display: none;
 }
 
 .sidebar-collapsed .nav-link {
   text-align: center;
-}
+} */
 
-button[aria-label="Toggle Sidebar"] {
+/* button[aria-label="Toggle Sidebar"] {
   background: none;
   border: none;
   color: #fff;
   cursor: pointer;
-}
+} */
 
 .calendar {
   padding: 10px;

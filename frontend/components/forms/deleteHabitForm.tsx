@@ -5,7 +5,7 @@ import { ModalTypeEnum } from "../../shared/enum/modalTypeEnum";
 const DeleteHabitForm: React.FC<IDeleteHabitForm> = ({ habit, onSubmit, onModalClose }) => {
 	const handleConfirm = () => {
 		onSubmit(habit);
-        onModalClose(ModalTypeEnum.DeleteHabitModal);
+		onModalClose(ModalTypeEnum.DeleteHabitModal);
 	};
 
 	return (
