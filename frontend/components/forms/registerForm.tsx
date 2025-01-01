@@ -3,14 +3,32 @@ import IRegisterUserFormData from "../../shared/interfaces/IRegisterUserFormData
 import { useState } from "react";
 import { AuthModel } from "../../model/authModel";
 import { AuthService } from "../../services/authService";
-import ILoggedInUser from "../../shared/interfaces/ILoggedInUser";
 import ILoginUser from "../../shared/interfaces/ILoginUser";
+import GenericErrorForm from "./genericErrorForm";
+import { ModalTypeEnum } from "../../shared/enum/modalTypeEnum";
+import Modal from "../modal/modal";
+import IUserAuthModalTypes from "../../shared/interfaces/IUserAuthModalTypes";
 
 const RegisterForm: React.FC = () => {
 	const router = useRouter();
 	const form: IRegisterUserFormData = { firstName: "", lastName: "", emailAddress: "", password: "" };
 	const [formData, setFormData] = useState<IRegisterUserFormData>(form);
 	const [errors, setErrors] = useState<IRegisterUserFormData>({ firstName: "", lastName: "", emailAddress: "", password: "" });
+        const [showModal, setShowModal] = useState<IUserAuthModalTypes>({ RegisterErrorModal: false, LoginErrorModal: false });
+    
+        const handleOpenModal = (modalType: ModalTypeEnum) => {
+            if (modalType === ModalTypeEnum.RegisterErrorModal) return setShowModal({ RegisterErrorModal: true, LoginErrorModal: false });
+            if (modalType === ModalTypeEnum.LoginErrorModal) return setShowModal({ RegisterErrorModal: false, LoginErrorModal: true });
+        };
+    
+        const handleCloseModal = (modalType: ModalTypeEnum) => {
+            if (modalType === ModalTypeEnum.RegisterErrorModal) return setShowModal({ RegisterErrorModal: false, LoginErrorModal: false });
+            if (modalType === ModalTypeEnum.LoginErrorModal) return setShowModal({ RegisterErrorModal: false, LoginErrorModal: false });
+        };
+    
+        const onGenericErrorModalSubmit = () => {
+            setShowModal({ RegisterErrorModal: false, LoginErrorModal: false });
+        }
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -54,7 +72,10 @@ const RegisterForm: React.FC = () => {
 
 	const onSubmit = async (registerUser: IRegisterUserFormData) => {
 		const registeredUser = await AuthService.register(registerUser);
-		if (!registeredUser.Success) return; // show generic error modal...
+		if (!registeredUser.Success) {
+            handleOpenModal(ModalTypeEnum.RegisterErrorModal);
+            return;
+        }
 
 		const loginUser: ILoginUser = {
 			emailAddress: registerUser.emailAddress,
@@ -62,7 +83,10 @@ const RegisterForm: React.FC = () => {
 		};
 
 		const loggedInUser = await AuthService.login(loginUser);
-		if (!loggedInUser.Success) return; // show generic error modal...
+		if (!loggedInUser.Success) {
+            handleOpenModal(ModalTypeEnum.LoginErrorModal);
+            return;
+        }
 
 		router.push("/");
 	};
@@ -76,7 +100,25 @@ const RegisterForm: React.FC = () => {
 	};
 
 	return (
-		<div className="register">
+		<div id="register" className="register">
+            <Modal
+                id="registerErrorModal"
+                title="Register"
+                body={<GenericErrorForm error="Failed To Register User" modalType={ModalTypeEnum.RegisterErrorModal} onSubmit={onGenericErrorModalSubmit} onModalClose={handleCloseModal}/>}
+                showModal={showModal.RegisterErrorModal}
+                modalType={ModalTypeEnum.RegisterErrorModal}
+                onModalOpen={handleOpenModal}
+                onModalClose={handleCloseModal}
+                />
+            <Modal
+                id="loginErrorModal"
+                title="Login"
+                body={<GenericErrorForm error="Invalid Login Details" modalType={ModalTypeEnum.LoginErrorModal} onSubmit={onGenericErrorModalSubmit} onModalClose={handleCloseModal}/>}
+                showModal={showModal.LoginErrorModal}
+                modalType={ModalTypeEnum.LoginErrorModal}
+                onModalOpen={handleOpenModal}
+                onModalClose={handleCloseModal}
+                />
 			<div className="container mt-5">
 				<div className="row justify-content-center">
 					<div className="col-md-6">

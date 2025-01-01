@@ -96,12 +96,14 @@ export class AuthService {
 			const shortlivedJWTAccessToken = sessionStorage.getItem("access-token");
 			const userData = shortlivedJWTAccessToken ? AuthModel.parseJWT(shortlivedJWTAccessToken) : null;
 
+            if (!userData) return window.location.href = "/login";
+
 			const response = await fetch(`/api/${process.env.API_URL}/refresh`, {
 				method: "POST",
-				body: JSON.stringify({ EmailAddress: userData.Email }),
+				body: JSON.stringify({ EmailAddress: userData.username }),
 			});
 
-			if (!response.ok) window.location.href = "/login";
+			if (!response.ok) return window.location.href = "/login";
 			const data = await response.json();
 			sessionStorage.setItem("access-token", data.Token);
 			callback();

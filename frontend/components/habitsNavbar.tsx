@@ -6,7 +6,7 @@ import CreateHabitForm from "./forms/createHabitForm";
 import UpdateHabitForm from "./forms/updateHabitForm";
 import DeleteHabitForm from "./forms/deleteHabitForm";
 import IHabitsNavbar from "../shared/interfaces/IHabitsNavbar";
-import IModalTypes from "../shared/interfaces/IModalTypes";
+import IHabitModalTypes from "../shared/interfaces/IHabitModalTypes";
 import { ModalTypeEnum } from "../shared/enum/modalTypeEnum";
 import { useRouter } from "next/router";
 import { AuthModel } from "../model/authModel";
@@ -14,7 +14,7 @@ import { AuthModel } from "../model/authModel";
 const HabitsNavbar: React.FC<IHabitsNavbar> = ({ showSidebar, setShowSidebar, habit, habitOps: { createHabit, updateHabit, deleteHabit } }) => {
 	const router = useRouter();
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-	const [showModal, setShowModal] = useState<IModalTypes>({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: false });
+	const [showModal, setShowModal] = useState<IHabitModalTypes>({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: false});
 
 	useEffect(() => {
 		const jwt = sessionStorage.getItem("access-token");
@@ -50,7 +50,7 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ showSidebar, setShowSidebar, ha
 		<nav className="navbar navbar-expand-lg navbar-light bg-primary">
 			<div className="container-fluid d-flex justify-content-between align-items-center">
 				{/* Right Section - Content */}
-				<div>
+				<div className="d-flex gap-2">
 					<button className="btn btn-dark" type="button" onClick={() => setShowSidebar(true)}>
 						<i className={`bi bi-list`}></i>
 					</button>

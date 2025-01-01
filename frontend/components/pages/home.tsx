@@ -26,9 +26,10 @@ const Home: React.FC = () => {
 		setHasHabitsBeenUpdated(false);
 	}, [hasHabitsBeenUpdated]);
 
-	// LSB - remove
+	// Sidebar State
 	const [showSidebar, setShowSidebar] = useState(false);
 
+	// Calendar State
 	const [completionDates, setCompletionDates] = useState<string[]>([]);
 	const [completionDatesCounter, setCompletionDatesCompletionDatesCounter] = useState(0);
 
@@ -64,9 +65,7 @@ const Home: React.FC = () => {
 
 		if (!currentSelectedHabit && habitsUpdated) {
 			// Come from "All Habits" page. Update all the habits that have been changed.
-			for (const habit of habitsMenu) {
-				await HabitsService.updateHabit(habit);
-			}
+			for (const habit of habitsMenu) await HabitsService.updateHabit(habit);
 			setHasHabitsBeenUpdated(true);
 		}
 
@@ -74,9 +73,7 @@ const Home: React.FC = () => {
 			setHabitNavbar(null);
 			setCompletionDates([]);
 			setCompletionDatesCompletionDatesCounter(0);
-			if (habitsUpdated) {
-				setHasHabitsBeenUpdated(true);
-			}
+			if (habitsUpdated) setHasHabitsBeenUpdated(true);
 			setCurrentSelectedHabit(null);
 			return;
 		}
@@ -88,31 +85,30 @@ const Home: React.FC = () => {
 	};
 
 	return (
-		<div className="home">
+		<div id="home" className="home">
 			<Sidebar habitsMenu={habitsMenu} showSidebar={showSidebar} setShowSidebar={setShowSidebar} currentSelectedHabit={currentSelectedHabit} updateMain={updateMain} />
-				<HabitsNavbar showSidebar={showSidebar} setShowSidebar={setShowSidebar} habit={habitNavbar} habitOps={{ createHabit, updateHabit, deleteHabit }} />
-				{currentSelectedHabit && (
-					<Calendar
-						currentSelectedHabit={currentSelectedHabit}
-						completionDatesCounter={completionDatesCounter}
-						setCompletionDatesCompletionDatesCounter={setCompletionDatesCompletionDatesCounter}
-						setCompletionDates={setCompletionDates}
-						completionDates={completionDates}
-					/>
-				)}
-				{!currentSelectedHabit &&
-					habitsMenu?.map((habit, i) => (
-						<div key={`calendar_${i}`}>
-							<Calendar
-								currentSelectedHabit={habit}
-								completionDatesCounter={habit.completionDates ? habit.completionDates.length : 0}
-								setCompletionDatesCompletionDatesCounter={setCompletionDatesCompletionDatesCounter}
-								setCompletionDates={setCompletionDates}
-								completionDates={habit.completionDates}
-							/>
-						</div>
-					))
-                }
+			<HabitsNavbar showSidebar={showSidebar} setShowSidebar={setShowSidebar} habit={habitNavbar} habitOps={{ createHabit, updateHabit, deleteHabit }} />
+			{currentSelectedHabit && (
+				<Calendar
+					currentSelectedHabit={currentSelectedHabit}
+					completionDatesCounter={completionDatesCounter}
+					setCompletionDatesCompletionDatesCounter={setCompletionDatesCompletionDatesCounter}
+					setCompletionDates={setCompletionDates}
+					completionDates={completionDates}
+				/>
+			)}
+			{!currentSelectedHabit &&
+				habitsMenu?.map((habit, i) => (
+					<div key={`calendar_${i}`}>
+						<Calendar
+							currentSelectedHabit={habit}
+							completionDatesCounter={habit.completionDates ? habit.completionDates.length : 0}
+							setCompletionDatesCompletionDatesCounter={setCompletionDatesCompletionDatesCounter}
+							setCompletionDates={setCompletionDates}
+							completionDates={habit.completionDates}
+						/>
+					</div>
+				))}
 		</div>
 	);
 };

@@ -9,7 +9,7 @@ const DeleteHabitForm: React.FC<IDeleteHabitForm> = ({ habit, onSubmit, onModalC
 	};
 
 	return (
-		<div className="deleteForm">
+		<div id="deleteHabitForm" className="deleteHabitForm">
 			<p>{`Are you sure you want to delete: ${habit.name}`}</p>
 			<div className="button-group">
 				<button className="btn btn-danger" data-bs-dismiss="modal" onClick={handleConfirm}>

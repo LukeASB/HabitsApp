@@ -7,7 +7,7 @@ const Navbar: React.FC = () => {
 	useEffect(() => (sessionStorage.getItem("access-token") ? setIsLoggedIn(true) : setIsLoggedIn(false)), []);
 
 	return (
-		<nav className="navbar navbar-expand-lg navbar-light bg-dark">
+		<nav id="navbar" className="navbar navbar-expand-lg navbar-light bg-dark">
 			<div className="container-fluid">
 				<strong>
 					<span className="navbar-brand text-light">

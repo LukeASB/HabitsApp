@@ -5,12 +5,29 @@ import { AuthModel } from "../../model/authModel";
 import ILoginUser from "../../shared/interfaces/ILoginUser";
 import { AuthService } from "../../services/authService";
 import { useRouter } from "next/router";
+import { ModalTypeEnum } from "../../shared/enum/modalTypeEnum";
+import Modal from "../modal/modal";
+import GenericErrorForm from "./genericErrorForm";
+import IUserAuthModalTypes from "../../shared/interfaces/IUserAuthModalTypes";
 
 const LoginForm: React.FC = () => {
 	const router = useRouter();
 	const form: ILoginUserFormData = { emailAddress: "", password: "" };
 	const [formData, setFormData] = useState<ILoginUserFormData>(form);
 	const [errors, setErrors] = useState<ILoginUserFormError>({ emailAddress: "", password: "" });
+    const [showModal, setShowModal] = useState<IUserAuthModalTypes>({ RegisterErrorModal: false, LoginErrorModal: false });
+
+    const handleOpenModal = (modalType: ModalTypeEnum) => {
+        if (modalType === ModalTypeEnum.LoginErrorModal) return setShowModal({ RegisterErrorModal: false, LoginErrorModal: true });
+    };
+
+    const handleCloseModal = (modalType: ModalTypeEnum) => {
+        if (modalType === ModalTypeEnum.LoginErrorModal) return setShowModal({ RegisterErrorModal: false, LoginErrorModal: false });
+    };
+
+    const onGenericErrorModalSubmit = () => {
+        setShowModal({ RegisterErrorModal: false, LoginErrorModal: false });
+    }
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -44,7 +61,10 @@ const LoginForm: React.FC = () => {
 
 	const onSubmit = async (loginUser: ILoginUser) => {
 		const loggedInUser = await AuthService.login(loginUser);
-		if (!loggedInUser.Success) return; // show generic error modal...
+		if (!loggedInUser.Success) {
+            handleOpenModal(ModalTypeEnum.LoginErrorModal);
+            return; 
+        }
 		router.push("/");
 	};
 
@@ -57,7 +77,16 @@ const LoginForm: React.FC = () => {
 	};
 
 	return (
-		<div className="login">
+		<div id="login" className="login">
+            <Modal
+                id="loginErrorModal"
+                title="Login"
+                body={<GenericErrorForm error="Invalid Login Details" modalType={ModalTypeEnum.LoginErrorModal} onSubmit={onGenericErrorModalSubmit} onModalClose={handleCloseModal}/>}
+                showModal={showModal.LoginErrorModal}
+                modalType={ModalTypeEnum.LoginErrorModal}
+                onModalOpen={handleOpenModal}
+                onModalClose={handleCloseModal}
+                />
 			<div className="container mt-5">
 				<div className="row justify-content-center">
 					<div className="col-md-6">

@@ -57,7 +57,7 @@ const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, onModalClose })
 	};
 
 	return (
-		<>
+		<div id="createHabitForm" className="createHabitForm">
 			<div className="form-group">
 				<label htmlFor="name">Name</label>
 				<input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Enter habit name" className="form-control" />
@@ -76,7 +76,7 @@ const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, onModalClose })
 			<button type="submit" className="btn btn-primary" onClick={handleSubmit}>
 				{`Create Habit`}
 			</button>
-		</>
+		</div>
 	);
 };
 

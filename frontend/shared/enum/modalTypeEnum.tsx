@@ -1,5 +1,7 @@
 export enum ModalTypeEnum {
     CreateHabitModal = "createHabitModal",
     UpdateHabitModal = "updateHabitModal",
-    DeleteHabitModal = "deleteHabitModal"
+    DeleteHabitModal = "deleteHabitModal",
+    LoginErrorModal = "LoginErrorModal",
+    RegisterErrorModal = "RegisterErrorModal"
 };

@@ -1,19 +1,17 @@
 /* styles/globals.css */
 html, body, #__next {
   height: 100%;
-  width: 100%;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
-/* .mainLayout {
+.mainLayout {
   display: flex;
   flex-direction: column;
   min-height: 100%;
   width: 100%;
   background-color:white;
-} */
+}
 
 .content {
   flex: 1;
@@ -31,21 +29,6 @@ html, body, #__next {
   background-color: #f8f9fa;
   padding: 10px 0;
 }
-
-/* .sidebar-collapsed .nav-link span {
-  display: none;
-}
-
-.sidebar-collapsed .nav-link {
-  text-align: center;
-} */
-
-/* button[aria-label="Toggle Sidebar"] {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-} */
 
 .calendar {
   padding: 10px;

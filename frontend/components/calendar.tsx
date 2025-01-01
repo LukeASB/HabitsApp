@@ -66,7 +66,7 @@ const Calendar: React.FC<ICalendar> = ({ currentSelectedHabit, completionDatesCo
 	const { weeks, month, year } = GenerateCalendarGrid(currentDate);
 
 	return (
-		<div className="calendar">
+		<div id="calendar" className="calendar">
 			{currentSelectedHabit && <h1>{currentSelectedHabit?.name}</h1>}
 			<div className="calendar-header d-flex justify-content-between align-items-center mb-3">
 				<button onClick={prevMonth} className="btn btn-secondary">

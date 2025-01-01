@@ -51,7 +51,7 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit, onModalC
 	};
 
 	return (
-		<>
+		<div id="updateHabitForm" className="updateHabitForm">
 			<div className="form-group">
 				<label htmlFor="name">Name</label>
 				<input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Enter habit name" className="form-control" />
@@ -65,7 +65,7 @@ const UpdateHabitForm: React.FC<IUpdateHabitForm> = ({ habit, onSubmit, onModalC
 			<button type="submit" className="btn btn-primary" data-bs-dismiss="modal" onClick={handleSubmit}>
 				{`Update Habit`}
 			</button>
-		</>
+		</div>
 	);
 };
 
