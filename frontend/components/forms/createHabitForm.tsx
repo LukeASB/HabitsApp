@@ -56,28 +56,30 @@ const CreateHabitForm: React.FC<ICreateHabitForm> = ({ onSubmit, onModalClose })
 		setFormData({ name: "", days: 0, daysTarget: 0 });
 	};
 
-	return (
-		<div id="createHabitForm" className="createHabitForm">
-			<div className="form-group">
-				<label htmlFor="name">Name</label>
-				<input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Enter habit name" className="form-control" />
-				<div className="error text-danger">{errors.name}</div>
-			</div>
-			<div className="form-group">
-				<label htmlFor="days">Days</label>
-				<input type="number" id="days" name="days" value={formData.days} onChange={handleChange} placeholder="Enter current days" className="form-control" />
-				<div className="error text-danger">{errors.days}</div>
-			</div>
-			<div className="form-group">
-				<label htmlFor="daysTarget">Days Target</label>
-				<input type="number" id="daysTarget" name="daysTarget" value={formData.daysTarget} onChange={handleChange} placeholder="Enter target days" className="form-control" />
-				<div className="error text-danger">{errors.daysTarget}</div>
-			</div>
-			<button type="submit" className="btn btn-primary" onClick={handleSubmit}>
-				{`Create Habit`}
-			</button>
-		</div>
-	);
+    return (
+        <div id="createHabitForm" className="createHabitForm">
+            <div className="shadow-sm bg-white rounded">
+                <div className="form-group mb-3">
+                    <label htmlFor="name" className="form-label">Name</label>
+                    <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Enter habit name" className="form-control" />
+                    <div className="error text-danger">{errors.name}</div>
+                </div>
+                <div className="form-group mb-3">
+                    <label htmlFor="days" className="form-label">Days</label>
+                    <input type="text" id="days" name="days" value={formData.days} onChange={handleChange} placeholder="Enter current days" className="form-control" inputMode="numeric" pattern="[0-9]*" />
+                    <div className="error text-danger">{errors.days}</div>
+                </div>
+                <div className="form-group mb-3">
+                    <label htmlFor="daysTarget" className="form-label">Days Target</label>
+                    <input type="text" id="daysTarget" name="daysTarget" value={formData.daysTarget} onChange={handleChange} placeholder="Enter target days" className="form-control" inputMode="numeric" pattern="[0-9]*" />
+                    <div className="error text-danger">{errors.daysTarget}</div>
+                </div>
+                <button type="submit" className="btn btn-primary w-100" onClick={handleSubmit}>
+                    Create Habit
+                </button>
+            </div>
+        </div>
+    );
 };
 
 export default CreateHabitForm;

@@ -4,7 +4,14 @@ import Modal from "./modal/modal";
 const HabitsButtons: React.FC<IHabitsButton> = ({ icon, modal }) => {
 	return (
 		<div>
-			<button type="button" className="btn btn-dark btn-custom robo popup-trigger popmake-680" data-popup-id="680" data-do-default="0" onClick={() => modal.onModalOpen(modal.modalType)}>
+			<button
+				type="button"
+				className="btn btn-outline-dark btn-custom robo popup-trigger popmake-680"
+				data-popup-id="680"
+				data-do-default="0"
+				onClick={() => modal.onModalOpen(modal.modalType)}
+				style={{ backgroundColor: "transparent" }}
+			>
 				<i className={`bi bi-${icon}`}></i>
 			</button>
 			<Modal

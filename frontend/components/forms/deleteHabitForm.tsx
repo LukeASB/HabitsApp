@@ -8,16 +8,18 @@ const DeleteHabitForm: React.FC<IDeleteHabitForm> = ({ habit, onSubmit, onModalC
 		onModalClose(ModalTypeEnum.DeleteHabitModal);
 	};
 
-	return (
-		<div id="deleteHabitForm" className="deleteHabitForm">
-			<p>{`Are you sure you want to delete: ${habit.name}`}</p>
-			<div className="button-group">
-				<button className="btn btn-danger" data-bs-dismiss="modal" onClick={handleConfirm}>
-					Confirm
-				</button>
-			</div>
-		</div>
-	);
+    return (
+        <div id="deleteHabitForm" className="deleteHabitForm">
+            <div className="shadow-sm bg-white rounded p-4">
+                <p className="mb-4">{`Are you sure you want to delete: ${habit.name}`}</p>
+                <div className="d-flex justify-content-center">
+                    <button className="btn btn-danger me-2" data-bs-dismiss="modal" onClick={handleConfirm}>
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default DeleteHabitForm;

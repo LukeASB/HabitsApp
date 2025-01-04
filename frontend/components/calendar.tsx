@@ -66,23 +66,23 @@ const Calendar: React.FC<ICalendar> = ({ currentSelectedHabit, completionDatesCo
 
 	return (
 		<div id="calendar" className="calendar">
-			{currentSelectedHabit && <h1>{currentSelectedHabit?.name}</h1>}
+			{currentSelectedHabit && <h1 className="text-center text-dark">{currentSelectedHabit?.name}</h1>}
 			<div className="calendar-header d-flex justify-content-between align-items-center mb-3">
-				<button onClick={prevMonth} className="btn btn-secondary">
-					&larr;
+				<button onClick={prevMonth} className="btn btn-outline-dark">
+					<i className="bi bi-chevron-left"></i>
 				</button>
-				<h4>
+				<h4 className="text-dark">
 					{currentDate.toLocaleString("default", { month: "long" })} {year}
 				</h4>
-				<button onClick={nextMonth} className="btn btn-secondary">
-					&rarr;
+				<button onClick={nextMonth} className="btn btn-outline-dark">
+					<i className="bi bi-chevron-right"></i>
 				</button>
 			</div>
 
 			<div className="calendar-grid">
 				<div id="weekday-headers" className="d-flex">
 					{daysOfWeek.map((day) => (
-						<div className="day-header flex-fill text-center fw-bold" key={day} style={{ width: "calc(100% / 7)" }}>
+						<div className="day-header flex-fill text-center fw-bold text-dark" key={day} style={{ width: "calc(100% / 7)", borderRadius: "5px", margin: "2px" }}>
 							{day}
 						</div>
 					))}
@@ -91,17 +91,19 @@ const Calendar: React.FC<ICalendar> = ({ currentSelectedHabit, completionDatesCo
 				{weeks.map((week, rowIndex) => (
 					<div id="calendar-row" key={rowIndex} className="d-flex">
 						{week.map((day, colIndex) => {
-							if (!day) return <div key={colIndex} className="day-cell flex-fill text-center p-2 empty" style={{ width: "calc(100% / 7)" }}></div>;
-
 							return (
 								<div
 									key={colIndex}
 									className={`day-cell flex-fill text-center p-2 ${day ? "day" : "empty"}`}
 									style={{
 										width: "calc(100% / 7)",
-										backgroundColor: isCompletedDay(day) ? "green" : "transparent",
-										color: isCompletedDay(day) ? "white" : "inherit",
-										cursor: "pointer",
+										height: "50px",
+										backgroundColor: day && isCompletedDay(day) ? "green" : "transparent",
+										color: day && isCompletedDay(day) ? "white" : "inherit",
+										cursor: day ? "pointer" : "default",
+										border: "1px solid #ccc",
+										borderRadius: "5px",
+										margin: "2px",
 									}}
 									onClick={() => day && handleDaySelection(currentSelectedHabit, year, month, day)}
 								>
@@ -114,12 +116,18 @@ const Calendar: React.FC<ICalendar> = ({ currentSelectedHabit, completionDatesCo
 			</div>
 
 			<div className="card mt-3 p-3 shadow-sm">
-    <div className="card-body">
-        <p><strong>Completed Days Total:</strong> {completionDatesCounter}</p>
-        <p><strong>Days Target:</strong> {currentSelectedHabit?.daysTarget}</p>
-        <p><strong>Created At:</strong> {FormatDate(currentSelectedHabit?.createdAt ? `${currentSelectedHabit?.createdAt}` : "")}</p>
-    </div>
-</div>
+				<div className="card-body">
+					<p>
+						<strong>Completed Days Total:</strong> {completionDatesCounter}
+					</p>
+					<p>
+						<strong>Days Target:</strong> {currentSelectedHabit?.daysTarget}
+					</p>
+					<p>
+						<strong>Created At:</strong> {FormatDate(currentSelectedHabit?.createdAt ? `${currentSelectedHabit?.createdAt}` : "")}
+					</p>
+				</div>
+			</div>
 		</div>
 	);
 };

@@ -8,7 +8,7 @@ const Modal: React.FC<IModal> = (modal: IModal) => {
 			tabIndex={-1}
 			aria-labelledby={`${modal.id}Label`}
 			aria-hidden={!modal.showModal}
-			style={{ backgroundColor: modal.showModal ? "rgba(0, 0, 0, 0.5)" : "transparent" }} // Optional: Add dimming effect
+			style={{ backgroundColor: modal.showModal ? "rgba(0, 0, 0, 0.5)" : "transparent" }}
 		>
 			<div className="modal-dialog modal-dialog-centered" role="document">
 				<div className="modal-content">
@@ -21,6 +21,7 @@ const Modal: React.FC<IModal> = (modal: IModal) => {
 							className="btn-close"
 							onClick={() => modal.onModalClose(modal.modalType)} // Handle modal close
 							aria-label="Close"
+                            onMouseDown={e => e.preventDefault()}
 						></button>
 					</div>
 					<div className="modal-body text-black text-start">{modal.body}</div>

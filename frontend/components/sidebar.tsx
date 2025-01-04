@@ -20,7 +20,7 @@ const Sidebar: React.FC<ISideBar> = ({ habitsMenu, showSidebar, setShowSidebar, 
 					<h5 className="offcanvas-title" id="offcanvasSidebarLabel">
 						Habits
 					</h5>
-					<button type="button" className="btn-close text-reset" onClick={() => setShowSidebar(false)} aria-label="Close"></button>
+					<button type="button" className="btn-close btn-close-white" onClick={() => setShowSidebar(false)} aria-label="Close" onMouseDown={e => e.preventDefault()}></button>
 				</div>
 
 				<div className="offcanvas-body">

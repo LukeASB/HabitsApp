@@ -50,7 +50,7 @@ const HabitsNavbar: React.FC<IHabitsNavbar> = ({ showSidebar, setShowSidebar, ha
 			<div className="container-fluid d-flex justify-content-between align-items-center">
 				{/* Right Section - Content */}
 				<div className="d-flex gap-2">
-					<button className="btn btn-dark" type="button" onClick={() => setShowSidebar(true)}>
+					<button className="btn btn-outline-dark" type="button" style={{ backgroundColor: "transparent" }} onClick={() => setShowSidebar(true)}>
 						<i className={`bi bi-list`}></i>
 					</button>
 					<strong>
