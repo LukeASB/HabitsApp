@@ -198,12 +198,12 @@ func TestLogoutHandler(t *testing.T) {
 
 	testCases := []struct {
 		name     string
-		want     bool
+		want     string
 		username string
 	}{
 		{
 			name:     "Successfully logout",
-			want:     true,
+			want:     "200 OK",
 			username: "john.loggedin@example.com",
 		},
 	}
@@ -227,29 +227,10 @@ func TestLogoutHandler(t *testing.T) {
 
 			defer res.Body.Close()
 
-			got, err := io.ReadAll(res.Body)
+			got := res.Status
 
-			if err != nil {
-				t.Errorf("TestLogoutHandler err: %s", err)
-				return
-			}
-
-			userLoggedOutResponse := &data.UserLoggedOutResponse{}
-
-			err = json.Unmarshal(got, userLoggedOutResponse)
-
-			if err != nil {
-				t.Errorf("TestLogoutHandler err: %s", err)
-				return
-			}
-
-			if userLoggedOutResponse.EmailAddress != val.username {
-				t.Errorf("TestLogoutHandler - email does not match logged out  user. got=%s want=%s", userLoggedOutResponse.EmailAddress, val.username)
-				return
-			}
-
-			if userLoggedOutResponse.Success != val.want {
-				t.Errorf("TestLogoutHandler Failed - got=%v, want=%v", userLoggedOutResponse.Success, val.want)
+			if val.want != got {
+				t.Errorf("TestLogoutHandler Failed - got=%s, want=%s", got, val.want)
 			}
 		})
 	}

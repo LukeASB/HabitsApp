@@ -102,28 +102,21 @@ func TestLogoutHandler(t *testing.T) {
 	testCases := []struct {
 		name                 string
 		userLoggedOutRequest *data.UserLoggedOutRequest
-		want                 bool
+		want                 error
 	}{
 		{
 			name:                 "Successfully logout",
 			userLoggedOutRequest: &data.UserLoggedOutRequest{EmailAddress: "john.loggedin@example.com"},
-			want:                 true,
+			want:                 nil,
 		},
 	}
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			userLoggedOutResponse, err := authModel.LogoutHandler(w, val.userLoggedOutRequest, jwtTokensMock, csrfTokenMock)
+			err := authModel.LogoutHandler(w, val.userLoggedOutRequest, jwtTokensMock, csrfTokenMock)
 
 			if err != nil {
 				t.Errorf("TestLogoutHandler Failed - err=%s", err)
-				return
-			}
-
-			got := userLoggedOutResponse.Success
-
-			if got != val.want {
-				t.Errorf("TestLogoutHandler Failed - got=%v, want=%v", got, val.want)
 			}
 		})
 	}

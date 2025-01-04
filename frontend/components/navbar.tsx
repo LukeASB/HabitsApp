@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { HabitsService } from "../services/habitsService";
 import { AuthService } from "../services/authService";
+import { useRouter } from "next/router";
 
 const Navbar: React.FC = () => {
+    const router = useRouter();
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
 	useEffect(() => (sessionStorage.getItem("access-token") ? setIsLoggedIn(true) : setIsLoggedIn(false)), []);
@@ -33,10 +35,9 @@ const Navbar: React.FC = () => {
 							</>
 						)}
                         <span className="navbar-brand text-light" style={{ cursor: 'pointer' }} onClick={async () => {
-                            const logout = await AuthService.logout();
-                            if (logout?.Success) return setIsLoggedIn(false);
-                            
-                            alert("Failed to logout.");
+                            await AuthService.logout();
+                            router.push("/login");
+                            return setIsLoggedIn(false);
                             
                         }}>Logout</span>
 					</li>

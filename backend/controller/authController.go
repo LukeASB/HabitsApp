@@ -99,7 +99,6 @@ func (ac *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func (ac *AuthController) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// frontend will delete this short-lived JWT accessToken from session, delete user's refreshToken to prevent new short-lived JWT accessToken. It will invalidate itself after 5 mins.
-
 	claims, ok := r.Context().Value(session.ClaimsKey).(*session.Claims)
 
 	if !ok {
@@ -116,27 +115,10 @@ func (ac *AuthController) LogoutHandler(w http.ResponseWriter, r *http.Request) 
 
 	userLoggedOutRequest := data.UserLoggedOutRequest{EmailAddress: username}
 
-	userLoggedOutResponse, err := ac.authModel.LogoutHandler(w, &userLoggedOutRequest, ac.jwtTokens, ac.csrfTokens)
-
-	if err != nil {
+	if err := ac.authModel.LogoutHandler(w, &userLoggedOutRequest, ac.jwtTokens, ac.csrfTokens); err != nil {
 		ac.logger.DebugLog(fmt.Sprintf("authController.LogoutHandler - err: %s", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
-	}
-
-	response, err := ac.authView.LogoutHandler(userLoggedOutResponse)
-
-	if err != nil {
-		ac.logger.DebugLog(fmt.Sprintf("authController.LogoutHandler - err: %s", err))
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	ac.logger.DebugLog(fmt.Sprintf("authController.LogoutHandler - Writing response: %s", response))
-	numOfBytes, err := w.Write([]byte(response))
-	ac.logger.DebugLog(fmt.Sprintf("authController.LogoutHandler - w.Write wrote %d bytes", numOfBytes))
-	if err != nil {
-		ac.logger.ErrorLog(fmt.Sprintf("authController.LogoutHandler - Error writing response: %s", err))
 	}
 }
 

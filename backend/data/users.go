@@ -53,12 +53,6 @@ type UserLoggedInResponse struct {
 	LoggedInAt time.Time        `json:"LoggedInAt"`
 }
 
-type UserLoggedOutResponse struct {
-	Success      bool      `json:"Success"`
-	EmailAddress string    `json:"EmailAddress"`
-	LoggedOutAt  time.Time `json:"LoggedOutAt"`
-}
-
 type UserLoggedOutRequest struct {
 	EmailAddress string `json:"EmailAddress"`
 }

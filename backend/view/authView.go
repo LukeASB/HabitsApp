@@ -13,7 +13,6 @@ type AuthView struct {
 type IAuthView interface {
 	RegisterUserHandler(registeredUserData *data.RegisterUserData) ([]byte, error)
 	LoginHandler(loginData *data.UserLoggedInData) ([]byte, error)
-	LogoutHandler(logoutData *data.UserLoggedOutResponse) ([]byte, error)
 	RefreshHandler(userRefreshRequest *data.UserRefreshRequest) ([]byte, error)
 }
 
@@ -62,18 +61,6 @@ func (ac *AuthView) LoginHandler(loginData *data.UserLoggedInData) ([]byte, erro
 	}
 
 	return jsonRes, nil
-}
-
-func (ac *AuthView) LogoutHandler(logoutData *data.UserLoggedOutResponse) ([]byte, error) {
-	ac.logger.InfoLog("authView.LogoutHandler")
-
-	jsonRes, err := json.Marshal(logoutData)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return jsonRes, err
 }
 
 func (ac *AuthView) RefreshHandler(userRefreshRequest *data.UserRefreshRequest) ([]byte, error) {

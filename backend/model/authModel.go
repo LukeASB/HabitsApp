@@ -20,7 +20,7 @@ type AuthModel struct {
 type IAuthModel interface {
 	RegisterUserHandler(userRegisterRequest *data.RegisterUserRequest) (*data.RegisterUserData, error)
 	LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedInData, error)
-	LogoutHandler(w http.ResponseWriter, UserLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedOutResponse, error)
+	LogoutHandler(w http.ResponseWriter, UserLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) error
 	RefreshHandler(userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens) (string, error)
 }
 
@@ -143,37 +143,33 @@ func (am *AuthModel) LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth
 	}, nil
 }
 
-func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedOutResponse, error) {
+func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) error {
 	am.logger.InfoLog("authModel.LogoutHandler")
 
 	userDetails, err := am.db.GetUserDetails(userLoggedOutRequest)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	userData, ok := userDetails.(data.UserData)
 
 	if !ok {
-		return nil, fmt.Errorf("authModel.LoginHandler - data.UserData is invalid")
+		return fmt.Errorf("authModel.LoginHandler - data.UserData is invalid")
 	}
 
 	if !userData.IsLoggedIn {
-		return nil, fmt.Errorf("authModel.LoginHandler - User is not logged in. UserID: %s", userData.UserID)
+		return fmt.Errorf("authModel.LoginHandler - User is not logged in. UserID: %s", userData.UserID)
 	}
 
 	jwtTokens.DestroyJWTRefreshToken(userLoggedOutRequest.EmailAddress)
 	csrfTokens.DestroyCSRFToken(w)
 
 	if err := am.db.LogoutUser(&userData); err != nil {
-		return nil, err
+		return err
 	}
 
-	return &data.UserLoggedOutResponse{
-		Success:      true,
-		EmailAddress: userLoggedOutRequest.EmailAddress,
-		LoggedOutAt:  time.Now(),
-	}, nil
+	return nil
 }
 
 func (am *AuthModel) RefreshHandler(userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens) (string, error) {

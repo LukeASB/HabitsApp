@@ -130,45 +130,6 @@ func TestLoginHandler(t *testing.T) {
 	}
 }
 
-func TestLogoutHandler(t *testing.T) {
-	logger := &logger.Logger{}
-	authView := NewAuthView(logger)
-
-	testCases := []struct {
-		name string
-		want *data.UserLoggedOutResponse
-	}{
-		{
-			name: "Test Logout Response",
-			want: &data.UserLoggedOutResponse{
-				Success:      true,
-				EmailAddress: "test@test.com",
-				LoggedOutAt:  time.Now(),
-			},
-		},
-	}
-
-	for _, val := range testCases {
-		t.Run(val.name, func(t *testing.T) {
-			marshalledUserLoggedOutResponse, err := json.Marshal(val.want)
-
-			if err != nil {
-				t.Errorf("TestLogoutHandler - Fail err: %s", err)
-			}
-
-			got, err := authView.LogoutHandler(val.want)
-
-			if err != nil {
-				t.Errorf("TestLogoutHandler - Fail err: %s", err)
-			}
-
-			if !bytes.Equal(marshalledUserLoggedOutResponse, got) {
-				t.Errorf("TestLogoutHandler - Fail want doesn't match got")
-			}
-		})
-	}
-}
-
 func TestRefreshHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	authView := NewAuthView(logger)

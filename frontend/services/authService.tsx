@@ -62,12 +62,11 @@ export class AuthService {
 		return { Success: false }; // on false, return an error modal
 	}
 
-	public static async logout(): Promise<Partial<ILoggedOutUser>> {
+	public static async logout() {
 		if (process.env.ENVIRONMENT === "DEV") {
 			sessionStorage.removeItem("access-token");
 			sessionStorage.removeItem("csrf-token");
 			sessionStorage.removeItem("user-data");
-			return { Success: true };
 		}
 
 		try {
@@ -80,18 +79,17 @@ export class AuthService {
 
 			if (!response.ok) throw new Error("Failed to logout.");
 
-			const loggedOutUser: ILoggedInUser = await response.json();
-
             sessionStorage.removeItem("access-token");
 			sessionStorage.removeItem("csrf-token");
 			sessionStorage.removeItem("user-data");
 
-			return loggedOutUser;
 		} catch (ex) {
 			console.log(ex);
-		}
 
-		return { Success: false };
+            sessionStorage.removeItem("access-token");
+			sessionStorage.removeItem("csrf-token");
+			sessionStorage.removeItem("user-data");
+		}
 	}
 
 	public static async refresh(callback: Function) {
