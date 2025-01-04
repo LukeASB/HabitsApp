@@ -70,26 +70,27 @@ export class AuthService {
 		}
 
 		try {
+            const csrfToken = sessionStorage.getItem("csrf-token");
+			const shortlivedJWTAccessToken = sessionStorage.getItem("access-token");
+
 			const response = await fetch(`/api/${process.env.API_URL}/logout`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken || "",
+                    Authorization: shortlivedJWTAccessToken || "",
 				},
 			});
 
 			if (!response.ok) throw new Error("Failed to logout.");
 
-            sessionStorage.removeItem("access-token");
-			sessionStorage.removeItem("csrf-token");
-			sessionStorage.removeItem("user-data");
-
 		} catch (ex) {
 			console.log(ex);
-
+		} finally {
             sessionStorage.removeItem("access-token");
 			sessionStorage.removeItem("csrf-token");
 			sessionStorage.removeItem("user-data");
-		}
+        }
 	}
 
 	public static async refresh(callback: Function) {

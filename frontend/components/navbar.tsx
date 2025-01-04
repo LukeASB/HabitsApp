@@ -34,12 +34,13 @@ const Navbar: React.FC = () => {
 								</Link>
 							</>
 						)}
-                        <span className="navbar-brand text-light" style={{ cursor: 'pointer' }} onClick={async () => {
-                            await AuthService.logout();
-                            router.push("/login");
-                            return setIsLoggedIn(false);
-                            
-                        }}>Logout</span>
+                        {isLoggedIn && (
+                            <span className="navbar-brand text-light" style={{ cursor: 'pointer' }} onClick={async () => {
+                                await AuthService.logout();
+                                router.push("/login");
+                                return setIsLoggedIn(false);
+                            }}>Logout</span>
+                        )}
 					</li>
 				</ul>
 			</div>
