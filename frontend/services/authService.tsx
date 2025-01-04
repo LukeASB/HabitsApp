@@ -62,7 +62,7 @@ export class AuthService {
 		return { Success: false }; // on false, return an error modal
 	}
 
-	public static async logout(emailAddress: string): Promise<Partial<ILoggedOutUser>> {
+	public static async logout(): Promise<Partial<ILoggedOutUser>> {
 		if (process.env.ENVIRONMENT === "DEV") {
 			sessionStorage.removeItem("access-token");
 			sessionStorage.removeItem("csrf-token");
@@ -76,12 +76,15 @@ export class AuthService {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ EmailAddress: emailAddress }),
 			});
 
 			if (!response.ok) throw new Error("Failed to logout.");
 
 			const loggedOutUser: ILoggedInUser = await response.json();
+
+            sessionStorage.removeItem("access-token");
+			sessionStorage.removeItem("csrf-token");
+			sessionStorage.removeItem("user-data");
 
 			return loggedOutUser;
 		} catch (ex) {

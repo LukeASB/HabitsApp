@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { HabitsService } from "../services/habitsService";
+import { AuthService } from "../services/authService";
 
 const Navbar: React.FC = () => {
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -30,6 +32,13 @@ const Navbar: React.FC = () => {
 								</Link>
 							</>
 						)}
+                        <span className="navbar-brand text-light" style={{ cursor: 'pointer' }} onClick={async () => {
+                            const logout = await AuthService.logout();
+                            if (logout?.Success) return setIsLoggedIn(false);
+                            
+                            alert("Failed to logout.");
+                            
+                        }}>Logout</span>
 					</li>
 				</ul>
 			</div>

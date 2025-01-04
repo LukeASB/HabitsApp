@@ -100,12 +100,21 @@ func (ac *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 func (ac *AuthController) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// frontend will delete this short-lived JWT accessToken from session, delete user's refreshToken to prevent new short-lived JWT accessToken. It will invalidate itself after 5 mins.
 
-	userLoggedOutRequest := data.UserLoggedOutRequest{}
+	claims, ok := r.Context().Value(session.ClaimsKey).(*session.Claims)
 
-	if err := json.NewDecoder(r.Body).Decode(&userLoggedOutRequest); err != nil {
+	if !ok {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
+	username := claims.Username
+
+	if username == "" {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	userLoggedOutRequest := data.UserLoggedOutRequest{EmailAddress: username}
 
 	userLoggedOutResponse, err := ac.authModel.LogoutHandler(w, &userLoggedOutRequest, ac.jwtTokens, ac.csrfTokens)
 

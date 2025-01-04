@@ -14,7 +14,7 @@ func SetUpRoutes(app internal.IApp) {
 
 	http.HandleFunc(fmt.Sprintf("/%s/register", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().RegisterUserHandler, data.Middleware{HTTPMethod: http.MethodPost}))
 	http.HandleFunc(fmt.Sprintf("/%s/login", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().LoginHandler, data.Middleware{HTTPMethod: http.MethodPost}))
-	http.HandleFunc(fmt.Sprintf("/%s/logout", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().LogoutHandler, data.Middleware{HTTPMethod: http.MethodPost}))
+	http.HandleFunc(fmt.Sprintf("/%s/logout", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().LogoutHandler, data.Middleware{IsProtected: true, CSRFRequired: true, HTTPMethod: http.MethodPost}))
 	http.HandleFunc(fmt.Sprintf("/%s/refresh", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().RefreshHandler, data.Middleware{HTTPMethod: http.MethodPost}))
 
 	http.HandleFunc(fmt.Sprintf("/%s/createhabit", endpoint), app.GetMiddleware().MiddlewareList(app.GetHabitsController().CreateHabitsHandler, data.Middleware{IsProtected: true, CSRFRequired: true, HTTPMethod: http.MethodPost}))

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bytes"
+	"context"
 	"dohabits/data"
 	"dohabits/db"
 	"dohabits/logger"
@@ -196,29 +197,23 @@ func TestLogoutHandler(t *testing.T) {
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
 	testCases := []struct {
-		name                 string
-		want                 bool
-		userLoggedOutRequest *data.UserLoggedOutRequest
+		name     string
+		want     bool
+		username string
 	}{
 		{
-			name: "Successfully logout",
-			want: true,
-			userLoggedOutRequest: &data.UserLoggedOutRequest{
-				EmailAddress: "john.loggedin@example.com",
-			},
+			name:     "Successfully logout",
+			want:     true,
+			username: "john.loggedin@example.com",
 		},
 	}
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			marshalledLoggedOutRequest, err := json.Marshal(val.userLoggedOutRequest)
-
-			if err != nil {
-				t.Errorf("TestLogoutHandler err: %s", err)
-				return
-			}
-
-			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/%s/logout", endpoint), io.NopCloser(bytes.NewBuffer(marshalledLoggedOutRequest)))
+			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/%s/logout", endpoint), nil)
+			claims := &session.Claims{Username: val.username}
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+			req = req.WithContext(ctx)
 			w := httptest.NewRecorder()
 
 			authController.LogoutHandler(w, req)
@@ -248,8 +243,8 @@ func TestLogoutHandler(t *testing.T) {
 				return
 			}
 
-			if userLoggedOutResponse.EmailAddress != val.userLoggedOutRequest.EmailAddress {
-				t.Errorf("TestLogoutHandler - email does not match logged out  user. got=%s want=%s", userLoggedOutResponse.EmailAddress, val.userLoggedOutRequest.EmailAddress)
+			if userLoggedOutResponse.EmailAddress != val.username {
+				t.Errorf("TestLogoutHandler - email does not match logged out  user. got=%s want=%s", userLoggedOutResponse.EmailAddress, val.username)
 				return
 			}
 

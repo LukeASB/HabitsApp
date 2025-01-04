@@ -227,7 +227,7 @@ func TestUpdateHabitsHandler(t *testing.T) {
 		Name:            "Test Update Habit",
 		Days:            30,
 		DaysTarget:      50,
-		CompletionDates: append(data.MockHabit[0].CompletionDates, []string{"2021-09-01", "2021-09-02", "2021-09-03"}...),
+		CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"},
 	}
 
 	marshalledUpdatedHabit, err := json.Marshal(data.UpdateHabit{
