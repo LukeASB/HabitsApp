@@ -1,7 +1,6 @@
 import { mockLoggedInUser, mockRegisteredUser } from "../data/mock_users";
 import { AuthModel } from "../model/authModel";
 import ILoggedInUser from "../shared/interfaces/ILoggedInUser";
-import ILoggedOutUser from "../shared/interfaces/ILoggedOutUser";
 import ILoginUser from "../shared/interfaces/ILoginUser";
 import IRegisteredUser from "../shared/interfaces/IRegisteredUser";
 import IRegisterUser from "../shared/interfaces/IRegisterUser";
@@ -59,7 +58,7 @@ export class AuthService {
 			console.log(ex);
 		}
 
-		return { Success: false }; // on false, return an error modal
+		return { Success: false };
 	}
 
 	public static async logout() {
@@ -70,27 +69,26 @@ export class AuthService {
 		}
 
 		try {
-            const csrfToken = sessionStorage.getItem("csrf-token");
+			const csrfToken = sessionStorage.getItem("csrf-token");
 			const shortlivedJWTAccessToken = sessionStorage.getItem("access-token");
 
 			const response = await fetch(`/api/${process.env.API_URL}/logout`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-                    "X-CSRF-Token": csrfToken || "",
-                    Authorization: shortlivedJWTAccessToken || "",
+					"X-CSRF-Token": csrfToken || "",
+					Authorization: shortlivedJWTAccessToken || "",
 				},
 			});
 
 			if (!response.ok) throw new Error("Failed to logout.");
-
 		} catch (ex) {
 			console.log(ex);
 		} finally {
-            sessionStorage.removeItem("access-token");
+			sessionStorage.removeItem("access-token");
 			sessionStorage.removeItem("csrf-token");
 			sessionStorage.removeItem("user-data");
-        }
+		}
 	}
 
 	public static async refresh(callback: Function) {
@@ -98,14 +96,14 @@ export class AuthService {
 			const shortlivedJWTAccessToken = sessionStorage.getItem("access-token");
 			const userData = shortlivedJWTAccessToken ? AuthModel.parseJWT(shortlivedJWTAccessToken) : null;
 
-            if (!userData) return window.location.href = "/login";
+			if (!userData) return (window.location.href = "/login");
 
 			const response = await fetch(`/api/${process.env.API_URL}/refresh`, {
 				method: "POST",
 				body: JSON.stringify({ EmailAddress: userData.username }),
 			});
 
-			if (!response.ok) return window.location.href = "/login";
+			if (!response.ok) return (window.location.href = "/login");
 			const data = await response.json();
 			sessionStorage.setItem("access-token", data.Token);
 			callback();

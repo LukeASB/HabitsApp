@@ -15,17 +15,9 @@ const App: React.FC<IApp> = ({ page = "" }) => {
 	} = useRouter();
 
 	const renderPage = () => {
-		if (page === "home") {
-			return <Home />;
-		}
-
-		if (page === "register") {
-			return <Register />;
-		}
-
-		if (page === "login") {
-			return <Login />;
-		}
+		if (page === "home") return <Home />;
+		if (page === "register") return <Register />;
+		if (page === "login") return <Login />;
 
 		return <h3>No component for navigation value. {page} not found</h3>;
 	};

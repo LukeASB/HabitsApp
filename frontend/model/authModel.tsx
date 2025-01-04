@@ -16,7 +16,7 @@ export class AuthModel {
 			return JSON.parse(atob(base64));
 		} catch (err) {
 			console.error("Invalid JWT:", err);
-            return null;
+			return null;
 		}
 	}
 }

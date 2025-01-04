@@ -1,6 +1,7 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { useState } from "react";
 import IHabit from "../shared/interfaces/IHabit";
 import ICalendar from "../shared/interfaces/ICalendar";
+import { FormatDate } from "../shared/helpers/formatDate";
 
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -23,9 +24,7 @@ const Calendar: React.FC<ICalendar> = ({ currentSelectedHabit, completionDatesCo
 		while (calendarDays.length % 7 !== 0) calendarDays.push(null);
 
 		const weeks: (number | null)[][] = [];
-		for (let i = 0; i < calendarDays.length; i += 7) {
-			weeks.push(calendarDays.slice(i, i + 7));
-		}
+		for (let i = 0; i < calendarDays.length; i += 7) weeks.push(calendarDays.slice(i, i + 7));
 
 		return { weeks, month, year };
 	};
@@ -114,9 +113,13 @@ const Calendar: React.FC<ICalendar> = ({ currentSelectedHabit, completionDatesCo
 				))}
 			</div>
 
-			<div className="completionDatesCounter mt-3">
-				<p>Selected Days: {completionDatesCounter}</p>
-			</div>
+			<div className="card mt-3 p-3 shadow-sm">
+    <div className="card-body">
+        <p><strong>Completed Days Total:</strong> {completionDatesCounter}</p>
+        <p><strong>Days Target:</strong> {currentSelectedHabit?.daysTarget}</p>
+        <p><strong>Created At:</strong> {FormatDate(currentSelectedHabit?.createdAt ? `${currentSelectedHabit?.createdAt}` : "")}</p>
+    </div>
+</div>
 		</div>
 	);
 };

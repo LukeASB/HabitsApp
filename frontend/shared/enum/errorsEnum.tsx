@@ -7,4 +7,4 @@ export enum ErrorsEnum {
     HabitDaysMax = "Habit Days cannot be more than {0} days",
     PasswordMin = "Password must be at least {0} characters",
     PasswordMax = "Password must be less than {0} characters",
-}
+};

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import IHabit from "../shared/interfaces/IHabit";
 import HabitsButtons from "./habitButtons";
 import CreateHabitForm from "./forms/createHabitForm";
 import UpdateHabitForm from "./forms/updateHabitForm";
@@ -14,7 +13,7 @@ import { AuthModel } from "../model/authModel";
 const HabitsNavbar: React.FC<IHabitsNavbar> = ({ showSidebar, setShowSidebar, habit, habitOps: { createHabit, updateHabit, deleteHabit } }) => {
 	const router = useRouter();
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-	const [showModal, setShowModal] = useState<IHabitModalTypes>({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: false});
+	const [showModal, setShowModal] = useState<IHabitModalTypes>({ createHabitModal: false, updateHabitModal: false, deleteHabitModal: false });
 
 	useEffect(() => {
 		const jwt = sessionStorage.getItem("access-token");
