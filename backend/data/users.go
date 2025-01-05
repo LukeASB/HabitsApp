@@ -3,6 +3,7 @@ package data
 import "time"
 
 type UserAuth struct {
+	UserID       string `json:"UserID"`
 	EmailAddress string `json:"EmailAddress"`
 	Password     string `json:"Password"`
 }
@@ -12,9 +13,8 @@ type UserRefreshRequest struct {
 }
 
 type UserRefreshResponse struct {
-	Success      bool   `json:"Succcess"`
+	Success      bool   `json:"Success"`
 	EmailAddress string `json:"EmailAddress"`
-	AccessToken  string `json:"AccessToken"`
 }
 type RegisterUserRequest struct {
 	EmailAddress string `json:"EmailAddress"`
@@ -24,17 +24,16 @@ type RegisterUserRequest struct {
 }
 
 type RegisterUserData struct {
-	Success bool     `json:"Succcess"`
+	Success bool     `json:"Success"`
 	User    UserData `json:"User"`
 }
 
 type RegisterUserResponse struct {
-	Success bool             `json:"Succcess"`
+	Success bool             `json:"Success"`
 	User    UserDataResponse `json:"User"`
 }
 
 type UserDataResponse struct {
-	UserID       string    `json:"UserID"`
 	FirstName    string    `json:"FirstName"`
 	LastName     string    `json:"LastName"`
 	EmailAddress string    `json:"EmailAddress"`
@@ -42,28 +41,19 @@ type UserDataResponse struct {
 }
 
 type UserLoggedInData struct {
-	Success     bool      `json:"Succcess"`
+	Success     bool      `json:"Success"`
 	User        UserData  `json:"User"`
 	AccessToken string    `json:"AccessToken"`
 	LoggedInAt  time.Time `json:"LoggedInAt"`
 }
 
 type UserLoggedInResponse struct {
-	Success     bool             `json:"Succcess"`
-	User        UserDataResponse `json:"User"`
-	AccessToken string           `json:"AccessToken"`
-	LoggedInAt  time.Time        `json:"LoggedInAt"`
-}
-
-type UserLoggedOutResponse struct {
-	Success      bool      `json:"Succcess"`
-	UserID       string    `json:"UserID"`
-	EmailAddress string    `json:"EmailAddress"`
-	LoggedOutAt  time.Time `json:"LoggedOutAt"`
+	Success    bool             `json:"Success"`
+	User       UserDataResponse `json:"User"`
+	LoggedInAt time.Time        `json:"LoggedInAt"`
 }
 
 type UserLoggedOutRequest struct {
-	UserID       string `json:"UserID"`
 	EmailAddress string `json:"EmailAddress"`
 }
 

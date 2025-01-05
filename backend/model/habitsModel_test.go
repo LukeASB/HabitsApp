@@ -14,20 +14,22 @@ func TestCreateHabitsHandler(t *testing.T) {
 	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
-		name     string
-		newHabit data.NewHabit
-		want     error
+		name             string
+		userEmailAddress string
+		newHabit         data.NewHabit
+		want             error
 	}{
 		{
-			name:     "Successfully Create Habit",
-			newHabit: data.NewHabit{Name: "Create Habit Test", Days: 1, DaysTarget: 11},
-			want:     nil,
+			name:             "Successfully Create Habit",
+			userEmailAddress: "johndoe1@example.com",
+			newHabit:         data.NewHabit{Name: "Create Habit Test", Days: 1, DaysTarget: 11},
+			want:             nil,
 		},
 	}
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			if err := model.CreateHabitsHandler(val.newHabit); err != nil {
+			if err := model.CreateHabitsHandler(val.userEmailAddress, val.newHabit); err != nil {
 				t.Errorf("TestCreate Failed - err=%s", err)
 			}
 		})
@@ -40,20 +42,22 @@ func TestRetrieveHabitsHandler(t *testing.T) {
 	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
-		name string
-		id   string
-		want data.Habit
+		name             string
+		userEmailAddress string
+		habitId          string
+		want             data.Habit
 	}{
 		{
-			name: "Get Habit Successfully",
-			id:   data.MockHabit[0].ID,
-			want: data.MockHabit[0],
+			name:             "Get Habit Successfully",
+			userEmailAddress: "johndoe1@example.com",
+			habitId:          data.MockHabit[0].HabitID,
+			want:             data.MockHabit[0],
 		},
 	}
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			habit, err := model.RetrieveHabitsHandler(val.id)
+			habit, err := model.RetrieveHabitsHandler(val.userEmailAddress, val.habitId)
 
 			if err != nil {
 				t.Errorf("TestRetrieve Failed - err=%s", err)
@@ -73,19 +77,29 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 	db := db.NewDB(logger)
 	model := NewHabitsModel(logger, db)
 
+	var mockHabitForUserID1 []data.Habit
+
+	for _, habit := range data.MockHabit {
+		if habit.UserID == "1" {
+			mockHabitForUserID1 = append(mockHabitForUserID1, habit)
+		}
+	}
+
 	testCases := []struct {
-		name string
-		want []data.Habit
+		name             string
+		userEmailAddress string
+		want             []data.Habit
 	}{
 		{
-			name: "Get All Habits Successfully",
-			want: data.MockHabit,
+			name:             "Get All Habits Successfully",
+			userEmailAddress: "johndoe1@example.com",
+			want:             mockHabitForUserID1,
 		},
 	}
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			habits, err := model.RetrieveAllHabitsHandler()
+			habits, err := model.RetrieveAllHabitsHandler(val.userEmailAddress)
 
 			if err != nil {
 				t.Errorf("TestRetrieve Failed - err=%s", err)
@@ -108,20 +122,22 @@ func TestUpdateHabitsHandler(t *testing.T) {
 	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
-		name        string
-		updateHabit data.Habit
-		id          string
+		name             string
+		userEmailAddress string
+		updateHabit      data.Habit
+		habitId          string
 	}{
 		{
-			name:        "Update Habit Successfully",
-			updateHabit: data.Habit{Name: "Pray everday", Days: 12, DaysTarget: 30},
-			id:          "1",
+			name:             "Update Habit Successfully",
+			userEmailAddress: "johndoe1@example.com",
+			updateHabit:      data.Habit{Name: "Pray everday", Days: 12, DaysTarget: 30},
+			habitId:          "1",
 		},
 	}
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			if err := model.UpdateHabitsHandler(val.updateHabit, val.id); err != nil {
+			if err := model.UpdateHabitsHandler(val.userEmailAddress, val.updateHabit, val.habitId); err != nil {
 				t.Errorf("TestUpdate Failed - err=%s", err)
 			}
 		})
@@ -134,26 +150,29 @@ func TestDeleteHabitsHandler(t *testing.T) {
 	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
-		name    string
-		id      string
-		wantErr bool
-		got     bool
+		name             string
+		userEmailAddress string
+		habitId          string
+		wantErr          bool
+		got              bool
 	}{
 		{
-			name:    "Delete Habit Successfully",
-			id:      "1",
-			wantErr: false,
+			name:             "Delete Habit Successfully",
+			userEmailAddress: "johndoe1@example.com",
+			habitId:          "1",
+			wantErr:          false,
 		},
 		{
-			name:    "Delete Habit Failed",
-			id:      "9",
-			wantErr: true,
+			name:             "Delete Habit Failed",
+			userEmailAddress: "1",
+			habitId:          "9",
+			wantErr:          true,
 		},
 	}
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			err := model.DeleteHabitsHandler(val.id)
+			err := model.DeleteHabitsHandler(val.userEmailAddress, val.habitId)
 
 			if err != nil {
 				val.got = true

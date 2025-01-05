@@ -3,6 +3,7 @@ package controller
 import (
 	"dohabits/data"
 	"dohabits/logger"
+	"dohabits/middleware/session"
 	"dohabits/model"
 	"dohabits/view"
 	"encoding/json"
@@ -59,6 +60,32 @@ func (c *HabitsController) CreateHabitsHandler(w http.ResponseWriter, r *http.Re
 	c.opsChan <- func() {
 		c.logger.InfoLog("habitsController.Create")
 
+		claims, ok := r.Context().Value(session.ClaimsKey).(*session.Claims)
+
+		if !ok {
+			resultChan <- struct {
+				data []byte
+				err  error
+			}{
+				data: []byte(""),
+				err:  fmt.Errorf("habitsController.Create - JWT Token claims not found"),
+			}
+			return
+		}
+
+		username := claims.Username
+
+		if username == "" {
+			resultChan <- struct {
+				data []byte
+				err  error
+			}{
+				data: []byte(""),
+				err:  fmt.Errorf("habitsController.Create - JWT Token claims username is empty"),
+			}
+			return
+		}
+
 		if r.Body == nil {
 			resultChan <- struct {
 				data []byte
@@ -83,7 +110,7 @@ func (c *HabitsController) CreateHabitsHandler(w http.ResponseWriter, r *http.Re
 			return
 		}
 
-		if err := c.habitsModel.CreateHabitsHandler(newHabit); err != nil {
+		if err := c.habitsModel.CreateHabitsHandler(username, newHabit); err != nil {
 			resultChan <- struct {
 				data []byte
 				err  error
@@ -139,22 +166,48 @@ func (c *HabitsController) RetrieveHabitsHandler(w http.ResponseWriter, r *http.
 	}, 1)
 
 	c.opsChan <- func() {
-		id := r.URL.Query().Get("id")
+		claims, ok := r.Context().Value(session.ClaimsKey).(*session.Claims)
 
-		c.logger.InfoLog(fmt.Sprintf("habitsController.Retrieve - id=%s", id))
-
-		if len(id) == 0 {
+		if !ok {
 			resultChan <- struct {
 				data []byte
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Retrieve - id query param is empty"),
+				err:  fmt.Errorf("habitsController.Retrieve - JWT Token claims not found"),
 			}
 			return
 		}
 
-		habit, err := c.habitsModel.RetrieveHabitsHandler(id)
+		username := claims.Username
+
+		if username == "" {
+			resultChan <- struct {
+				data []byte
+				err  error
+			}{
+				data: []byte(""),
+				err:  fmt.Errorf("habitsController.Retrieve - JWT Token claims username is empty"),
+			}
+			return
+		}
+
+		habitId := r.URL.Query().Get("habitId")
+
+		if len(habitId) == 0 {
+			resultChan <- struct {
+				data []byte
+				err  error
+			}{
+				data: []byte(""),
+				err:  fmt.Errorf("habitsController.Retrieve - habitId query param is empty"),
+			}
+			return
+		}
+
+		c.logger.InfoLog(fmt.Sprintf("habitsController.Retrieve - email=%s, habitId=%s", username, habitId))
+
+		habit, err := c.habitsModel.RetrieveHabitsHandler(username, habitId)
 
 		if err != nil {
 			resultChan <- struct {
@@ -212,9 +265,35 @@ func (c *HabitsController) RetrieveAllHabitsHandler(w http.ResponseWriter, r *ht
 	}, 1)
 
 	c.opsChan <- func() {
-		c.logger.InfoLog("habitsController.RetrieveAll")
+		claims, ok := r.Context().Value(session.ClaimsKey).(*session.Claims)
 
-		habits, err := c.habitsModel.RetrieveAllHabitsHandler()
+		if !ok {
+			resultChan <- struct {
+				data []byte
+				err  error
+			}{
+				data: []byte(""),
+				err:  fmt.Errorf("habitsController.RetrieveAll - JWT Token claims not found"),
+			}
+			return
+		}
+
+		username := claims.Username
+
+		if username == "" {
+			resultChan <- struct {
+				data []byte
+				err  error
+			}{
+				data: []byte(""),
+				err:  fmt.Errorf("habitsController.RetrieveAll - JWT Token claims username is empty"),
+			}
+			return
+		}
+
+		c.logger.InfoLog(fmt.Sprintf("habitsController.RetrieveAll = email=%s", username))
+
+		habits, err := c.habitsModel.RetrieveAllHabitsHandler(username)
 
 		if err != nil {
 			resultChan <- struct {
@@ -272,17 +351,43 @@ func (c *HabitsController) UpdateHabitsHandler(w http.ResponseWriter, r *http.Re
 	}, 1)
 
 	c.opsChan <- func() {
-		id := r.URL.Query().Get("id")
+		claims, ok := r.Context().Value(session.ClaimsKey).(*session.Claims)
 
-		c.logger.InfoLog(fmt.Sprintf("habitsController.Update - id=%s", id))
-
-		if len(id) == 0 {
+		if !ok {
 			resultChan <- struct {
 				data []byte
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Update - id query param is missing"),
+				err:  fmt.Errorf("habitsController.Update - JWT Token claims not found"),
+			}
+			return
+		}
+
+		username := claims.Username
+
+		if username == "" {
+			resultChan <- struct {
+				data []byte
+				err  error
+			}{
+				data: []byte(""),
+				err:  fmt.Errorf("habitsController.Update - JWT Token claims username is empty"),
+			}
+			return
+		}
+
+		habitId := r.URL.Query().Get("habitId")
+
+		c.logger.InfoLog(fmt.Sprintf("habitsController.Update - email=%s, habitId=%s", username, habitId))
+
+		if len(habitId) == 0 {
+			resultChan <- struct {
+				data []byte
+				err  error
+			}{
+				data: []byte(""),
+				err:  fmt.Errorf("habitsController.Update - habitId query param is missing"),
 			}
 			return
 		}
@@ -302,7 +407,7 @@ func (c *HabitsController) UpdateHabitsHandler(w http.ResponseWriter, r *http.Re
 			return
 		}
 
-		habit, err := c.habitsModel.RetrieveHabitsHandler(id)
+		habit, err := c.habitsModel.RetrieveHabitsHandler(username, habitId)
 
 		if err != nil {
 			resultChan <- struct {
@@ -327,7 +432,11 @@ func (c *HabitsController) UpdateHabitsHandler(w http.ResponseWriter, r *http.Re
 			habit.DaysTarget = *updatedHabit.DaysTarget
 		}
 
-		err = c.habitsModel.UpdateHabitsHandler(habit, id)
+		if updatedHabit.CompletionDates != nil {
+			habit.CompletionDates = *updatedHabit.CompletionDates
+		}
+
+		err = c.habitsModel.UpdateHabitsHandler(username, habit, habitId)
 
 		if err != nil {
 			resultChan <- struct {
@@ -385,22 +494,48 @@ func (c *HabitsController) DeleteHabitsHandler(w http.ResponseWriter, r *http.Re
 	}, 1)
 
 	c.opsChan <- func() {
-		id := r.URL.Query().Get("id")
+		claims, ok := r.Context().Value(session.ClaimsKey).(*session.Claims)
 
-		c.logger.InfoLog(fmt.Sprintf("habitsController.Delete - id=%s", id))
-
-		if len(id) == 0 {
+		if !ok {
 			resultChan <- struct {
 				data []byte
 				err  error
 			}{
 				data: []byte(""),
-				err:  fmt.Errorf("habitsController.Delete - id query param is missing"),
+				err:  fmt.Errorf("habitsController.Delete - JWT Token claims not found"),
 			}
 			return
 		}
 
-		err := c.habitsModel.DeleteHabitsHandler(id)
+		username := claims.Username
+
+		if username == "" {
+			resultChan <- struct {
+				data []byte
+				err  error
+			}{
+				data: []byte(""),
+				err:  fmt.Errorf("habitsController.Delete - JWT Token claims username is empty"),
+			}
+			return
+		}
+
+		habitId := r.URL.Query().Get("habitId")
+
+		c.logger.InfoLog(fmt.Sprintf("habitsController.Delete - email=%s, habitId=%s", username, habitId))
+
+		if len(habitId) == 0 {
+			resultChan <- struct {
+				data []byte
+				err  error
+			}{
+				data: []byte(""),
+				err:  fmt.Errorf("habitsController.Delete - habitId query param is missing"),
+			}
+			return
+		}
+
+		err := c.habitsModel.DeleteHabitsHandler(username, habitId)
 
 		if err != nil {
 			resultChan <- struct {

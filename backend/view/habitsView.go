@@ -63,7 +63,14 @@ func (v *HabitsView) RetrieveAllHabitsHandler(habits []data.Habit) ([]byte, erro
 
 func (v *HabitsView) UpdateHabitsHandler(habit data.Habit) ([]byte, error) {
 	v.logger.InfoLog("habitsView.Update")
-	result, err := json.Marshal(habit)
+
+	updatedHabit := data.UpdateHabit{
+		Name:            &habit.Name,
+		Days:            &habit.Days,
+		DaysTarget:      &habit.DaysTarget,
+		CompletionDates: &habit.CompletionDates,
+	}
+	result, err := json.Marshal(updatedHabit)
 
 	if err != nil {
 		v.logger.ErrorLog(fmt.Sprintf("habitsView.Update - Error encoding to JSON - err=%s", err))

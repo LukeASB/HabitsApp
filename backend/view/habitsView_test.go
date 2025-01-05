@@ -127,9 +127,19 @@ func Test_UpdateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	v := NewHabitsView(logger)
 
-	habit := data.MockHabit[0]
+	habit := data.Habit{
+		Name:            "Test Update Habit",
+		Days:            30,
+		DaysTarget:      50,
+		CompletionDates: append(data.MockHabit[0].CompletionDates, []string{"2021-09-01", "2021-09-02", "2021-09-03"}...),
+	}
 
-	marshalledHabit, err := json.Marshal(habit)
+	marshalledUpdatedHabit, err := json.Marshal(data.UpdateHabit{
+		Name:            &habit.Name,
+		Days:            &habit.Days,
+		DaysTarget:      &habit.DaysTarget,
+		CompletionDates: &habit.CompletionDates,
+	})
 
 	if err != nil {
 		t.Errorf("Fail err: %s", err)
@@ -141,7 +151,7 @@ func Test_UpdateHabitsHandler(t *testing.T) {
 	}{
 		{
 			name: "Test Successful Update",
-			want: marshalledHabit,
+			want: marshalledUpdatedHabit,
 		},
 	}
 
