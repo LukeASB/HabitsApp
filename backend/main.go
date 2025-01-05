@@ -29,7 +29,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	db := db.NewDB(logger)
+	db := db.NewMongoDB(logger)
 
 	if err := db.Connect(); err != nil {
 		log.Fatal(err)

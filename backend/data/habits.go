@@ -3,24 +3,24 @@ package data
 import "time"
 
 type Habit struct {
-	HabitID         string    `json:"habitId"`
-	UserID          string    `json:"userId"`
-	CreatedAt       time.Time `json:"createdAt"`
-	Name            string    `json:"name"`
-	Days            int       `json:"days"`
-	DaysTarget      int       `json:"daysTarget"`
-	CompletionDates []string  `json:"completionDates"`
+	HabitID         string    `json:"habitId" bson:"habitId"`
+	UserID          string    `json:"userId" bson:"userId"`
+	CreatedAt       time.Time `json:"createdAt" bson:"createdAt"`
+	Name            string    `json:"name" bson:"name"`
+	Days            int       `json:"days" bson:"days"`
+	DaysTarget      int       `json:"daysTarget" bson:"daysTarget"`
+	CompletionDates []string  `json:"completionDates" bson:"completionDates"`
 }
 
 type NewHabit struct {
-	Name       string `json:"name"`
-	Days       int    `json:"days"`
-	DaysTarget int    `json:"daysTarget"`
+	Name       string `json:"name" bson:"name"`
+	Days       int    `json:"days" bson:"days"`
+	DaysTarget int    `json:"daysTarget" bson:"daysTarget"`
 }
 
 type UpdateHabit struct {
-	Name            *string   `json:"name"`
-	Days            *int      `json:"days"`
-	DaysTarget      *int      `json:"daysTarget"`
-	CompletionDates *[]string `json:"completionDates"`
+	Name            *string   `json:"name" bson:"name"`
+	Days            *int      `json:"days" bson:"days"`
+	DaysTarget      *int      `json:"daysTarget" bson:"daysTarget"`
+	CompletionDates *[]string `json:"completionDates" bson:"completionDates"`
 }

@@ -11,7 +11,7 @@ import (
 
 func TestRegisterUserHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
 	testCases := []struct {
@@ -51,7 +51,7 @@ func TestRegisterUserHandler(t *testing.T) {
 
 func TestLoginHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
@@ -91,7 +91,7 @@ func TestLoginHandler(t *testing.T) {
 
 func TestLogoutHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
@@ -124,7 +124,7 @@ func TestLogoutHandler(t *testing.T) {
 
 func TestRefreshHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")

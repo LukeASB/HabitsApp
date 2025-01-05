@@ -16,7 +16,7 @@ type MyMockDB struct {
 	logger logger.ILogger
 }
 
-func NewDB(logger logger.ILogger) *MyMockDB {
+func NewMockDB(logger logger.ILogger) *MyMockDB {
 	return &MyMockDB{
 		logger: logger,
 	}
@@ -74,20 +74,6 @@ func (db *MyMockDB) LoginUser(value interface{}) error {
 		db.logger.ErrorLog("mock_db.LoginUser - value type is not data.UserSession")
 		return fmt.Errorf("mock_db.LoginUser - value type is not data.UserSession")
 	}
-	var sessionID int
-
-	if len(data.MockUserSession) > 0 {
-		id, err := strconv.Atoi(data.MockUserSession[len(data.MockUserSession)-1].ID)
-
-		if err != nil {
-			db.logger.ErrorLog("mock_db.LoginUser - failed to get latest id")
-			return fmt.Errorf("mock_db.LoginUser - failed to get latest id")
-		}
-
-		sessionID = id
-	}
-
-	userSession.ID = fmt.Sprintf("%v", sessionID+1)
 
 	data.MockUserSession = append(data.MockUserSession, *userSession)
 

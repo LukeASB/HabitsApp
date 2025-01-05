@@ -52,6 +52,7 @@ var MockHabit = []Habit{
 	},
 	{
 		HabitID:         "6",
+		UserID:          "1",
 		CreatedAt:       time.Date(2024, time.September, 21, 10, 30, 0, 0, time.UTC),
 		Name:            "Limit phone screen time to 1 hour a day",
 		Days:            5,

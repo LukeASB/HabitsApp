@@ -20,7 +20,7 @@ import (
 
 func TestRegisterUserHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
 	csrfTokenMock := session.NewMockCSRFToken(logger)
 	authModel := model.NewAuthModel(logger, db)
@@ -109,7 +109,7 @@ func TestRegisterUserHandler(t *testing.T) {
 
 func TestLoginHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
 	csrfTokenMock := session.NewMockCSRFToken(logger)
 	authModel := model.NewAuthModel(logger, db)
@@ -187,7 +187,7 @@ func TestLoginHandler(t *testing.T) {
 
 func TestLogoutHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
 	csrfTokenMock := session.NewMockCSRFToken(logger)
 	authModel := model.NewAuthModel(logger, db)
@@ -238,7 +238,7 @@ func TestLogoutHandler(t *testing.T) {
 
 func TestRefreshHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
 	csrfTokenMock := session.NewMockCSRFToken(logger)
 	authModel := model.NewAuthModel(logger, db)

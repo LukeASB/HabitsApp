@@ -10,7 +10,7 @@ import (
 
 func TestCreateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
@@ -38,7 +38,7 @@ func TestCreateHabitsHandler(t *testing.T) {
 
 func TestRetrieveHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
@@ -74,7 +74,7 @@ func TestRetrieveHabitsHandler(t *testing.T) {
 
 func TestRetrieveAllHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
 	var mockHabitForUserID1 []data.Habit
@@ -118,7 +118,7 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 
 func TestUpdateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
@@ -146,7 +146,7 @@ func TestUpdateHabitsHandler(t *testing.T) {
 
 func TestDeleteHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
 	testCases := []struct {
