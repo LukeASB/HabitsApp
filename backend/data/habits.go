@@ -3,7 +3,7 @@ package data
 import "time"
 
 type Habit struct {
-	HabitID         string    `json:"habitId" bson:"habitId"`
+	HabitID         string    `json:"habitId" bson:"_id"`
 	UserID          string    `json:"userId" bson:"userId"`
 	CreatedAt       time.Time `json:"createdAt" bson:"createdAt"`
 	Name            string    `json:"name" bson:"name"`
