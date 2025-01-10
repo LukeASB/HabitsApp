@@ -71,6 +71,18 @@ func (ac *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if userAuth.EmailAddress == "" {
+		ac.logger.DebugLog("authController.LoginHandler - Email Address is empty")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	if userAuth.Password == "" {
+		ac.logger.DebugLog("authController.LoginHandler - Password is empty")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	userLoggedIn, err := ac.authModel.LoginHandler(w, &userAuth, ac.jwtTokens, ac.csrfTokens)
 
 	if err != nil {

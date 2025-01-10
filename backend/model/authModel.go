@@ -97,7 +97,7 @@ func (am *AuthModel) LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth
 		return nil, err
 	}
 
-	userData, ok := userDetails.(data.UserData)
+	userData, ok := userDetails.(*data.UserData)
 
 	if !ok {
 		return nil, fmt.Errorf("authModel.LoginHandler - data.UserData is invalid")
@@ -137,7 +137,7 @@ func (am *AuthModel) LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth
 
 	return &data.UserLoggedInData{
 		Success:     true,
-		User:        userData,
+		User:        *userData,
 		AccessToken: accessToken,
 		LoggedInAt:  loggedInAt,
 	}, nil
@@ -152,7 +152,7 @@ func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *
 		return err
 	}
 
-	userData, ok := userDetails.(data.UserData)
+	userData, ok := userDetails.(*data.UserData)
 
 	if !ok {
 		return fmt.Errorf("authModel.LoginHandler - data.UserData is invalid")
@@ -165,7 +165,7 @@ func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *
 	jwtTokens.DestroyJWTRefreshToken(userLoggedOutRequest.EmailAddress)
 	csrfTokens.DestroyCSRFToken(w)
 
-	if err := am.db.LogoutUser(&userData); err != nil {
+	if err := am.db.LogoutUser(userData); err != nil {
 		return err
 	}
 

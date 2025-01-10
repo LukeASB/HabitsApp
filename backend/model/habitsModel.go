@@ -42,10 +42,10 @@ func (m *HabitsModel) CreateHabitsHandler(userEmailAddress string, habit data.Ne
 		return err
 	}
 
-	currentUserData, ok := userDetails.(data.UserData)
+	currentUserData, ok := userDetails.(*data.UserData)
 
 	if !ok {
-		return fmt.Errorf("authModel.RegisterUserHandler - data.UserData is invalid")
+		return fmt.Errorf("authModel.CreateHabitsHandler - data.UserData is invalid")
 	}
 
 	err = m.db.CreateHabitsHandler(currentUserData.UserID, habit)
@@ -68,10 +68,10 @@ func (m *HabitsModel) RetrieveHabitsHandler(userEmailAddress, habitId string) (d
 		return habit, err
 	}
 
-	currentUserData, ok := userDetails.(data.UserData)
+	currentUserData, ok := userDetails.(*data.UserData)
 
 	if !ok {
-		return data.Habit{}, fmt.Errorf("authModel.RegisterUserHandler - data.UserData is invalid")
+		return data.Habit{}, fmt.Errorf("habitsModel.RetrieveHabitsHandler - data.UserData is invalid")
 	}
 
 	result, err := m.db.RetrieveHabitsHandler(currentUserData.UserID, habitId)
@@ -99,10 +99,10 @@ func (m *HabitsModel) RetrieveAllHabitsHandler(userEmailAddress string) ([]data.
 		return nil, err
 	}
 
-	currentUserData, ok := userDetails.(data.UserData)
+	currentUserData, ok := userDetails.(*data.UserData)
 
 	if !ok {
-		return nil, fmt.Errorf("authModel.RegisterUserHandler - data.UserData is invalid")
+		return nil, fmt.Errorf("habitsModel.RetrieveAllHabitsHandler - data.UserData is invalid")
 	}
 
 	result, err := m.db.RetrieveAllHabitsHandler(currentUserData.UserID)
@@ -130,10 +130,10 @@ func (m *HabitsModel) UpdateHabitsHandler(userEmailAddress string, habit data.Ha
 		return err
 	}
 
-	currentUserData, ok := userDetails.(data.UserData)
+	currentUserData, ok := userDetails.(*data.UserData)
 
 	if !ok {
-		return fmt.Errorf("authModel.RegisterUserHandler - data.UserData is invalid")
+		return fmt.Errorf("habitsModel.UpdateHabitsHandler - data.UserData is invalid")
 	}
 
 	if err := validation.ValidateHabit(habit, m.logger); err != nil {
@@ -158,10 +158,10 @@ func (m *HabitsModel) DeleteHabitsHandler(userEmailAddress, habitId string) erro
 		return err
 	}
 
-	currentUserData, ok := userDetails.(data.UserData)
+	currentUserData, ok := userDetails.(*data.UserData)
 
 	if !ok {
-		return fmt.Errorf("authModel.RegisterUserHandler - data.UserData is invalid")
+		return fmt.Errorf("habitsModel.DeleteHabitsHandler - data.UserData is invalid")
 	}
 
 	if err := m.db.DeleteHabitsHandler(currentUserData.UserID, habitId); err != nil {

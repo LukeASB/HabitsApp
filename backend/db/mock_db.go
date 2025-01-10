@@ -118,7 +118,7 @@ func (db *MyMockDB) GetUserDetails(value interface{}) (interface{}, error) {
 	if userAuth, ok := value.(*data.RegisterUserRequest); ok {
 		for _, val := range data.MockUsers {
 			if val.EmailAddress == userAuth.EmailAddress {
-				return val, nil
+				return &val, nil
 			}
 		}
 
@@ -128,7 +128,7 @@ func (db *MyMockDB) GetUserDetails(value interface{}) (interface{}, error) {
 	if userAuth, ok := value.(*data.UserAuth); ok {
 		for _, val := range data.MockUsers {
 			if val.EmailAddress == userAuth.EmailAddress {
-				return val, nil
+				return &val, nil
 			}
 		}
 
@@ -138,7 +138,7 @@ func (db *MyMockDB) GetUserDetails(value interface{}) (interface{}, error) {
 	if userLoggedOutRequest, ok := value.(*data.UserLoggedOutRequest); ok {
 		for _, val := range data.MockUsers {
 			if val.EmailAddress == userLoggedOutRequest.EmailAddress {
-				return val, nil
+				return &val, nil
 			}
 		}
 

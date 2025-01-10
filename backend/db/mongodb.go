@@ -183,7 +183,13 @@ func (db *MongoDB) LoginUser(value interface{}) error {
 		return fmt.Errorf("mongodb.LoginUser - Failed to insert user session for userId=%s: %v", userSession.UserID, err)
 	}
 
-	filter := bson.M{"UserID": userSession.UserID}
+	objectID, err := primitive.ObjectIDFromHex(userSession.UserID)
+	if err != nil {
+		db.logger.ErrorLog(fmt.Sprintf("mongodb.LoginUser - Failed to insert user session for userId=%s", userSession.UserID))
+		return fmt.Errorf("mongodb.LoginUser - Failed to insert user session for userId=%s: %v", userSession.UserID, err)
+	}
+
+	filter := bson.M{"_id": bson.ObjectID(objectID)}
 
 	update := bson.M{
 		"$set": bson.M{
@@ -258,62 +264,97 @@ func (db *MongoDB) GetUserDetails(value interface{}) (interface{}, error) {
 	if userAuth, ok := value.(*data.RegisterUserRequest); ok {
 		filter := bson.M{"EmailAddress": userAuth.EmailAddress}
 
-		var user data.UserData
-
-		err := newUsersCollection.FindOne(ctx, filter).Decode(&user)
+		user, err := db.findUser(ctx, filter, newUsersCollection)
 
 		if err != nil {
-			if errors.Is(err, mongo.ErrNoDocuments) {
-				return data.UserData{}, nil
-			}
-
 			db.logger.ErrorLog(fmt.Sprintf("mongodb.GetUserDetails - Failed to get user details err=%s", err))
 			return nil, fmt.Errorf("mongodb.GetUserDetails - Failed to get user details err=%s", err)
 		}
 
-		return &user, nil
+		return user, nil
 	}
 
 	if userAuth, ok := value.(*data.UserAuth); ok {
 		filter := bson.M{"EmailAddress": userAuth.EmailAddress}
 
-		var user data.UserData
-
-		err := newUsersCollection.FindOne(ctx, filter).Decode(&user)
+		user, err := db.findUser(ctx, filter, newUsersCollection)
 
 		if err != nil {
-			if errors.Is(err, mongo.ErrNoDocuments) {
-				return nil, fmt.Errorf("mock_db.GetUserData - User doesn't exist")
-			}
-
 			db.logger.ErrorLog(fmt.Sprintf("mongodb.GetUserDetails - Failed to get user details err=%s", err))
 			return nil, fmt.Errorf("mongodb.GetUserDetails - Failed to get user details err=%s", err)
 		}
 
-		return &user, nil
+		return user, nil
 	}
 
 	if userLoggedOutRequest, ok := value.(*data.UserLoggedOutRequest); ok {
 		filter := bson.M{"EmailAddress": userLoggedOutRequest.EmailAddress}
 
-		var user data.UserData
-
-		err := newUsersCollection.FindOne(ctx, filter).Decode(&user)
+		user, err := db.findUser(ctx, filter, newUsersCollection)
 
 		if err != nil {
-			if errors.Is(err, mongo.ErrNoDocuments) {
-				return nil, fmt.Errorf("mock_db.GetUserData - User doesn't exist")
-			}
-
 			db.logger.ErrorLog(fmt.Sprintf("mongodb.GetUserDetails - Failed to get user details err=%s", err))
 			return nil, fmt.Errorf("mongodb.GetUserDetails - Failed to get user details err=%s", err)
 		}
 
-		return &user, nil
+		return user, nil
 	}
 
 	db.logger.ErrorLog("mock_db.GetUserData - value type is unsupported")
 	return nil, fmt.Errorf("mock_db.GetUserData - value type is unsupported")
+}
+
+func (db *MongoDB) findUser(ctx context.Context, filter bson.M, newUsersCollection *mongo.Collection) (*data.UserData, error) {
+	var user data.UserData
+	var result bson.M
+
+	err := newUsersCollection.FindOne(ctx, filter).Decode(&result)
+
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("mock_db.findUser - User doesn't exist")
+		}
+
+		db.logger.ErrorLog(fmt.Sprintf("mongodb.findUser - Failed to get user details err=%s", err))
+		return nil, fmt.Errorf("mongodb.findUser - Failed to get user details err=%s", err)
+	}
+
+	if id, ok := result["_id"].(bson.ObjectID); ok {
+		user.UserID = id.Hex()
+	} else {
+		return nil, fmt.Errorf("mock_db.findUser - _id field is missing or not an ObjectID")
+	}
+
+	// Manually assign other fields from result to user struct
+	if password, ok := result["Password"].(string); ok {
+		user.Password = password
+	}
+
+	if firstName, ok := result["FirstName"].(string); ok {
+		user.FirstName = firstName
+	}
+
+	if lastName, ok := result["LastName"].(string); ok {
+		user.LastName = lastName
+	}
+
+	if emailAddress, ok := result["EmailAddress"].(string); ok {
+		user.EmailAddress = emailAddress
+	}
+
+	if createdAt, ok := result["CreatedAt"].(bson.DateTime); ok {
+		user.CreatedAt = createdAt.Time()
+	}
+
+	if lastLogin, ok := result["LastLogin"].(bson.DateTime); ok {
+		user.LastLogin = lastLogin.Time()
+	}
+
+	if isLoggedIn, ok := result["IsLoggedIn"].(bool); ok {
+		user.IsLoggedIn = isLoggedIn
+	}
+
+	return &user, nil
 }
 
 func (db *MongoDB) CreateHabitsHandler(userId string, value interface{}) error {
