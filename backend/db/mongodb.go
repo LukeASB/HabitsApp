@@ -28,23 +28,6 @@ type MongoDB struct {
 	habitsCollection      string
 }
 
-// type ICollection interface {
-// 	InsertOne(ctx context.Context, document interface{}, opts ...*options.InsertOneOptions) (*mongo.InsertOneResult, error)
-// 	FindOne(ctx context.Context, filter interface{}, opts ...*options.FindOneOptions) *mongo.SingleResult
-// 	Find(ctx context.Context, filter interface{}, opts ...*options.FindOptions) (cur *mongo.Cursor, err error)
-// 	UpdateOne(ctx context.Context, filter interface{}, update interface{}, opts ...*options.UpdateOptions) (*mongo.UpdateResult, error)
-// 	DeleteMany(ctx context.Context, filter interface{}, opts ...*options.DeleteOptions) (*mongo.DeleteResult, error)
-// }
-
-type UsersCollection struct {
-}
-
-type UserSessionCollection struct {
-}
-
-type HabitsCollection struct {
-}
-
 func NewMongoDB(logger logger.ILogger) *MongoDB {
 	return &MongoDB{
 		logger:                logger,
@@ -333,8 +316,8 @@ func (db *MongoDB) GetUserDetails(value interface{}) (interface{}, error) {
 		return user, nil
 	}
 
-	db.logger.ErrorLog("mock_db.GetUserData - value type is unsupported")
-	return nil, fmt.Errorf("mock_db.GetUserData - value type is unsupported")
+	db.logger.ErrorLog("mongodb.GetUserDetails - value type is unsupported")
+	return nil, fmt.Errorf("mongodb.GetUserDetails - value type is unsupported")
 }
 
 func (db *MongoDB) findUser(ctx context.Context, filter bson.M, newUsersCollection *mongo.Collection) (*data.UserData, error) {
@@ -345,7 +328,7 @@ func (db *MongoDB) findUser(ctx context.Context, filter bson.M, newUsersCollecti
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("mock_db.findUser - User doesn't exist")
+			return nil, fmt.Errorf("mongodb.findUser - User doesn't exist")
 		}
 
 		db.logger.ErrorLog(fmt.Sprintf("mongodb.findUser - Failed to get user details err=%s", err))
@@ -355,7 +338,7 @@ func (db *MongoDB) findUser(ctx context.Context, filter bson.M, newUsersCollecti
 	if id, ok := result["_id"].(bson.ObjectID); ok {
 		user.UserID = id.Hex()
 	} else {
-		return nil, fmt.Errorf("mock_db.findUser - _id field is missing or not an ObjectID")
+		return nil, fmt.Errorf("mongodb.findUser - _id field is missing or not an ObjectID")
 	}
 
 	// Manually assign other fields from result to user struct
@@ -404,8 +387,24 @@ func (db *MongoDB) CreateHabitsHandler(userId string, value interface{}) error {
 
 	newHabitsCollection := db.NewHabitsCollection()
 
-	habit := data.Habit{
-		UserID:          userId,
+	objectID, err := primitive.ObjectIDFromHex(userId)
+
+	if err != nil {
+		db.logger.ErrorLog(fmt.Sprintf("mongodb.CreateHabitsHandler - Failed to insert new habit: userId=%s, err=%v", userId, err))
+		return fmt.Errorf("mongodb.CreateHabitsHandler - Failed to insert new habit: userId=%s, err=%v", userId, err)
+	}
+
+	type insertHabitData struct {
+		UserID          bson.ObjectID `bson:"UserID"`
+		CreatedAt       time.Time     `bson:"CreatedAt"`
+		Name            string        `bson:"Name"`
+		Days            int           `bson:"Days"`
+		DaysTarget      int           `bson:"DaysTarget"`
+		CompletionDates []string      `bson:"CompletionDates"`
+	}
+
+	insertHabit := insertHabitData{
+		UserID:          bson.ObjectID(objectID),
 		CreatedAt:       time.Now(),
 		Name:            newHabit.Name,
 		Days:            newHabit.Days,
@@ -413,13 +412,13 @@ func (db *MongoDB) CreateHabitsHandler(userId string, value interface{}) error {
 		CompletionDates: []string{},
 	}
 
-	insertResult, err := newHabitsCollection.InsertOne(ctx, habit)
+	insertResult, err := newHabitsCollection.InsertOne(ctx, insertHabit)
 	if err != nil {
 		db.logger.ErrorLog(fmt.Sprintf("mongodb.CreateHabitsHandler - Failed to insert new habit: userId=%s, err=%v", userId, err))
 		return fmt.Errorf("mongodb.CreateHabitsHandler - Failed to insert new habit: userId=%s, err=%v", userId, err)
 	}
 
-	db.logger.InfoLog(fmt.Sprintf("mongodb.CreateHabitsHandler - User registered successfully with userId: %s, Acknowledged: %v, InsertedID: %v", userId, insertResult.Acknowledged, insertResult.InsertedID))
+	db.logger.InfoLog(fmt.Sprintf("mongodb.CreateHabitsHandler - habit inserted successfully with userId: %s, Acknowledged: %v, InsertedID: %v", userId, insertResult.Acknowledged, insertResult.InsertedID))
 
 	return nil
 }
@@ -438,11 +437,11 @@ func (db *MongoDB) RetrieveAllHabitsHandler(userId string) (interface{}, error) 
 		db.logger.ErrorLog(fmt.Sprintf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err))
 		return nil, fmt.Errorf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err)
 	}
-
-	var results []*data.Habit
+	var results []data.Habit
 
 	for cur.Next(ctx) {
-		var el data.Habit
+		var el bson.M
+		var habit data.Habit
 		err := cur.Decode(&el)
 
 		if err != nil {
@@ -450,28 +449,47 @@ func (db *MongoDB) RetrieveAllHabitsHandler(userId string) (interface{}, error) 
 			return nil, fmt.Errorf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err)
 		}
 
-		objectIDString := el.HabitID
-
-		objectID, err := primitive.ObjectIDFromHex(objectIDString)
-
-		if err != nil {
-			db.logger.ErrorLog(fmt.Sprintf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err))
-			return nil, fmt.Errorf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err)
+		if id, ok := el["_id"].(bson.ObjectID); ok {
+			habit.HabitID = id.Hex()
+		} else {
+			return nil, fmt.Errorf("mongodb.RetrieveAllHabitsHandler - _id field is missing or not an ObjectID")
 		}
 
-		idStr := objectID.Hex()
-
-		habit := data.Habit{
-			HabitID:         idStr,
-			UserID:          el.UserID,
-			CreatedAt:       el.CreatedAt,
-			Name:            el.Name,
-			Days:            el.Days,
-			DaysTarget:      el.DaysTarget,
-			CompletionDates: el.CompletionDates,
+		// Manually assign other fields from result to user struct
+		if userId, ok := el["UserID"].(bson.ObjectID); ok {
+			habit.UserID = userId.Hex()
 		}
 
-		results = append(results, &habit)
+		if createdAt, ok := el["CreatedAt"].(bson.DateTime); ok {
+			habit.CreatedAt = createdAt.Time()
+		}
+
+		if name, ok := el["Name"].(string); ok {
+			habit.Name = name
+		}
+
+		if days, ok := el["Days"].(int32); ok {
+			habit.Days = int(days)
+		}
+
+		if daysTarget, ok := el["DaysTarget"].(int32); ok {
+			habit.DaysTarget = int(daysTarget)
+		}
+
+		if completionDates, ok := el["CompletionDates"].(bson.A); ok {
+			var completionDate []string
+			for _, date := range completionDates {
+				if strDate, ok := date.(string); ok {
+					completionDate = append(completionDate, strDate)
+				} else {
+					db.logger.ErrorLog("mongodb.RetrieveAllHabitsHandler - non-string value in Completed Date")
+				}
+			}
+
+			habit.CompletionDates = completionDate
+		}
+
+		results = append(results, habit)
 	}
 
 	if err := cur.Err(); err != nil {
@@ -490,18 +508,62 @@ func (db *MongoDB) RetrieveHabitsHandler(userId, habitId string) (interface{}, e
 
 	newHabitCollection := db.NewHabitsCollection()
 
-	filter := bson.M{"_id": habitId}
-	var habit data.Habit
-	err := newHabitCollection.FindOne(ctx, filter).Decode(&habit)
-
+	objectID, err := primitive.ObjectIDFromHex(habitId)
 	if err != nil {
 		db.logger.ErrorLog(fmt.Sprintf("mongodb.RetrieveHabitsHandler - Failed to retrieve habit: userId=%s, err=%v", userId, err))
 		return nil, fmt.Errorf("mongodb.RetrieveHabitsHandler - Failed to retrieve habit: userId=%s, err=%v", userId, err)
 	}
 
-	if err != mongo.ErrNoDocuments {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.RetrieveHabitsHandler - Error checking for existing user: err=%v", err))
-		return nil, fmt.Errorf("mongodb.RetrieveHabitsHandler - Error checking for existing user: err=%v", err)
+	filter := bson.M{"_id": bson.ObjectID(objectID)}
+	var result bson.M
+	var habit data.Habit
+	err = newHabitCollection.FindOne(ctx, filter).Decode(&result)
+
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, fmt.Errorf("mongodb.RetrieveHabitsHandler - Habit doesn't exist")
+		}
+
+		db.logger.ErrorLog(fmt.Sprintf("mongodb.RetrieveHabitsHandler - Failed to retrieve habit: userId=%s, err=%v", userId, err))
+		return nil, fmt.Errorf("mongodb.RetrieveHabitsHandler - Failed to retrieve habit: userId=%s, err=%v", userId, err)
+	}
+
+	// Manually assign other fields from result to user struct
+	if habitId, ok := result["_id"].(bson.ObjectID); ok {
+		habit.HabitID = habitId.Hex()
+	}
+
+	if userId, ok := result["UserID"].(bson.ObjectID); ok {
+		habit.UserID = userId.Hex()
+	}
+
+	if createdAt, ok := result["CreatedAt"].(bson.DateTime); ok {
+		habit.CreatedAt = createdAt.Time()
+	}
+
+	if name, ok := result["Name"].(string); ok {
+		habit.Name = name
+	}
+
+	if days, ok := result["Days"].(int32); ok {
+		habit.Days = int(days)
+	}
+
+	if daysTarget, ok := result["DaysTarget"].(int32); ok {
+		habit.DaysTarget = int(daysTarget)
+	}
+
+	if completionDates, ok := result["CompletionDates"].(bson.A); ok {
+		var completionDate []string
+		for _, date := range completionDates {
+			if strDate, ok := date.(string); ok {
+				completionDate = append(completionDate, strDate)
+			} else {
+				db.logger.ErrorLog("mongodb.RetrieveAllHabitsHandler - non-string value in Completed Date")
+			}
+		}
+
+		habit.CompletionDates = completionDate
 	}
 
 	return habit, nil
@@ -510,7 +572,7 @@ func (db *MongoDB) RetrieveHabitsHandler(userId, habitId string) (interface{}, e
 func (db *MongoDB) UpdateHabitsHandler(userId, habitId string, value interface{}) error {
 	db.logger.InfoLog("mongodb.UpdateHabitsHandler")
 
-	newHabit, ok := value.(data.Habit)
+	updateHabit, ok := value.(data.Habit)
 
 	if !ok {
 		err := "mongodb.UpdateHabitsHandler - value type is not data.Habit"
@@ -523,12 +585,20 @@ func (db *MongoDB) UpdateHabitsHandler(userId, habitId string, value interface{}
 
 	newHabitCollection := db.NewHabitsCollection()
 
-	filter := bson.M{"_id": habitId}
+	objectId, err := primitive.ObjectIDFromHex(habitId)
+
+	if err != nil {
+		db.logger.ErrorLog(fmt.Sprintf("mongodb.UpdateHabitsHandler - Failed to update habits collection for userId=%s, habitId=%s, err=%s", userId, habitId, err))
+		return fmt.Errorf("mongodb.UpdateHabitsHandler - Failed to update habits collection for userId=%s, habitId=%s, err=%s", userId, habitId, err)
+	}
+
+	filter := bson.M{"_id": bson.ObjectID(objectId)}
 
 	update := bson.M{
 		"$set": bson.M{
-			"Name":       newHabit.Name,
-			"DaysTarget": newHabit.DaysTarget,
+			"Name":            updateHabit.Name,
+			"DaysTarget":      updateHabit.DaysTarget,
+			"CompletionDates": updateHabit.CompletionDates,
 		},
 	}
 
@@ -558,7 +628,7 @@ func (db *MongoDB) DeleteHabitsHandler(userId, habitId string) error {
 		return fmt.Errorf("mongodb.DeleteHabitsHandler - Failed to delete habit: err=%v", err)
 	}
 
-	filter := bson.M{"_id": objectID}
+	filter := bson.M{"_id": bson.ObjectID(objectID)}
 
 	result, err := newHabitCollection.DeleteOne(ctx, filter)
 
