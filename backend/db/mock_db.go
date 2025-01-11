@@ -118,11 +118,11 @@ func (db *MyMockDB) GetUserDetails(value interface{}) (interface{}, error) {
 	if userAuth, ok := value.(*data.RegisterUserRequest); ok {
 		for _, val := range data.MockUsers {
 			if val.EmailAddress == userAuth.EmailAddress {
-				return &val, nil
+				return nil, fmt.Errorf("mock_db.GetUserData - User already exists")
 			}
 		}
 
-		return data.UserData{}, nil
+		return nil, nil
 	}
 
 	if userAuth, ok := value.(*data.UserAuth); ok {

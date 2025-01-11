@@ -58,7 +58,7 @@ type UserLoggedOutRequest struct {
 }
 
 type UserData struct {
-	UserID       string    `json:"UserID" bson:"_id"`
+	UserID       string    `json:"UserID"`
 	Password     string    `json:"Password" bson:"Password"`
 	FirstName    string    `json:"FirstName" bson:"FirstName"`
 	LastName     string    `json:"LastName" bson:"LastName"`
@@ -69,7 +69,7 @@ type UserData struct {
 }
 
 type UserSession struct {
-	UserID       string    `json:"UserID" bson:"_id"`
+	UserID       string    `json:"UserID"`
 	RefreshToken string    `json:"RefreshToken" bson:"RefreshToken"`
 	Device       string    `json:"Device" bson:"Device"`
 	IPAddress    string    `json:"IpAddress" bson:"IpAddress"`

@@ -89,8 +89,6 @@ func (db *MongoDB) Connect() error {
 		return fmt.Errorf(fmt.Sprintf("mongodb.Connect - %s", err))
 	}
 
-	db.logger.InfoLog("Pinged your deployment. You successfully connected to MongoDB!")
-
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -101,6 +99,7 @@ func (db *MongoDB) Connect() error {
 	}
 
 	db.client = client
+	db.logger.InfoLog("Pinged your deployment. You successfully connected to MongoDB!")
 
 	return nil
 }
@@ -129,26 +128,26 @@ func (db *MongoDB) RegisterUserHandler(value interface{}) (interface{}, error) {
 
 	newUsersCollection := db.NewUsersCollection()
 
-	filter := bson.M{"EmailAddress": newUser.EmailAddress}
+	registerTime := time.Now()
 
-	var existingUser data.UserData
-	err := newUsersCollection.FindOne(ctx, filter).Decode(&existingUser)
-	if err == nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.RegisterUserHandler - User already exists with EmailAddress: %s", newUser.EmailAddress))
-		return nil, fmt.Errorf("mongodb.RegisterUserHandler - User already exists with EmailAddress: %s", newUser.EmailAddress)
+	type registerUserData struct {
+		Password     string    `bson:"Password"`
+		FirstName    string    `bson:"FirstName"`
+		LastName     string    `bson:"LastName"`
+		EmailAddress string    `bson:"EmailAddress"`
+		CreatedAt    time.Time `bson:"CreatedAt"`
+		LastLogin    time.Time `bson:"LastLogin"`
+		IsLoggedIn   bool      `bson:"IsLoggedIn"`
 	}
 
-	if err != mongo.ErrNoDocuments {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.RegisterUserHandler - Error checking for existing user: %v", err))
-		return nil, fmt.Errorf("mongodb.RegisterUserHandler - Error checking for existing user: %v", err)
-	}
-
-	registerUser := data.UserData{
+	registerUser := registerUserData{
+		EmailAddress: newUser.EmailAddress,
+		Password:     newUser.Password,
 		FirstName:    newUser.FirstName,
 		LastName:     newUser.LastName,
-		Password:     newUser.Password,
-		EmailAddress: newUser.EmailAddress,
-		CreatedAt:    time.Now(),
+		CreatedAt:    registerTime,
+		LastLogin:    registerTime,
+		IsLoggedIn:   false,
 	}
 
 	insertResult, err := newUsersCollection.InsertOne(ctx, registerUser)
@@ -159,7 +158,13 @@ func (db *MongoDB) RegisterUserHandler(value interface{}) (interface{}, error) {
 
 	db.logger.InfoLog(fmt.Sprintf("mongodb.RegisterUserHandler - User registered successfully with EmailAddress: %s, Acknowledged: %v, InsertedID: %v", registerUser.EmailAddress, insertResult.Acknowledged, insertResult.InsertedID))
 
-	return nil, nil
+	return &data.UserData{
+		FirstName:    newUser.FirstName,
+		LastName:     newUser.LastName,
+		Password:     newUser.Password,
+		EmailAddress: newUser.EmailAddress,
+		CreatedAt:    registerTime,
+	}, nil
 }
 
 func (db *MongoDB) LoginUser(value interface{}) error {
@@ -177,13 +182,29 @@ func (db *MongoDB) LoginUser(value interface{}) error {
 	newUsersSessionCollection := db.NewUsersSessionCollection()
 	newUsersCollection := db.NewUsersCollection()
 
-	_, err := newUsersSessionCollection.InsertOne(ctx, userSession)
+	objectID, err := primitive.ObjectIDFromHex(userSession.UserID)
 	if err != nil {
 		db.logger.ErrorLog(fmt.Sprintf("mongodb.LoginUser - Failed to insert user session for userId=%s", userSession.UserID))
 		return fmt.Errorf("mongodb.LoginUser - Failed to insert user session for userId=%s: %v", userSession.UserID, err)
 	}
 
-	objectID, err := primitive.ObjectIDFromHex(userSession.UserID)
+	type insertUserSessionData struct {
+		UserID       bson.ObjectID `bson:"_id"`
+		RefreshToken string        `bson:"RefreshToken"`
+		Device       string        `bson:"Device"`
+		IPAddress    string        `bson:"IpAddress"`
+		CreatedAt    time.Time     `bson:"CreatedAt"`
+	}
+
+	insertUserSession := insertUserSessionData{
+		UserID:       bson.ObjectID(objectID),
+		RefreshToken: userSession.RefreshToken,
+		Device:       userSession.Device,
+		IPAddress:    userSession.IPAddress,
+		CreatedAt:    userSession.CreatedAt,
+	}
+
+	_, err = newUsersSessionCollection.InsertOne(ctx, insertUserSession)
 	if err != nil {
 		db.logger.ErrorLog(fmt.Sprintf("mongodb.LoginUser - Failed to insert user session for userId=%s", userSession.UserID))
 		return fmt.Errorf("mongodb.LoginUser - Failed to insert user session for userId=%s: %v", userSession.UserID, err)
@@ -225,7 +246,13 @@ func (db *MongoDB) LogoutUser(value interface{}) error {
 	newUsersSessionCollection := db.NewUsersSessionCollection()
 	newUsersCollection := db.NewUsersCollection()
 
-	sessionFilter := bson.M{"UserID": userLoggedOut.UserID}
+	objectID, err := primitive.ObjectIDFromHex(userLoggedOut.UserID)
+	if err != nil {
+		db.logger.ErrorLog(fmt.Sprintf("mongodb.Logout - Failed to retrieve the objectId from userId=%s", userLoggedOut.UserID))
+		return fmt.Errorf("mongodb.Logout -  Failed to retrieve the objectId from userId=%s: %v", userLoggedOut.UserID, err)
+	}
+
+	sessionFilter := bson.D{{Key: "_id", Value: bson.ObjectID(objectID)}}
 
 	deleteResult, err := newUsersSessionCollection.DeleteOne(ctx, sessionFilter)
 	if err != nil {
@@ -233,9 +260,9 @@ func (db *MongoDB) LogoutUser(value interface{}) error {
 		return fmt.Errorf("mongodb.LogoutUser - Failed to delete user session for userId=%s: %v", userLoggedOut.UserID, err)
 	}
 
-	db.logger.InfoLog(fmt.Sprintf("The document has been updated. Acknowledged: %v, DeleteCount: %v", deleteResult.Acknowledged, deleteResult.DeletedCount))
+	db.logger.InfoLog(fmt.Sprintf("mongodb.LogoutUser - The document has been updated. Acknowledged: %v, DeleteCount: %v", deleteResult.Acknowledged, deleteResult.DeletedCount))
 
-	updateFilter := bson.M{"UserID": userLoggedOut.UserID}
+	updateFilter := bson.M{"_id": bson.ObjectID(objectID)}
 	update := bson.M{
 		"$set": bson.M{
 			"IsLoggedIn": false,
@@ -248,7 +275,7 @@ func (db *MongoDB) LogoutUser(value interface{}) error {
 		return fmt.Errorf("mongodb.LogoutUser - Failed to update users collection for userId=%s: %v", userLoggedOut.UserID, err)
 	}
 
-	db.logger.InfoLog(fmt.Sprintf("The document has been updated. ModifiedCount: %v, UpsertedCount: %v", updateResult.ModifiedCount, updateResult.UpsertedCount))
+	db.logger.InfoLog(fmt.Sprintf("mongodb.LogoutUser - The document has been updated. ModifiedCount: %v, UpsertedCount: %v", updateResult.ModifiedCount, updateResult.UpsertedCount))
 
 	return nil
 }
@@ -263,15 +290,21 @@ func (db *MongoDB) GetUserDetails(value interface{}) (interface{}, error) {
 
 	if userAuth, ok := value.(*data.RegisterUserRequest); ok {
 		filter := bson.M{"EmailAddress": userAuth.EmailAddress}
+		var result bson.M
 
-		user, err := db.findUser(ctx, filter, newUsersCollection)
+		err := newUsersCollection.FindOne(ctx, filter).Decode(&result)
 
 		if err != nil {
+			if errors.Is(err, mongo.ErrNoDocuments) {
+				return nil, nil
+			}
+
 			db.logger.ErrorLog(fmt.Sprintf("mongodb.GetUserDetails - Failed to get user details err=%s", err))
 			return nil, fmt.Errorf("mongodb.GetUserDetails - Failed to get user details err=%s", err)
 		}
 
-		return user, nil
+		db.logger.ErrorLog(fmt.Sprintf("mongodb.GetUserDetails - Failed to get user details err=%s", err))
+		return nil, fmt.Errorf("mongodb.GetUserDetails - Failed to get user details err=%s", err)
 	}
 
 	if userAuth, ok := value.(*data.UserAuth); ok {

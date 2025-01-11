@@ -36,7 +36,7 @@ func (m *HabitsModel) CreateHabitsHandler(userEmailAddress string, habit data.Ne
 		return err
 	}
 
-	userDetails, err := m.db.GetUserDetails(&data.RegisterUserRequest{EmailAddress: userEmailAddress})
+	userDetails, err := m.db.GetUserDetails(&data.UserAuth{EmailAddress: userEmailAddress})
 
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func (m *HabitsModel) RetrieveHabitsHandler(userEmailAddress, habitId string) (d
 	m.logger.InfoLog(fmt.Sprintf("habitsModel.Retrieve - userEmailAddress=%s, habitId=%s", userEmailAddress, habitId))
 	habit := data.Habit{}
 
-	userDetails, err := m.db.GetUserDetails(&data.RegisterUserRequest{EmailAddress: userEmailAddress})
+	userDetails, err := m.db.GetUserDetails(&data.UserAuth{EmailAddress: userEmailAddress})
 
 	if err != nil {
 		return habit, err
@@ -93,7 +93,7 @@ func (m *HabitsModel) RetrieveHabitsHandler(userEmailAddress, habitId string) (d
 func (m *HabitsModel) RetrieveAllHabitsHandler(userEmailAddress string) ([]data.Habit, error) {
 	m.logger.InfoLog(fmt.Sprintf("habitsModel.RetrieveAll - userEmailAddress=%s", userEmailAddress))
 
-	userDetails, err := m.db.GetUserDetails(&data.RegisterUserRequest{EmailAddress: userEmailAddress})
+	userDetails, err := m.db.GetUserDetails(&data.UserAuth{EmailAddress: userEmailAddress})
 
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (m *HabitsModel) RetrieveAllHabitsHandler(userEmailAddress string) ([]data.
 func (m *HabitsModel) UpdateHabitsHandler(userEmailAddress string, habit data.Habit, habitId string) error {
 	m.logger.InfoLog(fmt.Sprintf("habitsModel.Update - userEmailAddress=%s, habitId=%s", userEmailAddress, habitId))
 
-	userDetails, err := m.db.GetUserDetails(&data.RegisterUserRequest{EmailAddress: userEmailAddress})
+	userDetails, err := m.db.GetUserDetails(&data.UserAuth{EmailAddress: userEmailAddress})
 
 	if err != nil {
 		return err
@@ -152,7 +152,7 @@ func (m *HabitsModel) UpdateHabitsHandler(userEmailAddress string, habit data.Ha
 func (m *HabitsModel) DeleteHabitsHandler(userEmailAddress, habitId string) error {
 	m.logger.InfoLog(fmt.Sprintf("habitsModel.Delete - userEmailAddress=%s, habitId=%s", userEmailAddress, habitId))
 
-	userDetails, err := m.db.GetUserDetails(&data.RegisterUserRequest{EmailAddress: userEmailAddress})
+	userDetails, err := m.db.GetUserDetails(&data.UserAuth{EmailAddress: userEmailAddress})
 
 	if err != nil {
 		return err

@@ -46,20 +46,10 @@ func (am *AuthModel) RegisterUserHandler(userRegisterRequest *data.RegisterUserR
 		return nil, fmt.Errorf("authModel.RegisterUserHandler - user: %s email address is invalid. LastName: %s", userRegisterRequest.EmailAddress, userRegisterRequest.EmailAddress)
 	}
 
-	userDetails, err := am.db.GetUserDetails(&data.RegisterUserRequest{EmailAddress: userRegisterRequest.EmailAddress})
+	_, err := am.db.GetUserDetails(&data.RegisterUserRequest{EmailAddress: userRegisterRequest.EmailAddress})
 
 	if err != nil {
 		return nil, err
-	}
-
-	currentUserData, ok := userDetails.(data.UserData)
-
-	if !ok {
-		return nil, fmt.Errorf("authModel.RegisterUserHandler - data.UserData is invalid")
-	}
-
-	if len(currentUserData.UserID) > 0 {
-		return nil, fmt.Errorf("authModel.RegisterUserHandler - User already exists. UserID: %s, EmailAddress: %s", currentUserData.UserID, currentUserData.EmailAddress)
 	}
 
 	hashedPassword, err := validation.HashPassword(userRegisterRequest.Password)
