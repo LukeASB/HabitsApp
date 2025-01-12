@@ -128,6 +128,8 @@ func TestRefreshHandler(t *testing.T) {
 	authModel := NewAuthModel(logger, db)
 
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
+	csrfTokensMock := session.NewMockCSRFToken(logger)
+	w := httptest.NewRecorder()
 
 	testCases := []struct {
 		name               string
@@ -143,7 +145,7 @@ func TestRefreshHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			newAccessToken, err := authModel.RefreshHandler(val.userRefreshRequest, jwtTokensMock)
+			newAccessToken, err := authModel.RefreshHandler(w, val.userRefreshRequest, jwtTokensMock, csrfTokensMock)
 
 			if err != nil {
 				t.Errorf("TestRefreshHandler Failed - err=%s", err)

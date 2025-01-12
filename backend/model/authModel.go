@@ -21,7 +21,7 @@ type IAuthModel interface {
 	RegisterUserHandler(userRegisterRequest *data.RegisterUserRequest) (*data.RegisterUserData, error)
 	LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedInData, error)
 	LogoutHandler(w http.ResponseWriter, UserLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) error
-	RefreshHandler(userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens) (string, error)
+	RefreshHandler(w http.ResponseWriter, userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (string, error)
 }
 
 func NewAuthModel(logger logger.ILogger, db db.IDB) *AuthModel {
@@ -162,12 +162,15 @@ func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *
 	return nil
 }
 
-func (am *AuthModel) RefreshHandler(userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens) (string, error) {
+func (am *AuthModel) RefreshHandler(w http.ResponseWriter, userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (string, error) {
 	am.logger.InfoLog(helper.GetFunctionName(), "")
 
 	newAccessToken, err := jwtTokens.RefreshJWTTokens(userRefreshRequest.EmailAddress)
-
 	if err != nil {
+		if err = am.LogoutHandler(w, &data.UserLoggedOutRequest{EmailAddress: userRefreshRequest.EmailAddress}, jwtTokens, csrfTokens); err != nil {
+			return "", err
+		}
+
 		return "", err
 	}
 

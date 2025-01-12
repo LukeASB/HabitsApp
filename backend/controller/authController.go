@@ -144,7 +144,7 @@ func (ac *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	newAccessToken, err := ac.authModel.RefreshHandler(&userRefreshRequest, ac.jwtTokens)
+	newAccessToken, err := ac.authModel.RefreshHandler(w, &userRefreshRequest, ac.jwtTokens, ac.csrfTokens)
 
 	if err != nil {
 		ac.logger.DebugLog(helper.GetFunctionName(), fmt.Sprintf("err: %s", err))

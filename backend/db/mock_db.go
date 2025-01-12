@@ -133,7 +133,7 @@ func (db *MyMockDB) GetUserDetails(value interface{}) (interface{}, error) {
 			}
 		}
 
-		return nil, fmt.Errorf("User doesn't exist", helper.GetFunctionName())
+		return nil, fmt.Errorf("%s - User doesn't exist", helper.GetFunctionName())
 	}
 
 	if userLoggedOutRequest, ok := value.(*data.UserLoggedOutRequest); ok {
@@ -143,11 +143,11 @@ func (db *MyMockDB) GetUserDetails(value interface{}) (interface{}, error) {
 			}
 		}
 
-		return nil, fmt.Errorf("User doesn't exist", helper.GetFunctionName())
+		return nil, fmt.Errorf("%s - User doesn't exist", helper.GetFunctionName())
 	}
 
 	db.logger.ErrorLog(helper.GetFunctionName(), "value type is unsupported")
-	return nil, fmt.Errorf("value type is unsupported", helper.GetFunctionName())
+	return nil, fmt.Errorf("%s - value type is unsupported", helper.GetFunctionName())
 }
 
 func (db *MyMockDB) CreateHabitsHandler(userId string, value interface{}) error {

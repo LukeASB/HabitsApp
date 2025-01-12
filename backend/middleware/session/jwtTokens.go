@@ -73,7 +73,8 @@ func (sa *JWTTokens) generateRefreshJWT(username string) (string, error) {
 	longLivedJWT := time.Now().Add(24 * time.Hour) // Long-lived refresh token
 	tokenString, err := sa.generateToken(username, longLivedJWT)
 
-	// Store the refresh token in a file - temp
+	// Can now be removed - will be stored and read in the DB user_session.
+	// // Store the refresh token in a file - temp
 	if err == nil {
 		err = os.WriteFile(fmt.Sprintf("%s/%s_%s", refreshTokenPath, username, refreshTokenFile), []byte(tokenString), 0644)
 	}
@@ -82,6 +83,7 @@ func (sa *JWTTokens) generateRefreshJWT(username string) (string, error) {
 }
 
 func (sa *JWTTokens) RefreshJWTTokens(username string) (string, error) {
+	// Now needs to get GetUserDetails to get the user's userId -> read from user_session based on userId to get return refresh token here.
 	refreshToken, err := os.ReadFile(fmt.Sprintf("%s/%s_%s", refreshTokenPath, username, refreshTokenFile))
 
 	if err != nil {
@@ -134,6 +136,7 @@ func (sa *JWTTokens) generateToken(username string, expirationTime time.Time) (s
 
 func (sa *JWTTokens) DestroyJWTRefreshToken(username string) error {
 	// Stored in file for now
+	// Call db to delete the user_session document
 	if err := os.Remove(fmt.Sprintf("%s/%s_%s", refreshTokenPath, username, refreshTokenFile)); err != nil {
 		return err
 	}

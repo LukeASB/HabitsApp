@@ -178,7 +178,7 @@ func (db *MongoDB) LoginUser(value interface{}) error {
 	objectID, err := primitive.ObjectIDFromHex(userSession.UserID)
 	if err != nil {
 		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to insert user session for userId=%s", userSession.UserID))
-		return fmt.Errorf("%s - Failed to insert user session for userId=%s: %v", userSession.UserID, err)
+		return fmt.Errorf("%s - Failed to insert user session for userId=%s: %v", helper.GetFunctionName(), userSession.UserID, err)
 	}
 
 	type insertUserSessionData struct {
@@ -338,17 +338,17 @@ func (db *MongoDB) findUser(ctx context.Context, filter bson.M, newUsersCollecti
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("User doesn't exist", helper.GetFunctionName())
+			return nil, fmt.Errorf("%s - User doesn't exist", helper.GetFunctionName())
 		}
 
 		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to get user details err=%s", err))
-		return nil, fmt.Errorf("Failed to get user details err=%s", helper.GetFunctionName(), err)
+		return nil, fmt.Errorf("%s - Failed to get user details err=%s", helper.GetFunctionName(), err)
 	}
 
 	if id, ok := result["_id"].(bson.ObjectID); ok {
 		user.UserID = id.Hex()
 	} else {
-		return nil, fmt.Errorf("_id field is missing or not an ObjectID", helper.GetFunctionName())
+		return nil, fmt.Errorf("%s - _id field is missing or not an ObjectID", helper.GetFunctionName())
 	}
 
 	// Manually assign other fields from result to user struct
