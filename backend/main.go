@@ -3,6 +3,7 @@ package main
 import (
 	"dohabits/controller"
 	"dohabits/db"
+	"dohabits/helper"
 	"dohabits/internal"
 	"dohabits/logger"
 	"dohabits/middleware"
@@ -53,23 +54,23 @@ func init() {
 
 	App = internal.NewApp(authController, habitsController, db, mw, logger, apiName, apiVersion, appVersion, port, jwtTokens)
 
-	App.GetLogger().DebugLog(fmt.Sprintf("main.init() - %s loaded successfully. App Version = %s, API Version = %s", App.GetAPIName(), App.GetAppVersion(), App.GetAPIVersion()))
+	App.GetLogger().DebugLog(helper.GetFunctionName(), fmt.Sprintf("%s loaded successfully. App Version = %s, API Version = %s", App.GetAPIName(), App.GetAppVersion(), App.GetAPIVersion()))
 }
 
 func main() {
-	App.GetLogger().DebugLog("main.main - Executed")
+	App.GetLogger().DebugLog(helper.GetFunctionName(), "Executed")
 	routes.SetUpRoutes(App)
 
 	defer cleanup()
 
-	App.GetLogger().InfoLog(fmt.Sprintf("Listening on port: :%s\n", App.GetPort()))
+	App.GetLogger().InfoLog(helper.GetFunctionName(), fmt.Sprintf("Listening on port: :%s\n", App.GetPort()))
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", App.GetPort()), nil); err != nil {
-		App.GetLogger().ErrorLog("The Habits App has Exploded: 💣")
+		App.GetLogger().ErrorLog(helper.GetFunctionName(), "The Habits App has Exploded: 💣")
 		os.Exit(1)
 	}
 }
 
 func cleanup() {
-	App.GetLogger().DebugLog("main.cleanup - Executed")
+	App.GetLogger().DebugLog(helper.GetFunctionName(), "Executed")
 	App.GetDB().Disconnect()
 }

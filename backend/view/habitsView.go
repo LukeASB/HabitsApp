@@ -2,6 +2,7 @@ package view
 
 import (
 	"dohabits/data"
+	"dohabits/helper"
 	"dohabits/logger"
 	"encoding/json"
 	"fmt"
@@ -26,11 +27,11 @@ func NewHabitsView(logger logger.ILogger) *HabitsView {
 }
 
 func (v *HabitsView) CreateHabitsHandler(newHabit data.NewHabit) ([]byte, error) {
-	v.logger.InfoLog("habitsView.Create")
+	v.logger.InfoLog(helper.GetFunctionName(), "")
 	result, err := json.Marshal(newHabit)
 
 	if err != nil {
-		v.logger.ErrorLog(fmt.Sprintf("habitsView.Create - Error encoding to JSON - err=%s", err))
+		v.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Error encoding to JSON - err=%s", err))
 		return nil, err
 	}
 
@@ -38,11 +39,11 @@ func (v *HabitsView) CreateHabitsHandler(newHabit data.NewHabit) ([]byte, error)
 }
 
 func (v *HabitsView) RetrieveHabitsHandler(habit data.Habit) ([]byte, error) {
-	v.logger.InfoLog("habitsView.Retrieve")
+	v.logger.InfoLog(helper.GetFunctionName(), "")
 	result, err := json.Marshal(habit)
 
 	if err != nil {
-		v.logger.ErrorLog(fmt.Sprintf("habitsView.Retrieve - Error encoding to JSON - err=%s", err))
+		v.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Error encoding to JSON - err=%s", err))
 		return nil, err
 	}
 
@@ -50,11 +51,11 @@ func (v *HabitsView) RetrieveHabitsHandler(habit data.Habit) ([]byte, error) {
 }
 
 func (v *HabitsView) RetrieveAllHabitsHandler(habits []data.Habit) ([]byte, error) {
-	v.logger.InfoLog("habitsView.RetrieveAll")
+	v.logger.InfoLog(helper.GetFunctionName(), "")
 	result, err := json.Marshal(habits)
 
 	if err != nil {
-		v.logger.ErrorLog(fmt.Sprintf("habitsView.RetrieveAll - Error encoding to JSON - err=%s", err))
+		v.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Error encoding to JSON - err=%s", err))
 		return nil, err
 	}
 
@@ -62,7 +63,7 @@ func (v *HabitsView) RetrieveAllHabitsHandler(habits []data.Habit) ([]byte, erro
 }
 
 func (v *HabitsView) UpdateHabitsHandler(habit data.Habit) ([]byte, error) {
-	v.logger.InfoLog("habitsView.Update")
+	v.logger.InfoLog(helper.GetFunctionName(), "")
 
 	updatedHabit := data.UpdateHabit{
 		Name:            &habit.Name,
@@ -73,7 +74,7 @@ func (v *HabitsView) UpdateHabitsHandler(habit data.Habit) ([]byte, error) {
 	result, err := json.Marshal(updatedHabit)
 
 	if err != nil {
-		v.logger.ErrorLog(fmt.Sprintf("habitsView.Update - Error encoding to JSON - err=%s", err))
+		v.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Error encoding to JSON - err=%s", err))
 		return nil, err
 	}
 
@@ -81,14 +82,14 @@ func (v *HabitsView) UpdateHabitsHandler(habit data.Habit) ([]byte, error) {
 }
 
 func (v *HabitsView) DeleteHabitsHandler() ([]byte, error) {
-	v.logger.InfoLog("habitsView.Delete")
+	v.logger.InfoLog(helper.GetFunctionName(), "")
 	response := map[string]bool{"success": true}
 
 	jsonRes, err := json.Marshal(response)
 
 	if err != nil {
-		v.logger.ErrorLog(fmt.Sprintf("habitsView.Delete - Error encoding to JSON - err=%s", err))
-		return nil, fmt.Errorf("failed to encode response: %v", err)
+		v.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Error encoding to JSON - err=%s", err))
+		return nil, fmt.Errorf("%s - failed to encode response: %v", helper.GetFunctionName(), err)
 	}
 
 	return jsonRes, nil

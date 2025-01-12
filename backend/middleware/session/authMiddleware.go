@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"dohabits/helper"
 	"dohabits/logger"
 	"fmt"
 	"net/http"
@@ -15,14 +16,15 @@ type contextKey string
 const ClaimsKey = contextKey("claims")
 
 func AuthMiddleware(jwtTokens IJWTTokens, logger logger.ILogger) func(http.HandlerFunc) http.HandlerFunc {
+	functionName := helper.GetFunctionName()
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			logger.InfoLog("session.AuthMiddleware - Start")
+			logger.InfoLog(functionName, "")
 
 			authHeader := r.Header.Get("Authorization")
 
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-				logger.ErrorLog("session.AuthMiddleware - No Auth Header present")
+				logger.ErrorLog(functionName, "No Auth Header present")
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
@@ -34,7 +36,7 @@ func AuthMiddleware(jwtTokens IJWTTokens, logger logger.ILogger) func(http.Handl
 			})
 
 			if err != nil || !token.Valid {
-				logger.ErrorLog("session.AuthMiddleware - JWT Token error")
+				logger.ErrorLog(functionName, "JWT Token error")
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}

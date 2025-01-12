@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"dohabits/data"
+	"dohabits/helper"
 	"dohabits/logger"
 	"dohabits/middleware/session"
 	"net/http"
@@ -34,12 +35,12 @@ func (mw *Middleware) MiddlewareList(handler http.HandlerFunc, dependencies data
 	}
 
 	if dependencies.IsProtected {
-		mw.logger.DebugLog("middleware.MiddlewareList - Auth commented out for debug")
+		mw.logger.DebugLog(helper.GetFunctionName(), "Auth commented out for debug")
 		middlewares = append(middlewares, mw.protectedMiddlewareList()...)
 	}
 
 	if dependencies.CSRFRequired {
-		mw.logger.DebugLog("middleware.MiddlewareList - CSRF Token commented out for debug")
+		mw.logger.DebugLog(helper.GetFunctionName(), "CSRF Token commented out for debug")
 		// middlewares = append(middlewares, CSRFToken(mw.csrfTokens, mw.logger)) // Commented out for debug
 	}
 

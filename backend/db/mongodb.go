@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"dohabits/data"
+	"dohabits/helper"
 	"dohabits/logger"
 	"errors"
 	"fmt"
@@ -38,14 +39,23 @@ func NewMongoDB(logger logger.ILogger) *MongoDB {
 	}
 }
 
+/*
+See README.md for users document example
+*/
 func (db *MongoDB) NewUsersCollection() *mongo.Collection {
 	return db.client.Database(db.habitsAppDBName).Collection(db.usersCollection)
 }
 
+/*
+See README.md for user_session document example
+*/
 func (db *MongoDB) NewUsersSessionCollection() *mongo.Collection {
 	return db.client.Database(db.habitsAppDBName).Collection(db.userSessionCollection)
 }
 
+/*
+See README.md for habits document example
+*/
 func (db *MongoDB) NewHabitsCollection() *mongo.Collection {
 	return db.client.Database(db.habitsAppDBName).Collection(db.habitsCollection)
 }
@@ -55,12 +65,12 @@ func (db *MongoDB) Connect() error {
 	connectionString := os.Getenv("DB_URL")
 
 	if connectionString == "" {
-		db.logger.ErrorLog("mongodb.Connect - connectionString is empty")
-		return fmt.Errorf("mongodb.Connect - connectionString is empty")
+		db.logger.ErrorLog(helper.GetFunctionName(), "connectionString is empty")
+		return fmt.Errorf("%s - connectionString is empty", helper.GetFunctionName())
 	}
 
-	db.logger.InfoLog("mongodb.Connect")
-	db.logger.DebugLog(fmt.Sprintf("db - Connect() - %s\n", connectionString))
+	db.logger.InfoLog(helper.GetFunctionName(), "")
+	db.logger.DebugLog(helper.GetFunctionName(), fmt.Sprintf("%s\n", connectionString))
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(connectionString).SetServerAPIOptions(serverAPI)
@@ -68,8 +78,8 @@ func (db *MongoDB) Connect() error {
 	// Create a new client and connect to the server
 	client, err := mongo.Connect(opts)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.Connect - %s", err))
-		return fmt.Errorf(fmt.Sprintf("mongodb.Connect - %s", err))
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("%s", err))
+		return fmt.Errorf(fmt.Sprintf("%s - %s", helper.GetFunctionName(), err))
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -77,12 +87,12 @@ func (db *MongoDB) Connect() error {
 
 	// Send a ping to confirm a successful connection
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.Connect - %s", err))
-		return fmt.Errorf(fmt.Sprintf("mongodb.Connect - %s", err))
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("%s", err))
+		return fmt.Errorf(fmt.Sprintf("%s - %s", helper.GetFunctionName(), err))
 	}
 
 	db.client = client
-	db.logger.InfoLog("Pinged your deployment. You successfully connected to MongoDB!")
+	db.logger.InfoLog(helper.GetFunctionName(), "Pinged your deployment. You successfully connected to MongoDB!")
 
 	return nil
 }
@@ -92,18 +102,18 @@ func (db *MongoDB) Disconnect() error {
 		panic(err)
 	}
 
-	db.logger.InfoLog("mongodb.Disconnect - Successfully disconnected from MongoDB")
+	db.logger.InfoLog(helper.GetFunctionName(), "Successfully disconnected from MongoDB")
 	return nil
 }
 
 func (db *MongoDB) RegisterUserHandler(value interface{}) (interface{}, error) {
-	db.logger.InfoLog("mongodb.RegisterUserHandler")
+	db.logger.InfoLog(helper.GetFunctionName(), "")
 
 	newUser, ok := value.(*data.RegisterUserRequest)
 
 	if !ok {
-		db.logger.ErrorLog("mongodb.RegisterUserHandler - value type is not data.UserData")
-		return nil, fmt.Errorf("mongodb.RegisterUserHandler - value type is not data.UserData")
+		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.UserData")
+		return nil, fmt.Errorf("%s - value type is not data.UserData", helper.GetFunctionName())
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -135,11 +145,11 @@ func (db *MongoDB) RegisterUserHandler(value interface{}) (interface{}, error) {
 
 	insertResult, err := newUsersCollection.InsertOne(ctx, registerUser)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.RegisterUserHandler - Failed to insert new user: %v", err))
-		return nil, fmt.Errorf("mongodb.RegisterUserHandler - Failed to insert new user: %v", err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to insert new user: %v", err))
+		return nil, fmt.Errorf("%s - Failed to insert new user: %v", helper.GetFunctionName(), err)
 	}
 
-	db.logger.InfoLog(fmt.Sprintf("mongodb.RegisterUserHandler - User registered successfully with EmailAddress: %s, Acknowledged: %v, InsertedID: %v", registerUser.EmailAddress, insertResult.Acknowledged, insertResult.InsertedID))
+	db.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("User registered successfully with EmailAddress: %s, Acknowledged: %v, InsertedID: %v", registerUser.EmailAddress, insertResult.Acknowledged, insertResult.InsertedID))
 
 	return &data.UserData{
 		FirstName:    newUser.FirstName,
@@ -151,12 +161,12 @@ func (db *MongoDB) RegisterUserHandler(value interface{}) (interface{}, error) {
 }
 
 func (db *MongoDB) LoginUser(value interface{}) error {
-	db.logger.InfoLog("mongodb.LoginUser")
+	db.logger.InfoLog(helper.GetFunctionName(), "")
 
 	userSession, ok := value.(*data.UserSession)
 	if !ok {
-		db.logger.ErrorLog("mongodb.LoginUser - value type is not data.UserSession")
-		return fmt.Errorf("mongodb.LoginUser - value type is not data.UserSession")
+		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.UserSession")
+		return fmt.Errorf("%s - value type is not data.UserSession", helper.GetFunctionName())
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -167,8 +177,8 @@ func (db *MongoDB) LoginUser(value interface{}) error {
 
 	objectID, err := primitive.ObjectIDFromHex(userSession.UserID)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.LoginUser - Failed to insert user session for userId=%s", userSession.UserID))
-		return fmt.Errorf("mongodb.LoginUser - Failed to insert user session for userId=%s: %v", userSession.UserID, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to insert user session for userId=%s", userSession.UserID))
+		return fmt.Errorf("%s - Failed to insert user session for userId=%s: %v", userSession.UserID, err)
 	}
 
 	type insertUserSessionData struct {
@@ -189,8 +199,8 @@ func (db *MongoDB) LoginUser(value interface{}) error {
 
 	_, err = newUsersSessionCollection.InsertOne(ctx, insertUserSession)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.LoginUser - Failed to insert user session for userId=%s", userSession.UserID))
-		return fmt.Errorf("mongodb.LoginUser - Failed to insert user session for userId=%s: %v", userSession.UserID, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to insert user session for userId=%s", userSession.UserID))
+		return fmt.Errorf("%s - Failed to insert user session for userId=%s: %v", helper.GetFunctionName(), userSession.UserID, err)
 	}
 
 	filter := bson.M{"_id": bson.ObjectID(objectID)}
@@ -204,23 +214,23 @@ func (db *MongoDB) LoginUser(value interface{}) error {
 
 	result, err := newUsersCollection.UpdateOne(ctx, filter, update)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.LoginUser - Failed to update users collection for userId=%s", userSession.UserID))
-		return fmt.Errorf("mongodb.LoginUser - Failed to update users collection for userId=%s: %v", userSession.UserID, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to update users collection for userId=%s", userSession.UserID))
+		return fmt.Errorf("%s - Failed to update users collection for userId=%s: %v", helper.GetFunctionName(), userSession.UserID, err)
 	}
 
-	db.logger.InfoLog(fmt.Sprintf("The document has been updated. ModifiedCount: %v, UpsertedCount: %v", result.ModifiedCount, result.UpsertedCount))
+	db.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("The document has been updated. ModifiedCount: %v, UpsertedCount: %v", result.ModifiedCount, result.UpsertedCount))
 
 	return nil
 }
 
 func (db *MongoDB) LogoutUser(value interface{}) error {
-	db.logger.InfoLog("mongodb.LogoutUser")
+	db.logger.InfoLog(helper.GetFunctionName(), "")
 
 	userLoggedOut, ok := value.(*data.UserData)
 
 	if !ok {
-		db.logger.ErrorLog("mongodb.LogoutUser - value type is not data.UserLoggedOutRequest")
-		return fmt.Errorf("mongodb.LogoutUser - value type is not data.UserLoggedOutRequest")
+		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.UserLoggedOutRequest")
+		return fmt.Errorf("%s - value type is not data.UserLoggedOutRequest", helper.GetFunctionName())
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -231,19 +241,19 @@ func (db *MongoDB) LogoutUser(value interface{}) error {
 
 	objectID, err := primitive.ObjectIDFromHex(userLoggedOut.UserID)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.Logout - Failed to retrieve the objectId from userId=%s", userLoggedOut.UserID))
-		return fmt.Errorf("mongodb.Logout -  Failed to retrieve the objectId from userId=%s: %v", userLoggedOut.UserID, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to retrieve the objectId from userId=%s", userLoggedOut.UserID))
+		return fmt.Errorf("%s - Failed to retrieve the objectId from userId=%s: %v", helper.GetFunctionName(), userLoggedOut.UserID, err)
 	}
 
 	sessionFilter := bson.D{{Key: "_id", Value: bson.ObjectID(objectID)}}
 
 	deleteResult, err := newUsersSessionCollection.DeleteOne(ctx, sessionFilter)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.LogoutUser - Failed to delete user session for userId=%s", userLoggedOut.UserID))
-		return fmt.Errorf("mongodb.LogoutUser - Failed to delete user session for userId=%s: %v", userLoggedOut.UserID, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to delete user session for userId=%s", userLoggedOut.UserID))
+		return fmt.Errorf("%s - Failed to delete user session for userId=%s: %v", helper.GetFunctionName(), userLoggedOut.UserID, err)
 	}
 
-	db.logger.InfoLog(fmt.Sprintf("mongodb.LogoutUser - The document has been updated. Acknowledged: %v, DeleteCount: %v", deleteResult.Acknowledged, deleteResult.DeletedCount))
+	db.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("The document has been updated. Acknowledged: %v, DeleteCount: %v", deleteResult.Acknowledged, deleteResult.DeletedCount))
 
 	updateFilter := bson.M{"_id": bson.ObjectID(objectID)}
 	update := bson.M{
@@ -254,17 +264,17 @@ func (db *MongoDB) LogoutUser(value interface{}) error {
 
 	updateResult, err := newUsersCollection.UpdateOne(ctx, updateFilter, update)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.LogoutUser - Failed to update users collection for userId=%s", userLoggedOut.UserID))
-		return fmt.Errorf("mongodb.LogoutUser - Failed to update users collection for userId=%s: %v", userLoggedOut.UserID, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to update users collection for userId=%s", userLoggedOut.UserID))
+		return fmt.Errorf("%s - Failed to update users collection for userId=%s: %v", helper.GetFunctionName(), userLoggedOut.UserID, err)
 	}
 
-	db.logger.InfoLog(fmt.Sprintf("mongodb.LogoutUser - The document has been updated. ModifiedCount: %v, UpsertedCount: %v", updateResult.ModifiedCount, updateResult.UpsertedCount))
+	db.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("The document has been updated. ModifiedCount: %v, UpsertedCount: %v", updateResult.ModifiedCount, updateResult.UpsertedCount))
 
 	return nil
 }
 
 func (db *MongoDB) GetUserDetails(value interface{}) (interface{}, error) {
-	db.logger.InfoLog("mongodb.GetUserDetails")
+	db.logger.InfoLog(helper.GetFunctionName(), "")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -282,12 +292,12 @@ func (db *MongoDB) GetUserDetails(value interface{}) (interface{}, error) {
 				return nil, nil
 			}
 
-			db.logger.ErrorLog(fmt.Sprintf("mongodb.GetUserDetails - Failed to get user details err=%s", err))
-			return nil, fmt.Errorf("mongodb.GetUserDetails - Failed to get user details err=%s", err)
+			db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to get user details err=%s", err))
+			return nil, fmt.Errorf(helper.GetFunctionName(), "Failed to get user details err=%s", err)
 		}
 
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.GetUserDetails - Failed to get user details err=%s", err))
-		return nil, fmt.Errorf("mongodb.GetUserDetails - Failed to get user details err=%s", err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to get user details err=%s", err))
+		return nil, fmt.Errorf("%s - Failed to get user details err=%s", helper.GetFunctionName(), err)
 	}
 
 	if userAuth, ok := value.(*data.UserAuth); ok {
@@ -296,8 +306,8 @@ func (db *MongoDB) GetUserDetails(value interface{}) (interface{}, error) {
 		user, err := db.findUser(ctx, filter, newUsersCollection)
 
 		if err != nil {
-			db.logger.ErrorLog(fmt.Sprintf("mongodb.GetUserDetails - Failed to get user details err=%s", err))
-			return nil, fmt.Errorf("mongodb.GetUserDetails - Failed to get user details err=%s", err)
+			db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to get user details err=%s", err))
+			return nil, fmt.Errorf("%s - Failed to get user details err=%s", helper.GetFunctionName(), err)
 		}
 
 		return user, nil
@@ -309,15 +319,15 @@ func (db *MongoDB) GetUserDetails(value interface{}) (interface{}, error) {
 		user, err := db.findUser(ctx, filter, newUsersCollection)
 
 		if err != nil {
-			db.logger.ErrorLog(fmt.Sprintf("mongodb.GetUserDetails - Failed to get user details err=%s", err))
-			return nil, fmt.Errorf("mongodb.GetUserDetails - Failed to get user details err=%s", err)
+			db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to get user details err=%s", err))
+			return nil, fmt.Errorf("%s - Failed to get user details err=%s", helper.GetFunctionName(), err)
 		}
 
 		return user, nil
 	}
 
-	db.logger.ErrorLog("mongodb.GetUserDetails - value type is unsupported")
-	return nil, fmt.Errorf("mongodb.GetUserDetails - value type is unsupported")
+	db.logger.ErrorLog(helper.GetFunctionName(), "value type is unsupported")
+	return nil, fmt.Errorf("%s - value type is unsupported", helper.GetFunctionName())
 }
 
 func (db *MongoDB) findUser(ctx context.Context, filter bson.M, newUsersCollection *mongo.Collection) (*data.UserData, error) {
@@ -328,17 +338,17 @@ func (db *MongoDB) findUser(ctx context.Context, filter bson.M, newUsersCollecti
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("mongodb.findUser - User doesn't exist")
+			return nil, fmt.Errorf("User doesn't exist", helper.GetFunctionName())
 		}
 
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.findUser - Failed to get user details err=%s", err))
-		return nil, fmt.Errorf("mongodb.findUser - Failed to get user details err=%s", err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to get user details err=%s", err))
+		return nil, fmt.Errorf("Failed to get user details err=%s", helper.GetFunctionName(), err)
 	}
 
 	if id, ok := result["_id"].(bson.ObjectID); ok {
 		user.UserID = id.Hex()
 	} else {
-		return nil, fmt.Errorf("mongodb.findUser - _id field is missing or not an ObjectID")
+		return nil, fmt.Errorf("_id field is missing or not an ObjectID", helper.GetFunctionName())
 	}
 
 	// Manually assign other fields from result to user struct
@@ -374,12 +384,12 @@ func (db *MongoDB) findUser(ctx context.Context, filter bson.M, newUsersCollecti
 }
 
 func (db *MongoDB) CreateHabitsHandler(userId string, value interface{}) error {
-	db.logger.InfoLog(fmt.Sprintf("mongodb.CreateHabitsHandler = userId=%s", userId))
+	db.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("userId=%s", userId))
 	newHabit, ok := value.(data.NewHabit)
 
 	if !ok {
-		db.logger.ErrorLog("mongodb.CreateHabitsHandler - value type is not data.Habit")
-		return fmt.Errorf("mongodb.CreateHabitsHandler - value type is not data.Habit")
+		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.Habit")
+		return fmt.Errorf("%s - value type is not data.Habit", helper.GetFunctionName())
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -390,8 +400,8 @@ func (db *MongoDB) CreateHabitsHandler(userId string, value interface{}) error {
 	objectID, err := primitive.ObjectIDFromHex(userId)
 
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.CreateHabitsHandler - Failed to insert new habit: userId=%s, err=%v", userId, err))
-		return fmt.Errorf("mongodb.CreateHabitsHandler - Failed to insert new habit: userId=%s, err=%v", userId, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to insert new habit: userId=%s, err=%v", userId, err))
+		return fmt.Errorf("%s - Failed to insert new habit: userId=%s, err=%v", helper.GetFunctionName(), userId, err)
 	}
 
 	type insertHabitData struct {
@@ -414,17 +424,17 @@ func (db *MongoDB) CreateHabitsHandler(userId string, value interface{}) error {
 
 	insertResult, err := newHabitsCollection.InsertOne(ctx, insertHabit)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.CreateHabitsHandler - Failed to insert new habit: userId=%s, err=%v", userId, err))
-		return fmt.Errorf("mongodb.CreateHabitsHandler - Failed to insert new habit: userId=%s, err=%v", userId, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to insert new habit: userId=%s, err=%v", userId, err))
+		return fmt.Errorf("%s - Failed to insert new habit: userId=%s, err=%v", helper.GetFunctionName(), userId, err)
 	}
 
-	db.logger.InfoLog(fmt.Sprintf("mongodb.CreateHabitsHandler - habit inserted successfully with userId: %s, Acknowledged: %v, InsertedID: %v", userId, insertResult.Acknowledged, insertResult.InsertedID))
+	db.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("habit inserted successfully with userId: %s, Acknowledged: %v, InsertedID: %v", userId, insertResult.Acknowledged, insertResult.InsertedID))
 
 	return nil
 }
 
 func (db *MongoDB) RetrieveAllHabitsHandler(userId string) (interface{}, error) {
-	db.logger.InfoLog(fmt.Sprintf("mongodb.RetrieveAllHabitsHandler - userId=%s", userId))
+	db.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("userId=%s", userId))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -434,8 +444,8 @@ func (db *MongoDB) RetrieveAllHabitsHandler(userId string) (interface{}, error) 
 	cur, err := newHabitsCollection.Find(ctx, bson.D{})
 
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err))
-		return nil, fmt.Errorf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to retrieve habit: err=%v", err))
+		return nil, fmt.Errorf("%s - Failed to retrieve habit: err=%v", helper.GetFunctionName(), err)
 	}
 	var results []data.Habit
 
@@ -445,14 +455,14 @@ func (db *MongoDB) RetrieveAllHabitsHandler(userId string) (interface{}, error) 
 		err := cur.Decode(&el)
 
 		if err != nil {
-			db.logger.ErrorLog(fmt.Sprintf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err))
-			return nil, fmt.Errorf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err)
+			db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to retrieve habit: err=%v", err))
+			return nil, fmt.Errorf("%s - Failed to retrieve habit: err=%v", helper.GetFunctionName(), err)
 		}
 
 		if id, ok := el["_id"].(bson.ObjectID); ok {
 			habit.HabitID = id.Hex()
 		} else {
-			return nil, fmt.Errorf("mongodb.RetrieveAllHabitsHandler - _id field is missing or not an ObjectID")
+			return nil, fmt.Errorf("%s - _id field is missing or not an ObjectID", helper.GetFunctionName())
 		}
 
 		// Manually assign other fields from result to user struct
@@ -482,26 +492,32 @@ func (db *MongoDB) RetrieveAllHabitsHandler(userId string) (interface{}, error) 
 				if strDate, ok := date.(string); ok {
 					completionDate = append(completionDate, strDate)
 				} else {
-					db.logger.ErrorLog("mongodb.RetrieveAllHabitsHandler - non-string value in Completed Date")
+					db.logger.ErrorLog(helper.GetFunctionName(), "non-string value in Completed Date")
 				}
 			}
 
-			habit.CompletionDates = completionDate
+			if len(completionDates) == 0 {
+				habit.CompletionDates = []string{}
+			} else {
+				habit.CompletionDates = completionDate
+			}
+		} else {
+			habit.CompletionDates = []string{}
 		}
 
 		results = append(results, habit)
 	}
 
 	if err := cur.Err(); err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err))
-		return nil, fmt.Errorf("mongodb.RetrieveAllHabitsHandler - Failed to retrieve habit: err=%v", err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to retrieve habit: err=%v", err))
+		return nil, fmt.Errorf("%s - Failed to retrieve habit: err=%v", helper.GetFunctionName(), err)
 	}
 
 	return results, nil
 }
 
 func (db *MongoDB) RetrieveHabitsHandler(userId, habitId string) (interface{}, error) {
-	db.logger.InfoLog(fmt.Sprintf("mongodb.RetrieveHabitsHandler userId=%s, habitId=%s\n", userId, habitId))
+	db.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("userId=%s, habitId=%s\n", userId, habitId))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -510,8 +526,8 @@ func (db *MongoDB) RetrieveHabitsHandler(userId, habitId string) (interface{}, e
 
 	objectID, err := primitive.ObjectIDFromHex(habitId)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.RetrieveHabitsHandler - Failed to retrieve habit: userId=%s, err=%v", userId, err))
-		return nil, fmt.Errorf("mongodb.RetrieveHabitsHandler - Failed to retrieve habit: userId=%s, err=%v", userId, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to retrieve habit: userId=%s, err=%v", userId, err))
+		return nil, fmt.Errorf("%s - Failed to retrieve habit: userId=%s, err=%v", helper.GetFunctionName(), userId, err)
 	}
 
 	filter := bson.M{"_id": bson.ObjectID(objectID)}
@@ -521,11 +537,11 @@ func (db *MongoDB) RetrieveHabitsHandler(userId, habitId string) (interface{}, e
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, fmt.Errorf("mongodb.RetrieveHabitsHandler - Habit doesn't exist")
+			return nil, fmt.Errorf("%s - Habit doesn't exist", helper.GetFunctionName())
 		}
 
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.RetrieveHabitsHandler - Failed to retrieve habit: userId=%s, err=%v", userId, err))
-		return nil, fmt.Errorf("mongodb.RetrieveHabitsHandler - Failed to retrieve habit: userId=%s, err=%v", userId, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to retrieve habit: userId=%s, err=%v", userId, err))
+		return nil, fmt.Errorf("%s - Failed to retrieve habit: userId=%s, err=%v", helper.GetFunctionName(), userId, err)
 	}
 
 	// Manually assign other fields from result to user struct
@@ -559,7 +575,7 @@ func (db *MongoDB) RetrieveHabitsHandler(userId, habitId string) (interface{}, e
 			if strDate, ok := date.(string); ok {
 				completionDate = append(completionDate, strDate)
 			} else {
-				db.logger.ErrorLog("mongodb.RetrieveAllHabitsHandler - non-string value in Completed Date")
+				db.logger.ErrorLog(helper.GetFunctionName(), "non-string value in Completed Date")
 			}
 		}
 
@@ -570,14 +586,14 @@ func (db *MongoDB) RetrieveHabitsHandler(userId, habitId string) (interface{}, e
 }
 
 func (db *MongoDB) UpdateHabitsHandler(userId, habitId string, value interface{}) error {
-	db.logger.InfoLog("mongodb.UpdateHabitsHandler")
+	db.logger.InfoLog(helper.GetFunctionName(), "")
 
 	updateHabit, ok := value.(data.Habit)
 
 	if !ok {
-		err := "mongodb.UpdateHabitsHandler - value type is not data.Habit"
-		db.logger.ErrorLog(err)
-		return fmt.Errorf(err)
+		err := "value type is not data.Habit"
+		db.logger.ErrorLog(helper.GetFunctionName(), err)
+		return fmt.Errorf("%s - %s", helper.GetFunctionName(), err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -588,8 +604,8 @@ func (db *MongoDB) UpdateHabitsHandler(userId, habitId string, value interface{}
 	objectId, err := primitive.ObjectIDFromHex(habitId)
 
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.UpdateHabitsHandler - Failed to update habits collection for userId=%s, habitId=%s, err=%s", userId, habitId, err))
-		return fmt.Errorf("mongodb.UpdateHabitsHandler - Failed to update habits collection for userId=%s, habitId=%s, err=%s", userId, habitId, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to update habits collection for userId=%s, habitId=%s, err=%s", userId, habitId, err))
+		return fmt.Errorf("%s - Failed to update habits collection for userId=%s, habitId=%s, err=%s", helper.GetFunctionName(), userId, habitId, err)
 	}
 
 	filter := bson.M{"_id": bson.ObjectID(objectId)}
@@ -605,17 +621,17 @@ func (db *MongoDB) UpdateHabitsHandler(userId, habitId string, value interface{}
 	result, err := newHabitCollection.UpdateOne(ctx, filter, update)
 
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.UpdateHabitsHandler - Failed to update habits collection for userId=%s, habitId=%s, err=%s", userId, habitId, err))
-		return fmt.Errorf("mongodb.UpdateHabitsHandler - Failed to update habits collection for userId=%s, habitId=%s, err=%s", userId, habitId, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to update habits collection for userId=%s, habitId=%s, err=%s", userId, habitId, err))
+		return fmt.Errorf("%s - Failed to update habits collection for userId=%s, habitId=%s, err=%s", helper.GetFunctionName(), userId, habitId, err)
 	}
 
-	db.logger.InfoLog(fmt.Sprintf("The document has been updated. ModifiedCount: %v, UpsertedCount: %v", result.ModifiedCount, result.UpsertedCount))
+	db.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("The document has been updated. ModifiedCount: %v, UpsertedCount: %v", result.ModifiedCount, result.UpsertedCount))
 
 	return nil
 }
 
 func (db *MongoDB) DeleteHabitsHandler(userId, habitId string) error {
-	db.logger.InfoLog("mongodb.DeleteHabitsHandler")
+	db.logger.InfoLog(helper.GetFunctionName(), "")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -624,8 +640,8 @@ func (db *MongoDB) DeleteHabitsHandler(userId, habitId string) error {
 
 	objectID, err := primitive.ObjectIDFromHex(habitId)
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.DeleteHabitsHandler - Failed to delete habit: err=%v", err))
-		return fmt.Errorf("mongodb.DeleteHabitsHandler - Failed to delete habit: err=%v", err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to delete habit: err=%v", err))
+		return fmt.Errorf("%s - Failed to delete habit: err=%v", helper.GetFunctionName(), err)
 	}
 
 	filter := bson.M{"_id": bson.ObjectID(objectID)}
@@ -633,11 +649,11 @@ func (db *MongoDB) DeleteHabitsHandler(userId, habitId string) error {
 	result, err := newHabitCollection.DeleteOne(ctx, filter)
 
 	if err != nil {
-		db.logger.ErrorLog(fmt.Sprintf("mongodb.DeleteHabitsHandler - Failed to delete habit for userId=%s: %v", userId, err))
-		return fmt.Errorf("mongodb.DeleteHabitsHandler - Failed to delete habit for userId=%s: %v", userId, err)
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to delete habit for userId=%s: %v", userId, err))
+		return fmt.Errorf("%s - Failed to delete habit for userId=%s: %v", helper.GetFunctionName(), userId, err)
 	}
 
-	db.logger.InfoLog(fmt.Sprintf("The document has been updated. Acknowledged: %v, DeleteCount: %v", result.Acknowledged, result.DeletedCount))
+	db.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("The document has been updated. Acknowledged: %v, DeleteCount: %v", result.Acknowledged, result.DeletedCount))
 
 	return nil
 }

@@ -32,18 +32,18 @@ func NewAuthModel(logger logger.ILogger, db db.IDB) *AuthModel {
 }
 
 func (am *AuthModel) RegisterUserHandler(userRegisterRequest *data.RegisterUserRequest) (*data.RegisterUserData, error) {
-	am.logger.InfoLog("authModel.RegisterUserHandler")
+	am.logger.InfoLog(helper.GetFunctionName(), "")
 
 	if !validation.IsValidName(userRegisterRequest.FirstName) {
-		return nil, fmt.Errorf("authModel.RegisterUserHandler - user: %s first name is invalid. FirstName: %s", userRegisterRequest.EmailAddress, userRegisterRequest.FirstName)
+		return nil, fmt.Errorf("%s - user: %s first name is invalid. FirstName: %s", helper.GetFunctionName(), userRegisterRequest.EmailAddress, userRegisterRequest.FirstName)
 	}
 
 	if !validation.IsValidName(userRegisterRequest.LastName) {
-		return nil, fmt.Errorf("authModel.RegisterUserHandler - user: %s last name is invalid. LastName: %s", userRegisterRequest.EmailAddress, userRegisterRequest.LastName)
+		return nil, fmt.Errorf("%s - user: %s last name is invalid. LastName: %s", helper.GetFunctionName(), userRegisterRequest.EmailAddress, userRegisterRequest.LastName)
 	}
 
 	if !validation.IsValidEmail(userRegisterRequest.EmailAddress) {
-		return nil, fmt.Errorf("authModel.RegisterUserHandler - user: %s email address is invalid. LastName: %s", userRegisterRequest.EmailAddress, userRegisterRequest.EmailAddress)
+		return nil, fmt.Errorf("%s - user: %s email address is invalid. LastName: %s", helper.GetFunctionName(), userRegisterRequest.EmailAddress, userRegisterRequest.EmailAddress)
 	}
 
 	_, err := am.db.GetUserDetails(&data.RegisterUserRequest{EmailAddress: userRegisterRequest.EmailAddress})
@@ -69,7 +69,7 @@ func (am *AuthModel) RegisterUserHandler(userRegisterRequest *data.RegisterUserR
 	registerUserData, ok := userData.(*data.UserData)
 
 	if !ok {
-		return nil, fmt.Errorf("authModel.RegisterUserHandler - data.UserData is invalid")
+		return nil, fmt.Errorf("%s - data.UserData is invalid", helper.GetFunctionName())
 	}
 
 	return &data.RegisterUserData{
@@ -79,7 +79,7 @@ func (am *AuthModel) RegisterUserHandler(userRegisterRequest *data.RegisterUserR
 }
 
 func (am *AuthModel) LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedInData, error) {
-	am.logger.InfoLog("authModel.LoginHandler")
+	am.logger.InfoLog(helper.GetFunctionName(), "")
 
 	userDetails, err := am.db.GetUserDetails(userAuth)
 
@@ -90,15 +90,15 @@ func (am *AuthModel) LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth
 	userData, ok := userDetails.(*data.UserData)
 
 	if !ok {
-		return nil, fmt.Errorf("authModel.LoginHandler - data.UserData is invalid")
+		return nil, fmt.Errorf("%s - data.UserData is invalid", helper.GetFunctionName())
 	}
 
 	if userData.IsLoggedIn {
-		return nil, fmt.Errorf("authModel.LoginHandler - User is already logged in. UserID: %s", userData.UserID)
+		return nil, fmt.Errorf("%s - User is already logged in. UserID: %s", helper.GetFunctionName(), userData.UserID)
 	}
 
 	if !validation.VerifyUserPassword(userAuth.Password, userData.Password) {
-		return nil, fmt.Errorf("authModel.LoginHandler - Invalid Password")
+		return nil, fmt.Errorf("%s - Invalid Password", helper.GetFunctionName())
 	}
 
 	accessToken, refreshToken, err := jwtTokens.GenerateJSONWebTokens(userAuth.EmailAddress)
@@ -134,7 +134,7 @@ func (am *AuthModel) LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth
 }
 
 func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) error {
-	am.logger.InfoLog("authModel.LogoutHandler")
+	am.logger.InfoLog(helper.GetFunctionName(), "")
 
 	userDetails, err := am.db.GetUserDetails(userLoggedOutRequest)
 
@@ -145,11 +145,11 @@ func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *
 	userData, ok := userDetails.(*data.UserData)
 
 	if !ok {
-		return fmt.Errorf("authModel.LoginHandler - data.UserData is invalid")
+		return fmt.Errorf("%s - data.UserData is invalid", helper.GetFunctionName())
 	}
 
 	if !userData.IsLoggedIn {
-		return fmt.Errorf("authModel.LoginHandler - User is not logged in. UserID: %s", userData.UserID)
+		return fmt.Errorf("%s - User is not logged in. UserID: %s", helper.GetFunctionName(), userData.UserID)
 	}
 
 	jwtTokens.DestroyJWTRefreshToken(userLoggedOutRequest.EmailAddress)
@@ -163,7 +163,7 @@ func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *
 }
 
 func (am *AuthModel) RefreshHandler(userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens) (string, error) {
-	am.logger.InfoLog("authModel.RefreshHandler")
+	am.logger.InfoLog(helper.GetFunctionName(), "")
 
 	newAccessToken, err := jwtTokens.RefreshJWTTokens(userRefreshRequest.EmailAddress)
 

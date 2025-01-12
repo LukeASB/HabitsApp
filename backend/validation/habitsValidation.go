@@ -2,6 +2,7 @@ package validation
 
 import (
 	"dohabits/data"
+	"dohabits/helper"
 	"dohabits/logger"
 	"fmt"
 	"regexp"
@@ -17,23 +18,23 @@ func ValidateHabit(value interface{}, logger logger.ILogger) error {
 	habitForValidation := habitForValidation{}
 
 	if err := processHabit(value, &habitForValidation); err != nil {
-		logger.ErrorLog(fmt.Sprintf("validationModel.validateHabit - %s", err))
+		logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("%s", err))
 		return err
 	}
 
 	if err := validateHabitName(habitForValidation.name); err != nil {
-		logger.ErrorLog(fmt.Sprintf("validationModel.validateHabit - %s", err))
-		return fmt.Errorf("validationModel.validateHabit - %s", err)
+		logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("%s", err))
+		return fmt.Errorf("%s - %s", helper.GetFunctionName(), err)
 	}
 
 	if err := validateHabitDays(habitForValidation.daysTarget); err != nil {
-		logger.ErrorLog(fmt.Sprintf("validationModel.validateHabit - %s", err))
-		return fmt.Errorf("validationModel.validateHabit - %s", err)
+		logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("%s", err))
+		return fmt.Errorf("%s - %s", helper.GetFunctionName(), err)
 	}
 
 	if err := validateHabitDays(habitForValidation.days); err != nil {
-		logger.ErrorLog(fmt.Sprintf("validationModel.validateHabit - %s", err))
-		return fmt.Errorf("validationModel.validateHabit - %s", err)
+		logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("%s", err))
+		return fmt.Errorf("%s - %s", helper.GetFunctionName(), err)
 	}
 
 	return nil
