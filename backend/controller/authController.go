@@ -144,9 +144,14 @@ func (ac *AuthController) RefreshHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	newAccessToken, err := ac.authModel.RefreshHandler(w, &userRefreshRequest, ac.jwtTokens, ac.csrfTokens)
+	newAccessToken, err := ac.authModel.RefreshHandler(w, &userRefreshRequest, ac.jwtTokens)
 
 	if err != nil {
+		if err = ac.authModel.LogoutHandler(w, &data.UserLoggedOutRequest{EmailAddress: userRefreshRequest.EmailAddress}, ac.jwtTokens, ac.csrfTokens); err != nil {
+			ac.logger.DebugLog(helper.GetFunctionName(), fmt.Sprintf("err: %s", err))
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+
 		ac.logger.DebugLog(helper.GetFunctionName(), fmt.Sprintf("err: %s", err))
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

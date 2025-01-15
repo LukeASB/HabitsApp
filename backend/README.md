@@ -58,8 +58,8 @@ Stores the user session. Is deleted when the user logs out.
     "$oid": "677ac7224620315e952dabd6"
   },
   "RefreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyMUBleGFtcGxlLmNvbSIsImV4cCI6MTczNjc3MjQ3MX0.vfVn044yRxx5kiLfo_VYxzqturusyN2gZofoGPK5hVg",
-  "Device": "LSB",
-  "IpAddress": "169.254.159.127",
+  "Device": "Device",
+  "IpAddress": "10.10.10.10",
   "CreatedAt": {
     "$date": {
       "$numberLong": "1736686071678"
@@ -76,8 +76,8 @@ Grows linearly.
     "$oid": "677ac7224620315e952dabd6"
   },
   "RefreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyMUBleGFtcGxlLmNvbSIsImV4cCI6MTczNjc3MjQ3MX0.vfVn044yRxx5kiLfo_VYxzqturusyN2gZofoGPK5hVg",
-  "Device": "LSB",
-  "IpAddress": "169.254.159.127",
+  "Device": "Device",
+  "IpAddress": "10.10.10.10",
   "CreatedAt": {
     "$date": {
       "$numberLong": "1736686071678"

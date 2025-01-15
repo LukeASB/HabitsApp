@@ -30,7 +30,7 @@ func NewHabitsModel(logger logger.ILogger, db db.IDB) *HabitsModel {
 }
 
 func (m *HabitsModel) CreateHabitsHandler(userEmailAddress string, habit data.NewHabit) error {
-	m.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("habitsModel.Create = userEmailAddress=%s", userEmailAddress))
+	m.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("userEmailAddress=%s", userEmailAddress))
 
 	if err := validation.ValidateHabit(habit, m.logger); err != nil {
 		m.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("habitsModel.Create - err=%s", err))

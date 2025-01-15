@@ -13,6 +13,9 @@ import (
 // Enforce interface compliance
 var _ IDB = (*MyMockDB)(nil)
 
+var refreshTokenPath = "data/mock_refresh_tokens"
+var refreshTokenFile = "mock_refresh_token.txt"
+
 type MyMockDB struct {
 	logger logger.ILogger
 }
@@ -80,6 +83,11 @@ func (db *MyMockDB) LoginUser(value interface{}) error {
 
 	for i, val := range data.MockUsers {
 		if val.UserID == userSession.UserID {
+			err := os.WriteFile(fmt.Sprintf("%s/%s_%s", refreshTokenPath, data.MockUsers[i].EmailAddress, refreshTokenFile), []byte(userSession.RefreshToken), 0644)
+			if err != nil {
+				db.logger.ErrorLog(helper.GetFunctionName(), "Failed to store the Refresh Token")
+				return fmt.Errorf("%s - Failed to store the Refresh Token", helper.GetFunctionName())
+			}
 			data.MockUsers[i].IsLoggedIn = true
 			data.MockUsers[i].LastLogin = userSession.CreatedAt
 		}
@@ -106,11 +114,27 @@ func (db *MyMockDB) LogoutUser(value interface{}) error {
 
 	for i, val := range data.MockUsers {
 		if val.UserID == userLoggedOut.UserID {
+			if err := os.Remove(fmt.Sprintf("%s/%s_%s", refreshTokenPath, data.MockUsers[i].EmailAddress, refreshTokenFile)); err != nil {
+				return err
+			}
 			data.MockUsers[i].IsLoggedIn = false
 		}
 	}
 
 	return nil
+}
+
+func (db *MyMockDB) RetrieveUserSession(value interface{}) (string, error) {
+	mockRefreshJWT, ok := value.(*data.MockRefreshJWT)
+
+	if !ok {
+		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.MockRefreshJWT")
+		return "", fmt.Errorf("%s - value type is not data.MockRefreshJWT", helper.GetFunctionName())
+	}
+
+	refreshToken, err := os.ReadFile(fmt.Sprintf("%s/%s_%s", mockRefreshJWT.RefreshTokenPath, mockRefreshJWT.Username, mockRefreshJWT.RefreshTokenFile))
+
+	return string(refreshToken), err
 }
 
 func (db *MyMockDB) GetUserDetails(value interface{}) (interface{}, error) {

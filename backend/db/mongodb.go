@@ -229,8 +229,8 @@ func (db *MongoDB) LogoutUser(value interface{}) error {
 	userLoggedOut, ok := value.(*data.UserData)
 
 	if !ok {
-		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.UserLoggedOutRequest")
-		return fmt.Errorf("%s - value type is not data.UserLoggedOutRequest", helper.GetFunctionName())
+		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.UserData")
+		return fmt.Errorf("%s - value type is not data.UserData", helper.GetFunctionName())
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -273,6 +273,60 @@ func (db *MongoDB) LogoutUser(value interface{}) error {
 	return nil
 }
 
+func (db *MongoDB) RetrieveUserSession(value interface{}) (string, error) {
+	emailAddress, ok := value.(string)
+
+	if !ok {
+		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not string")
+		return "", fmt.Errorf("%s - value type is not string", helper.GetFunctionName())
+	}
+
+	userDetails, err := db.GetUserDetails(&data.UserAuth{EmailAddress: emailAddress})
+
+	if err != nil {
+		return "", err
+	}
+
+	currentUserData, ok := userDetails.(*data.UserData)
+
+	if !ok {
+		return "", fmt.Errorf("%s - data.UserData is invalid", helper.GetFunctionName())
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	newUsersSessionCollection := db.NewUsersSessionCollection()
+
+	objectID, err := primitive.ObjectIDFromHex(currentUserData.UserID)
+	if err != nil {
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to retrieve user session for userId=%s", currentUserData.UserID))
+		return "", fmt.Errorf("%s - Failed to retrieve user session for userId=%s: %v", helper.GetFunctionName(), currentUserData.UserID, err)
+	}
+
+	filter := bson.M{"_id": bson.ObjectID(objectID)}
+
+	var userSession data.UserSession
+	var result bson.M
+
+	err = newUsersSessionCollection.FindOne(ctx, filter).Decode(&result)
+
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return "", fmt.Errorf("%s - User session doesn't exist", helper.GetFunctionName())
+		}
+
+		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to get user session err=%s", err))
+		return "", fmt.Errorf("%s - Failed to get user session err=%s", helper.GetFunctionName(), err)
+	}
+
+	if refreshToken, ok := result["RefreshToken"].(string); ok {
+		userSession.RefreshToken = refreshToken
+	}
+
+	return userSession.RefreshToken, nil
+}
+
 func (db *MongoDB) GetUserDetails(value interface{}) (interface{}, error) {
 	db.logger.InfoLog(helper.GetFunctionName(), "")
 
@@ -281,8 +335,8 @@ func (db *MongoDB) GetUserDetails(value interface{}) (interface{}, error) {
 
 	newUsersCollection := db.NewUsersCollection()
 
-	if userAuth, ok := value.(*data.RegisterUserRequest); ok {
-		filter := bson.M{"EmailAddress": userAuth.EmailAddress}
+	if userRegisterRequest, ok := value.(*data.RegisterUserRequest); ok {
+		filter := bson.M{"EmailAddress": userRegisterRequest.EmailAddress}
 		var result bson.M
 
 		err := newUsersCollection.FindOne(ctx, filter).Decode(&result)
