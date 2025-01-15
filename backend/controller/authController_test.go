@@ -210,6 +210,13 @@ func TestLogoutHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
+			var refreshTokenPath = "data/mock_refresh_tokens"
+			var refreshTokenFile = "mock_refresh_token.txt"
+			err := os.WriteFile(fmt.Sprintf("../%s/%s_%s", refreshTokenPath, val.username, refreshTokenFile), []byte("testjwt"), 0644)
+			if err != nil {
+				t.Errorf("TestLogoutHandler Failed - err=%s", err)
+			}
+
 			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/%s/logout", endpoint), nil)
 			claims := &session.Claims{Username: val.username}
 			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)

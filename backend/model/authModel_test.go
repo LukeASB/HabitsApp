@@ -5,7 +5,9 @@ import (
 	"dohabits/db"
 	"dohabits/logger"
 	"dohabits/middleware/session"
+	"fmt"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
@@ -113,7 +115,14 @@ func TestLogoutHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			err := authModel.LogoutHandler(w, val.userLoggedOutRequest, jwtTokensMock, csrfTokenMock)
+			var refreshTokenPath = "data/mock_refresh_tokens"
+			var refreshTokenFile = "mock_refresh_token.txt"
+			err := os.WriteFile(fmt.Sprintf("../%s/%s_%s", refreshTokenPath, val.userLoggedOutRequest.EmailAddress, refreshTokenFile), []byte("testjwt"), 0644)
+			if err != nil {
+				t.Errorf("TestLogoutHandler Failed - err=%s", err)
+			}
+
+			err = authModel.LogoutHandler(w, val.userLoggedOutRequest, jwtTokensMock, csrfTokenMock)
 
 			if err != nil {
 				t.Errorf("TestLogoutHandler Failed - err=%s", err)
