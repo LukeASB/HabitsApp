@@ -38,7 +38,6 @@ func TestRegisterUserHandler(t *testing.T) {
 			want: &data.RegisterUserResponse{
 				Success: true,
 				User: data.UserDataResponse{
-					UserID:       "1",
 					FirstName:    "first",
 					LastName:     "last",
 					EmailAddress: "email@email.com",
@@ -53,17 +52,17 @@ func TestRegisterUserHandler(t *testing.T) {
 			marshalledRegisterUserResponse, err := json.Marshal(val.want)
 
 			if err != nil {
-				t.Errorf("TestLoginHandler - Fail err: %s", err)
+				t.Errorf("TestRegisterUserHandler - Fail err: %s", err)
 			}
 
 			got, err := authView.RegisterUserHandler(val.registerUserData)
 
 			if err != nil {
-				t.Errorf("TestLoginHandler - Fail err: %s", err)
+				t.Errorf("TestRegisterUserHandler - Fail err: %s", err)
 			}
 
 			if !bytes.Equal(marshalledRegisterUserResponse, got) {
-				t.Errorf("TestLoginHandler - Fail want doesn't match got")
+				t.Errorf("TestRegisterUserHandler - Fail want doesn't match got")
 			}
 		})
 	}
@@ -100,14 +99,12 @@ func TestLoginHandler(t *testing.T) {
 			want: &data.UserLoggedInResponse{
 				Success: true,
 				User: data.UserDataResponse{
-					UserID:       "1",
 					FirstName:    "first",
 					LastName:     "last",
 					EmailAddress: "email@email.com",
 					CreatedAt:    fixedTime,
 				},
-				AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UxQGV4YW1wbGUuY29tIiwiZXhwIjoxNzMyMjU5NjUzfQ.vu2Vv_2z--i3p8TLYIHRmyKX9xjyICr_esCGrGYs2Es",
-				LoggedInAt:  fixedTime,
+				LoggedInAt: fixedTime,
 			},
 		},
 	}
@@ -133,66 +130,23 @@ func TestLoginHandler(t *testing.T) {
 	}
 }
 
-func TestLogoutHandler(t *testing.T) {
-	logger := &logger.Logger{}
-	authView := NewAuthView(logger)
-
-	testCases := []struct {
-		name string
-		want *data.UserLoggedOutResponse
-	}{
-		{
-			name: "Test Logout Response",
-			want: &data.UserLoggedOutResponse{
-				Success:      true,
-				UserID:       "1",
-				EmailAddress: "test@test.com",
-				LoggedOutAt:  time.Now(),
-			},
-		},
-	}
-
-	for _, val := range testCases {
-		t.Run(val.name, func(t *testing.T) {
-			marshalledUserLoggedOutResponse, err := json.Marshal(val.want)
-
-			if err != nil {
-				t.Errorf("TestLogoutHandler - Fail err: %s", err)
-			}
-
-			got, err := authView.LogoutHandler(val.want)
-
-			if err != nil {
-				t.Errorf("TestLogoutHandler - Fail err: %s", err)
-			}
-
-			if !bytes.Equal(marshalledUserLoggedOutResponse, got) {
-				t.Errorf("TestLogoutHandler - Fail want doesn't match got")
-			}
-		})
-	}
-}
-
 func TestRefreshHandler(t *testing.T) {
 	logger := &logger.Logger{}
 	authView := NewAuthView(logger)
 
 	testCases := []struct {
 		name               string
-		accessToken        string
 		userRefreshRequest *data.UserRefreshRequest
 		want               *data.UserRefreshResponse
 	}{
 		{
-			name:        "Test User Refresh Response",
-			accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UxQGV4YW1wbGUuY29tIiwiZXhwIjoxNzMyMjU5NjUzfQ.vu2Vv_2z--i3p8TLYIHRmyKX9xjyICr_esCGrGYs2Es",
+			name: "Test User Refresh Response",
 			userRefreshRequest: &data.UserRefreshRequest{
 				EmailAddress: "test@email.com",
 			},
 			want: &data.UserRefreshResponse{
 				Success:      true,
 				EmailAddress: "test@email.com",
-				AccessToken:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UxQGV4YW1wbGUuY29tIiwiZXhwIjoxNzMyMjU5NjUzfQ.vu2Vv_2z--i3p8TLYIHRmyKX9xjyICr_esCGrGYs2Es",
 			},
 		},
 	}
@@ -205,7 +159,7 @@ func TestRefreshHandler(t *testing.T) {
 				t.Errorf("TestRefreshHandler - Fail err: %s", err)
 			}
 
-			got, err := authView.RefreshHandler(val.userRefreshRequest, val.accessToken)
+			got, err := authView.RefreshHandler(val.userRefreshRequest)
 
 			if err != nil {
 				t.Errorf("TestRefreshHandler - Fail err: %s", err)

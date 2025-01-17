@@ -1,10 +1,9 @@
 package session
 
 import (
+	"dohabits/db"
 	"errors"
-	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -12,6 +11,7 @@ import (
 
 type JWTTokens struct {
 	jwtKey []byte
+	db     db.IDB
 }
 
 type IJWTTokens interface {
@@ -22,17 +22,14 @@ type IJWTTokens interface {
 	RefreshJWTTokens(username string) (string, error)
 	GetJWTToken(r *http.Request) (string, error)
 	generateToken(username string, expirationTime time.Time) (string, error)
-	DestroyJWTRefreshToken(username string) error
 }
 
-func NewJWTTokens(jwtSecret string) *JWTTokens {
+func NewJWTTokens(jwtSecret string, db db.IDB) *JWTTokens {
 	return &JWTTokens{
 		jwtKey: []byte(jwtSecret),
+		db:     db,
 	}
 }
-
-var refreshTokenPath = "data/mock_refresh_tokens"
-var refreshTokenFile = "mock_refresh_token.txt" // Stored in txt file for now
 
 // Claims represents the JWT claims
 type Claims struct {
@@ -63,7 +60,8 @@ func (sa *JWTTokens) GenerateJSONWebTokens(username string) (string, string, err
 
 // GenerateAccessJWT generates a new JWT for a given username
 func (sa *JWTTokens) generateAccessJWT(username string) (string, error) {
-	shortLivedJWT := time.Now().Add(5 * time.Minute)
+	// shortLivedJWT := time.Now().Add(5 * time.Minute)
+	shortLivedJWT := time.Now().Add(24 * time.Hour) // debug
 	return sa.generateToken(username, shortLivedJWT)
 }
 
@@ -72,16 +70,11 @@ func (sa *JWTTokens) generateRefreshJWT(username string) (string, error) {
 	longLivedJWT := time.Now().Add(24 * time.Hour) // Long-lived refresh token
 	tokenString, err := sa.generateToken(username, longLivedJWT)
 
-	// Store the refresh token in a file - temp
-	if err == nil {
-		err = os.WriteFile(fmt.Sprintf("%s/%s_%s", refreshTokenPath, username, refreshTokenFile), []byte(tokenString), 0644)
-	}
-
 	return tokenString, err
 }
 
 func (sa *JWTTokens) RefreshJWTTokens(username string) (string, error) {
-	refreshToken, err := os.ReadFile(fmt.Sprintf("%s/%s_%s", refreshTokenPath, username, refreshTokenFile))
+	refreshToken, err := sa.db.RetrieveUserSession(username)
 
 	if err != nil {
 		return "", err
@@ -129,12 +122,4 @@ func (sa *JWTTokens) generateToken(username string, expirationTime time.Time) (s
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString(sa.jwtKey)
-}
-
-func (sa *JWTTokens) DestroyJWTRefreshToken(username string) error {
-	// Stored in file for now
-	if err := os.Remove(fmt.Sprintf("%s/%s_%s", refreshTokenPath, username, refreshTokenFile)); err != nil {
-		return err
-	}
-	return nil
 }

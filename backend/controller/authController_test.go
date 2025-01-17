@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bytes"
+	"context"
 	"dohabits/data"
 	"dohabits/db"
 	"dohabits/logger"
@@ -19,7 +20,7 @@ import (
 
 func TestRegisterUserHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
 	csrfTokenMock := session.NewMockCSRFToken(logger)
 	authModel := model.NewAuthModel(logger, db)
@@ -34,7 +35,7 @@ func TestRegisterUserHandler(t *testing.T) {
 		userRegisterRequest *data.RegisterUserRequest
 	}{
 		{
-			name: "Succcessfully create a user",
+			name: "Successfully create a user",
 			want: true,
 			userRegisterRequest: &data.RegisterUserRequest{
 				EmailAddress: "controlller@test.com",
@@ -60,7 +61,7 @@ func TestRegisterUserHandler(t *testing.T) {
 			authController.RegisterUserHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestLoginHandler - HTTP Status Code = %d", status)
+				t.Errorf("TestRegisterUserHandler - HTTP Status Code = %d", status)
 				return
 			}
 
@@ -108,7 +109,7 @@ func TestRegisterUserHandler(t *testing.T) {
 
 func TestLoginHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
 	csrfTokenMock := session.NewMockCSRFToken(logger)
 	authModel := model.NewAuthModel(logger, db)
@@ -123,7 +124,7 @@ func TestLoginHandler(t *testing.T) {
 		userAuth *data.UserAuth
 	}{
 		{
-			name: "Succcessfully login",
+			name: "Successfully login",
 			want: true,
 			userAuth: &data.UserAuth{
 				EmailAddress: "johndoe1@example.com",
@@ -186,7 +187,7 @@ func TestLoginHandler(t *testing.T) {
 
 func TestLogoutHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
 	csrfTokenMock := session.NewMockCSRFToken(logger)
 	authModel := model.NewAuthModel(logger, db)
@@ -196,30 +197,30 @@ func TestLogoutHandler(t *testing.T) {
 	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
 	testCases := []struct {
-		name                 string
-		want                 bool
-		userLoggedOutRequest *data.UserLoggedOutRequest
+		name     string
+		want     string
+		username string
 	}{
 		{
-			name: "Succcessfully logout",
-			want: true,
-			userLoggedOutRequest: &data.UserLoggedOutRequest{
-				UserID:       "4",
-				EmailAddress: "john.loggedin@example.com",
-			},
+			name:     "Successfully logout",
+			want:     "200 OK",
+			username: "john.loggedin@example.com",
 		},
 	}
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			marshalledLoggedOutRequest, err := json.Marshal(val.userLoggedOutRequest)
-
+			var refreshTokenPath = "data/mock_refresh_tokens"
+			var refreshTokenFile = "mock_refresh_token.txt"
+			err := os.WriteFile(fmt.Sprintf("../%s/%s_%s", refreshTokenPath, val.username, refreshTokenFile), []byte("testjwt"), 0644)
 			if err != nil {
-				t.Errorf("TestLogoutHandler err: %s", err)
-				return
+				t.Errorf("TestLogoutHandler Failed - err=%s", err)
 			}
 
-			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/%s/logout", endpoint), io.NopCloser(bytes.NewBuffer(marshalledLoggedOutRequest)))
+			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/%s/logout", endpoint), nil)
+			claims := &session.Claims{Username: val.username}
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+			req = req.WithContext(ctx)
 			w := httptest.NewRecorder()
 
 			authController.LogoutHandler(w, req)
@@ -233,34 +234,10 @@ func TestLogoutHandler(t *testing.T) {
 
 			defer res.Body.Close()
 
-			got, err := io.ReadAll(res.Body)
+			got := res.Status
 
-			if err != nil {
-				t.Errorf("TestLogoutHandler err: %s", err)
-				return
-			}
-
-			userLoggedOutResponse := &data.UserLoggedOutResponse{}
-
-			err = json.Unmarshal(got, userLoggedOutResponse)
-
-			if err != nil {
-				t.Errorf("TestLogoutHandler err: %s", err)
-				return
-			}
-
-			if userLoggedOutResponse.UserID != val.userLoggedOutRequest.UserID {
-				t.Errorf("TestLoginHandler - userId does not match logged out user. got=%s want=%s", userLoggedOutResponse.UserID, val.userLoggedOutRequest.UserID)
-				return
-			}
-
-			if userLoggedOutResponse.EmailAddress != val.userLoggedOutRequest.EmailAddress {
-				t.Errorf("TestLoginHandler - email does not match logged out  user. got=%s want=%s", userLoggedOutResponse.EmailAddress, val.userLoggedOutRequest.EmailAddress)
-				return
-			}
-
-			if userLoggedOutResponse.Success != val.want {
-				t.Errorf("TestRegisterUser Failed - got=%v, want=%v", userLoggedOutResponse.Success, val.want)
+			if val.want != got {
+				t.Errorf("TestLogoutHandler Failed - got=%s, want=%s", got, val.want)
 			}
 		})
 	}
@@ -268,7 +245,7 @@ func TestLogoutHandler(t *testing.T) {
 
 func TestRefreshHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
 	csrfTokenMock := session.NewMockCSRFToken(logger)
 	authModel := model.NewAuthModel(logger, db)
@@ -279,12 +256,12 @@ func TestRefreshHandler(t *testing.T) {
 
 	testCases := []struct {
 		name               string
-		want               string
+		want               bool
 		userRefreshRequest *data.UserRefreshRequest
 	}{
 		{
 			name: "Successfully Get a Refresh Token",
-			want: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UxQGV4YW1wbGUuY29tIiwiZXhwIjoxNzMyMjU5NjUzfQ.vu2Vv_2z--i3p8TLYIHRmyKX9xjyICr_esCGrGYs2Es",
+			want: true,
 			userRefreshRequest: &data.UserRefreshRequest{
 				EmailAddress: "johndoe1@example.com",
 			},
@@ -330,8 +307,8 @@ func TestRefreshHandler(t *testing.T) {
 				return
 			}
 
-			if userRefreshResponse.AccessToken != val.want {
-				t.Errorf("TestRefreshHandler Failed - got=%v, want=%v", userRefreshResponse.AccessToken, val.want)
+			if userRefreshResponse.Success != val.want {
+				t.Errorf("TestRefreshHandler Failed")
 			}
 		})
 	}

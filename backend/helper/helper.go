@@ -3,6 +3,7 @@ package helper
 import (
 	"net"
 	"os"
+	"runtime"
 )
 
 func GetDeviceInfo() string {
@@ -30,4 +31,9 @@ func GetLocalIP() string {
 	}
 
 	return ""
+}
+
+func GetFunctionName() string {
+	pc, _, _, _ := runtime.Caller(1)
+	return runtime.FuncForPC(pc).Name()
 }

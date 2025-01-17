@@ -1,0 +1,55 @@
+/* styles/globals.css */
+html, body, #__next {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.mainLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  width: 100%;
+  background-color:white;
+}
+
+.content {
+  flex: 1;
+}
+
+.sectionBorder {
+  border-bottom:1px solid black;
+}
+
+.sectionMinHeight {
+  min-height: 100px;
+}
+
+.footer {
+  background-color: #f8f9fa;
+  padding: 10px 0;
+}
+
+.calendar {
+  padding: 10px;
+  margin: 0 auto;
+}
+
+.day-header {
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.day-cell {
+  border: 1px solid #ddd;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty {
+  background-color: #f8f9fa;
+}
