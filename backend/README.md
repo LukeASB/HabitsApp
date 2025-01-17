@@ -3,10 +3,19 @@
 ## Description
 DoHabitsAPI controls the backend operations for the DoHabitsApp. 
 
-MVP:
-- User can create, update and delete up to 5 habits to track daily.
+## Endpoints ( see /backend/api.md for more details)
+### User Endpoints
+1. **Register**: `POST /dohabitsapp/v1/register`
+2. **Login**: `POST /dohabitsapp/v1/login`
+3. **Logout**: `POST /dohabitsapp/v1/logout`
+4. **Refresh**: `POST /dohabitsapp/v1/refresh`
 
-## Features
+### Habit Endpoints
+1. **Create Habit**: `POST /dohabitsapp/v1/createhabit`
+2. **Retrieve Habit**: `GET /dohabitsapp/v1/retrievehabit`
+3. **Retrieve All Habits**: `GET /dohabitsapp/v1/retrievehabits`
+4. **Update Habit**: `PUT /dohabitsapp/v1/updatehabit`
+5. **Delete Habit**: `DELETE /dohabitsapp/v1/deletehabit`
 
 ## Architecture / Design Pattern
 MVC Architecture, CRUD Operations and Go Middleware.
@@ -86,23 +95,11 @@ Grows linearly.
 }
 ```
 
-## API Documentation
-Link to api.md
-
 ## Tech Stack
 Golang
 MongoDB
 
-## Installation
-MongoDB...
+# Dependencies
+See go.mod
 
-Locally...
-env vars
-go run .
-
-Docker...
-https://github.com/LukeASB/HabitsApp/blob/main/Dockerfile
-
-## Dependencies
-Required Go Modulesin `go.mod`
-MongoDB
+# Build See base README.md
