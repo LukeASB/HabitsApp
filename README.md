@@ -28,6 +28,8 @@ Users should be able to create, update and delete their habits.
 # Demo Video
 To do
 
+# Diagram
+
 # Tech Stack
 - Backend: Golang, MongoDB
 - Frontend: React, Next.js, TypeScript, Bootstrap CSS
