@@ -1,7 +1,7 @@
-# DoHabitsAPI
+# DoHabitsApp
 
 ## Description
-DoHabitsAPI controls the backend operations for the DoHabitsApp. 
+DoHabitsApp frontend - controls the UI layer.
 
 ## Endpoints ( see /backend/api.md for more details)
 ### User Endpoints
