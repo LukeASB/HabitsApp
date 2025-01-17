@@ -2,6 +2,7 @@ package routes
 
 import (
 	"dohabits/data"
+	"dohabits/helper"
 	"dohabits/internal"
 	"fmt"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 func SetUpRoutes(app internal.IApp) {
 	endpoint := fmt.Sprintf("%s/%s", app.GetAPIName(), app.GetAPIVersion())
 
-	app.GetLogger().InfoLog(fmt.Sprintf("routes.SetUpRoutes() - endpoint = %s", endpoint))
+	app.GetLogger().InfoLog(helper.GetFunctionName(), fmt.Sprintf("endpoint = %s", endpoint))
 
 	http.HandleFunc(fmt.Sprintf("/%s/register", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().RegisterUserHandler, data.Middleware{HTTPMethod: http.MethodPost}))
 	http.HandleFunc(fmt.Sprintf("/%s/login", endpoint), app.GetMiddleware().MiddlewareList(app.GetAuthController().LoginHandler, data.Middleware{HTTPMethod: http.MethodPost}))

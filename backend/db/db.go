@@ -6,6 +6,7 @@ type IDB interface {
 	RegisterUserHandler(value interface{}) (interface{}, error)
 	LoginUser(value interface{}) error
 	LogoutUser(value interface{}) error
+	RetrieveUserSession(value interface{}) (string, error)
 	GetUserDetails(value interface{}) (interface{}, error)
 	CreateHabitsHandler(userId string, value interface{}) error
 	RetrieveAllHabitsHandler(userId string) (interface{}, error)

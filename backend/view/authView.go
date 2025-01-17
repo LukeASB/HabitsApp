@@ -2,6 +2,7 @@ package view
 
 import (
 	"dohabits/data"
+	"dohabits/helper"
 	"dohabits/logger"
 	"encoding/json"
 )
@@ -23,7 +24,7 @@ func NewAuthView(logger logger.ILogger) *AuthView {
 }
 
 func (ac *AuthView) RegisterUserHandler(registeredUserData *data.RegisterUserData) ([]byte, error) {
-	ac.logger.InfoLog("authView.RegisterUserHandler")
+	ac.logger.InfoLog(helper.GetFunctionName(), "")
 
 	jsonRes, err := json.Marshal(data.RegisterUserResponse{
 		Success: registeredUserData.Success,
@@ -43,7 +44,7 @@ func (ac *AuthView) RegisterUserHandler(registeredUserData *data.RegisterUserDat
 }
 
 func (ac *AuthView) LoginHandler(loginData *data.UserLoggedInData) ([]byte, error) {
-	ac.logger.InfoLog("authView.LoginHandler")
+	ac.logger.InfoLog(helper.GetFunctionName(), "")
 
 	jsonRes, err := json.Marshal(data.UserLoggedInResponse{
 		Success: loginData.Success,
@@ -64,7 +65,7 @@ func (ac *AuthView) LoginHandler(loginData *data.UserLoggedInData) ([]byte, erro
 }
 
 func (ac *AuthView) RefreshHandler(userRefreshRequest *data.UserRefreshRequest) ([]byte, error) {
-	ac.logger.InfoLog("authView.RefreshHandler")
+	ac.logger.InfoLog(helper.GetFunctionName(), "")
 
 	jsonRes, err := json.Marshal(data.UserRefreshResponse{
 		Success:      true,

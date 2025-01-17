@@ -2,6 +2,7 @@ package session
 
 import (
 	"crypto/rand"
+	"dohabits/helper"
 	"dohabits/logger"
 	"encoding/base64"
 	"fmt"
@@ -33,7 +34,7 @@ func (mw *CSRFToken) CSRFToken(w http.ResponseWriter) error {
 	csrfToken, err := mw.generateCSRFToken()
 
 	if err != nil {
-		mw.logger.ErrorLog(fmt.Sprintf("CSRF token generation failed: %v", err))
+		mw.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("CSRF token generation failed: %v", err))
 		return err
 	}
 
@@ -47,7 +48,7 @@ func (mw *CSRFToken) generateCSRFToken() (string, error) {
 	tokenBytes := make([]byte, 32)
 	_, err := rand.Read(tokenBytes)
 	if err != nil {
-		mw.logger.ErrorLog(fmt.Sprintf("Failed to generate CSRF token: %s", err.Error()))
+		mw.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("Failed to generate CSRF token: %s", err.Error()))
 		return "", err
 	}
 	return base64.RawURLEncoding.EncodeToString(tokenBytes), nil
@@ -75,7 +76,7 @@ func (mw *CSRFToken) ValidateCSRFToken(r *http.Request) error {
 	tokenFromCookie, err := r.Cookie(csrf_token_cookie)
 
 	if err != nil || tokenFromHeader != tokenFromCookie.Value {
-		mw.logger.ErrorLog("Invalid or missing CSRF token")
+		mw.logger.ErrorLog(helper.GetFunctionName(), "Invalid or missing CSRF token")
 		return http.ErrNoCookie // Consider using a custom error type for more clarity
 	}
 	return nil

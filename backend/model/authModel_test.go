@@ -5,13 +5,15 @@ import (
 	"dohabits/db"
 	"dohabits/logger"
 	"dohabits/middleware/session"
+	"fmt"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
 func TestRegisterUserHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
 	testCases := []struct {
@@ -51,7 +53,7 @@ func TestRegisterUserHandler(t *testing.T) {
 
 func TestLoginHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
@@ -91,7 +93,7 @@ func TestLoginHandler(t *testing.T) {
 
 func TestLogoutHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
@@ -113,7 +115,14 @@ func TestLogoutHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			err := authModel.LogoutHandler(w, val.userLoggedOutRequest, jwtTokensMock, csrfTokenMock)
+			var refreshTokenPath = "data/mock_refresh_tokens"
+			var refreshTokenFile = "mock_refresh_token.txt"
+			err := os.WriteFile(fmt.Sprintf("../%s/%s_%s", refreshTokenPath, val.userLoggedOutRequest.EmailAddress, refreshTokenFile), []byte("testjwt"), 0644)
+			if err != nil {
+				t.Errorf("TestLogoutHandler Failed - err=%s", err)
+			}
+
+			err = authModel.LogoutHandler(w, val.userLoggedOutRequest, jwtTokensMock, csrfTokenMock)
 
 			if err != nil {
 				t.Errorf("TestLogoutHandler Failed - err=%s", err)
@@ -124,10 +133,11 @@ func TestLogoutHandler(t *testing.T) {
 
 func TestRefreshHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
 	jwtTokensMock := session.NewMockJWTTokens("secretJwt")
+	w := httptest.NewRecorder()
 
 	testCases := []struct {
 		name               string
@@ -143,7 +153,7 @@ func TestRefreshHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			newAccessToken, err := authModel.RefreshHandler(val.userRefreshRequest, jwtTokensMock)
+			newAccessToken, err := authModel.RefreshHandler(w, val.userRefreshRequest, jwtTokensMock)
 
 			if err != nil {
 				t.Errorf("TestRefreshHandler Failed - err=%s", err)

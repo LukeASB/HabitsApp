@@ -20,7 +20,7 @@ import (
 
 func TestCreateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)
@@ -85,7 +85,7 @@ func TestCreateHabitsHandler(t *testing.T) {
 
 func TestRetrieveHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)
@@ -148,7 +148,7 @@ func TestRetrieveHabitsHandler(t *testing.T) {
 
 func TestRetrieveAllHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)
@@ -216,7 +216,7 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 
 func TestUpdateHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)
@@ -306,7 +306,7 @@ func TestUpdateHabitsHandler(t *testing.T) {
 
 func TestDeleteHabitsHandler(t *testing.T) {
 	logger := &logger.Logger{}
-	db := db.NewDB(logger)
+	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)

@@ -13,9 +13,9 @@ type Logger struct {
 type ILogger interface {
 	SetVerbosity(level string) error
 	GetVerbosity() int
-	InfoLog(message string)
-	ErrorLog(message string)
-	DebugLog(message string)
+	InfoLog(functionName, message string)
+	ErrorLog(functionName, message string)
+	DebugLog(functionName, message string)
 }
 
 func (l *Logger) SetVerbosity(level string) error {
@@ -34,29 +34,41 @@ func (l *Logger) GetVerbosity() int {
 	return 0
 }
 
-func (l *Logger) InfoLog(message string) {
+func (l *Logger) InfoLog(functionName, message string) {
 	if l.verbosity > 0 {
 		log.SetOutput(os.Stdout)
 		log.SetPrefix("INFO: ")
 		log.SetFlags(log.Ldate | log.Ltime)
-		log.Println(message)
+		if message == "" {
+			log.Println(functionName)
+			return
+		}
+		log.Printf("%s - %s\n", functionName, message)
 	}
 }
 
-func (l *Logger) ErrorLog(message string) {
+func (l *Logger) ErrorLog(functionName, message string) {
 	if l.verbosity >= 1 {
 		log.SetOutput(os.Stdout)
 		log.SetPrefix("ERROR: ")
 		log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
-		log.Println(message)
+		if message == "" {
+			log.Println(functionName)
+			return
+		}
+		log.Printf("%s - %s\n", functionName, message)
 	}
 }
 
-func (l *Logger) DebugLog(message string) {
+func (l *Logger) DebugLog(functionName, message string) {
 	if l.verbosity >= 2 {
 		log.SetOutput(os.Stdout)
 		log.SetPrefix("DEBUG: ")
 		log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
-		log.Println(message)
+		if message == "" {
+			log.Println(functionName)
+			return
+		}
+		log.Printf("%s - %s\n", functionName, message)
 	}
 }
