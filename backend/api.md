@@ -151,20 +151,19 @@ curl -X POST http://localhost/dohabitsapp/v1/login \
 **Request**
 
 Request Headers:
+| Key              | Value                                                                                                           |
+|-------------------|-----------------------------------------------------------------------------------------------------------------|
+| Content-Type      | application/json                                                                                              |
+| X-CSRF-Token      | Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM                                                                    |
+| Authorization     | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ |
 
-Request Body:
-
-Request Body Example:
-
-**Response:**
-
-Response Headers:
-
-Response Body:
-
-Response Body Example:
-
-**Example cURL**
+**Example cURL**:
+```bash
+curl -X POST http://localhost/dohabitsapp/v1/logout \
+-H "Content-Type: application/json" \
+-H "X-CSRF-Token: Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ"
+```
 
 ### 4. Refresh
 **Endpoint** `POST /dohabitsapp/v1/refresh`
@@ -172,20 +171,50 @@ Response Body Example:
 **Request**
 
 Request Headers:
+| Key              | Value                                                                                                           |
+|-------------------|-----------------------------------------------------------------------------------------------------------------|
+| Content-Type      | application/json                                                                                              |
+| X-CSRF-Token      | Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM                                                                    |
+| Authorization     | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDczNDR9.nX7pZO9q6otlF9Y_s_3-ktgjuOF0Zm6z6KFB0KCqL3A |
 
 Request Body:
+| Field         | Type   | Description            | Example                     |
+|---------------|--------|------------------------|-----------------------------|
+| EmailAddress  | string | User's email address   | test333@example.com         |
 
 Request Body Example:
 
 **Response:**
+```json
+{
+    "EmailAddress": "test333@example.com"
+}
+```
 
 Response Headers:
 
 Response Body:
+| Field         | Type    | Description                      | Example                     |
+|---------------|---------|----------------------------------|-----------------------------|
+| Success       | boolean | Indicates request success        | true                        |
+| EmailAddress  | string  | Email address of the user        | test333@example.com         |
 
 Response Body Example:
+```json
+{
+    "Success": true,
+    "EmailAddress": "test333@example.com"
+}
+```
 
 **Example cURL**
+curl -X POST http://localhost/dohabitsapp/v1/refresh \
+-H "Content-Type: application/json" \
+-H "X-CSRF-Token: Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDczNDR9.nX7pZO9q6otlF9Y_s_3-ktgjuOF0Zm6z6KFB0KCqL3A" \
+-d '{
+    "EmailAddress": "test333@example.com"
+}'
 
 ## Habit Endpoints
 The following endpoints are used to retrieve/manipulate the user's habits data. Each endpoint is protected via a short-lived JWT Access Token and Cross-Site Request Forgery Token (CSRF) which are required in the Request Header.
@@ -196,26 +225,77 @@ The following endpoints are used to retrieve/manipulate the user's habits data. 
 **Request**
 
 Request Headers:
+| Key            | Value                                                                                                           |
+|----------------|---------------------------------------------------------------------------------------------------------------|
+| Authorization  | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDczNzh9.AcTzMY18Lmc1uWCN90Bz_krGtXsaAkB4g_Z2UGrnlow |
+| X-CSRF-Token   | X-CSRF-Token                                                                                                   |
 
 Request Body:
+| Field       | Type    | Description                       | Example           |
+|-------------|---------|-----------------------------------|-------------------|
+| Name        | string  | Name of the habit                | Meditate Daily    |
+| Days        | integer | Current number of days completed | 30                |
+| DaysTarget  | integer | Target number of days for habit  | 30                |
+
 
 Request Body Example:
+```json
+{
+    "Name": "Meditate Daily",
+    "Days": 30,
+    "DaysTarget": 30
+}
+```
 
 **Response:**
 
 Response Headers:
+| Key            | Value            |
+|----------------|------------------|
+| X-Csrf-Token   | OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs |
+| Set-Cookie     | csrf_token=OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs; Path=/; HttpOnly; SameSite=Strict |
 
 Response Body:
+| Field       | Type    | Description                       | Example           |
+|-------------|---------|-----------------------------------|-------------------|
+| Name        | string  | Name of the habit                | Meditate Daily    |
+| Days        | integer | Current number of days completed | 30                |
+| DaysTarget  | integer | Target number of days for habit  | 30                |
 
 Response Body Example:
+```json
+{
+    "Name": "Meditate Daily",
+    "Days": 30,
+    "DaysTarget": 30
+}
+```
+```
 
 **Example cURL**
+```bash
+curl -X POST http://localhost/dohabitsapp/v1/createhabit \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDczNzh9.AcTzMY18Lmc1uWCN90Bz_krGtXsaAkB4g_Z2UGrnlow" \
+-H "X-CSRF-Token: X-CSRF-Token" \
+-H "Content-Type: application/json" \
+-d '{
+    "Name": "Meditate Daily",
+    "Days": 30,
+    "DaysTarget": 30
+}'
+```
+
 ### 2. Retrieve Habit
 **Endpoint** `GET /dohabitsapp/v1/retrievehabit`
 
 **Request**
 
 Request Headers:
+| Key              | Value                                                                                                           |
+|-------------------|-----------------------------------------------------------------------------------------------------------------|
+| Content-Type      | application/json                                                                                              |
+| X-CSRF-Token      | Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM                                                                    |
+| Authorization     | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ |
 
 Request Body:
 
@@ -224,6 +304,10 @@ Request Body Example:
 **Response:**
 
 Response Headers:
+| Key            | Value            |
+|----------------|------------------|
+| X-Csrf-Token   | OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs |
+| Set-Cookie     | csrf_token=OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs; Path=/; HttpOnly; SameSite=Strict |
 
 Response Body:
 
@@ -237,6 +321,11 @@ Response Body Example:
 **Request**
 
 Request Headers:
+| Key              | Value                                                                                                           |
+|-------------------|-----------------------------------------------------------------------------------------------------------------|
+| Content-Type      | application/json                                                                                              |
+| X-CSRF-Token      | Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM                                                                    |
+| Authorization     | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ |
 
 Request Body:
 
@@ -245,6 +334,10 @@ Request Body Example:
 **Response:**
 
 Response Headers:
+| Key            | Value            |
+|----------------|------------------|
+| X-Csrf-Token   | OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs |
+| Set-Cookie     | csrf_token=OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs; Path=/; HttpOnly; SameSite=Strict |
 
 Response Body:
 
@@ -258,6 +351,11 @@ Response Body Example:
 **Request**
 
 Request Headers:
+| Key              | Value                                                                                                           |
+|-------------------|-----------------------------------------------------------------------------------------------------------------|
+| Content-Type      | application/json                                                                                              |
+| X-CSRF-Token      | Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM                                                                    |
+| Authorization     | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ |
 
 Request Body:
 
@@ -266,6 +364,10 @@ Request Body Example:
 **Response:**
 
 Response Headers:
+| Key            | Value            |
+|----------------|------------------|
+| X-Csrf-Token   | OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs |
+| Set-Cookie     | csrf_token=OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs; Path=/; HttpOnly; SameSite=Strict |
 
 Response Body:
 
@@ -279,6 +381,11 @@ Response Body Example:
 **Request**
 
 Request Headers:
+| Key              | Value                                                                                                           |
+|-------------------|-----------------------------------------------------------------------------------------------------------------|
+| Content-Type      | application/json                                                                                              |
+| X-CSRF-Token      | Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM                                                                    |
+| Authorization     | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ |
 
 Request Body:
 
@@ -287,6 +394,10 @@ Request Body Example:
 **Response:**
 
 Response Headers:
+| Key            | Value            |
+|----------------|------------------|
+| X-Csrf-Token   | OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs |
+| Set-Cookie     | csrf_token=OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs; Path=/; HttpOnly; SameSite=Strict |
 
 Response Body:
 
