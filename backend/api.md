@@ -14,7 +14,7 @@ Registers the user. Validates user data, if successful adds their credentials to
 
 **Request:**
 
-Headers:
+Request Headers:
 | Key            | Value            |
 |----------------|------------------|
 | Content-Type   | application/json |
@@ -38,8 +38,6 @@ Request Body Example:
 ```
 
 **Response:**
-
-Headers:
 
 Response Body:
 **Response Body**:
@@ -66,24 +64,7 @@ Response Body Example:
 }
 ```
 
-
-
-
-
-
-
-Explanation of the endpoint.
-Request Headers, Query Params, Body.
-Response Headers, Body, Status Code(s).
-Example data.
-Example cURL for Postman.
-
-
-
-#### Response
-
-
-#### Example cURL
+**Example cURL**
 ```bash
 curl -X POST http://localhost/dohabitsapp/v1/register \
 -H "Content-Type: application/json" \
@@ -95,40 +76,116 @@ curl -X POST http://localhost/dohabitsapp/v1/register \
 }'
 ```
 
-
-
 ### 2. Login
 **Endpoint** `POST /dohabitsapp/v1/login`
 
-#### Request
+**Request**
 
+Request Headers:
+Headers:
+| Key            | Value            |
+|----------------|------------------|
+| Content-Type   | application/json |
 
-#### Response
+**Request Body**:
+| Field         | Type   | Description            | Example                     |
+|---------------|--------|------------------------|-----------------------------|
+| EmailAddress  | string | User's email address   | test333@example.com         |
+| Password      | string | User's password        | secretPassword012!          |
 
+**Example Request Body**:
+```json
+{
+    "EmailAddress": "test333@example.com", /*"johndoe1@example.com"*/
+    "Password": "secretPassword012!"
+}
+```
 
-#### Example cURL
+**Response:**
+
+Response Headers:
+| Key            | Value            |
+|----------------|------------------|
+| Authorization  | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ |
+| X-Csrf-Token   | OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs |
+| Set-Cookie     | csrf_token=OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs; Path=/; HttpOnly; SameSite=Strict |
+
+**Response Body**:
+| Field         | Type    | Description                     | Example                      |
+|---------------|---------|---------------------------------|------------------------------|
+| Success       | boolean | Indicates request success       | true                         |
+| User          | object  | Details of the logged-in user   | See nested fields below      |
+| └ FirstName   | string  | User's first name               | TestUser123                  |
+| └ LastName    | string  | User's last name                | TestUser123                  |
+| └ EmailAddress | string | User's email address            | test333@example.com          |
+| └ CreatedAt   | string  | Timestamp of account creation   | 2025-01-18T17:00:13.947Z     |
+| LoggedInAt    | string  | Timestamp of login              | 2025-01-18T17:13:13.0799828Z|
+
+**Example Response**:
+```json
+{
+    "Success": true,
+    "User": {
+        "FirstName": "TestUser123",
+        "LastName": "TestUser123",
+        "EmailAddress": "test333@example.com",
+        "CreatedAt": "2025-01-18T17:00:13.947Z"
+    },
+    "LoggedInAt": "2025-01-18T17:13:13.0799828Z"
+}
+```
+
+**Example cURL**
+```bash
+curl -X POST http://localhost/dohabitsapp/v1/login \
+-H "Content-Type: application/json" \
+-d '{
+    "EmailAddress": "test333@example.com",
+    "Password": "secretPassword012!"
+}'
+```
 
 ### 3. Logout
 **Endpoint** `POST /dohabitsapp/v1/logout`
 
-#### Request
+**Request**
 
+Request Headers:
 
-#### Response
+Request Body:
 
+Request Body Example:
 
-#### Example cURL
+**Response:**
+
+Response Headers:
+
+Response Body:
+
+Response Body Example:
+
+**Example cURL**
 
 ### 4. Refresh
 **Endpoint** `POST /dohabitsapp/v1/refresh`
 
-#### Request
+**Request**
 
+Request Headers:
 
-#### Response
+Request Body:
 
+Request Body Example:
 
-#### Example cURL
+**Response:**
+
+Response Headers:
+
+Response Body:
+
+Response Body Example:
+
+**Example cURL**
 
 ## Habit Endpoints
 The following endpoints are used to retrieve/manipulate the user's habits data. Each endpoint is protected via a short-lived JWT Access Token and Cross-Site Request Forgery Token (CSRF) which are required in the Request Header.
@@ -136,54 +193,103 @@ The following endpoints are used to retrieve/manipulate the user's habits data. 
 ### 1. Create Habit
 **Endpoint** `POST /dohabitsapp/v1/createhabit`
 
-#### Request
+**Request**
 
+Request Headers:
 
-#### Response
+Request Body:
 
+Request Body Example:
 
-#### Example cURL
+**Response:**
 
+Response Headers:
+
+Response Body:
+
+Response Body Example:
+
+**Example cURL**
 ### 2. Retrieve Habit
 **Endpoint** `GET /dohabitsapp/v1/retrievehabit`
 
-#### Request
+**Request**
 
+Request Headers:
 
-#### Response
+Request Body:
 
+Request Body Example:
 
-#### Example cURL
+**Response:**
+
+Response Headers:
+
+Response Body:
+
+Response Body Example:
+
+**Example cURL**
 
 ### 3. Retrieve All Habits
 **Endpoint** `GET /dohabitsapp/v1/retrievehabits`
 
-#### Request
+**Request**
 
+Request Headers:
 
-#### Response
+Request Body:
 
+Request Body Example:
 
-#### Example cURL
+**Response:**
+
+Response Headers:
+
+Response Body:
+
+Response Body Example:
+
+**Example cURL**
 
 ### 4. Update Habit
 **Endpoint** `PUT /dohabitsapp/v1/updatehabit`
 
-#### Request
+**Request**
 
+Request Headers:
 
-#### Response
+Request Body:
 
+Request Body Example:
 
-#### Example cURL
+**Response:**
+
+Response Headers:
+
+Response Body:
+
+Response Body Example:
+
+**Example cURL**
 
 ### 5. Delete Habit
 **Endpoint** `DELETE /dohabitsapp/v1/deletehabit`
 
-#### Request
+**Request**
 
+Request Headers:
 
-#### Response
+Request Body:
 
+Request Body Example:
 
-#### Example cURL
+**Response:**
+
+Response Headers:
+
+Response Body:
+
+Response Body Example:
+
+**Example cURL**
