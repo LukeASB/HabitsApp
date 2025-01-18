@@ -286,7 +286,7 @@ curl -X POST http://localhost/dohabitsapp/v1/createhabit \
 ```
 
 ### 2. Retrieve Habit
-**Endpoint** `GET /dohabitsapp/v1/retrievehabit`
+**Endpoint** `GET /dohabitsapp/v1/retrievehabit?habitId={habitId}`
 
 **Request**
 
@@ -297,10 +297,6 @@ Request Headers:
 | X-CSRF-Token      | Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM                                                                    |
 | Authorization     | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ |
 
-Request Body:
-
-Request Body Example:
-
 **Response:**
 
 Response Headers:
@@ -310,10 +306,38 @@ Response Headers:
 | Set-Cookie     | csrf_token=OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs; Path=/; HttpOnly; SameSite=Strict |
 
 Response Body:
+| Field            | Type     | Description                               | Example                           |
+|------------------|----------|-------------------------------------------|-----------------------------------|
+| habitId          | string   | Unique identifier for the habit           | 67828988bfd0d3825fa10ee4          |
+| userId           | string   | Unique identifier for the user            | 677ac7224620315e952dabd6          |
+| createdAt        | datetime | Timestamp when the habit was created      | 2025-01-11T15:08:56.342Z          |
+| name             | string   | Name of the habit                        | No Fap Updated                    |
+| days             | integer  | Current number of days completed         | 30                                |
+| daysTarget       | integer  | Target number of days for habit          | 60                                |
+| completionDates  | array    | List of dates the habit was completed on | ["2025-01-01"]                    |
 
 Response Body Example:
+```json
+{
+    "habitId": "67828988bfd0d3825fa10ee4",
+    "userId": "677ac7224620315e952dabd6",
+    "createdAt": "2025-01-11T15:08:56.342Z",
+    "name": "No Fap Updated",
+    "days": 30,
+    "daysTarget": 60,
+    "completionDates": [
+        "2025-01-01"
+    ]
+}
+```
 
 **Example cURL**
+```bash
+curl -X GET "http://localhost/dohabitsapp/v1/retrievehabit?habitId=67828988bfd0d3825fa10ee4" \
+-H "Content-Type: application/json" \
+-H "X-CSRF-Token: sXNia5iMYKiDUFyY0YcJLXJnh0GHeEwqpA4cXZQMiN0" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDczNDR9.nX7pZO9q6otlF9Y_s_3-ktgjuOF0Zm6z6KFB0KCqL3A"
+```
 
 ### 3. Retrieve All Habits
 **Endpoint** `GET /dohabitsapp/v1/retrievehabits`
@@ -327,10 +351,6 @@ Request Headers:
 | X-CSRF-Token      | Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM                                                                    |
 | Authorization     | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ |
 
-Request Body:
-
-Request Body Example:
-
 **Response:**
 
 Response Headers:
@@ -340,13 +360,54 @@ Response Headers:
 | Set-Cookie     | csrf_token=OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs; Path=/; HttpOnly; SameSite=Strict |
 
 Response Body:
+| Field            | Type     | Description                               | Example                           |
+|------------------|----------|-------------------------------------------|-----------------------------------|
+| habitId          | string   | Unique identifier for the habit           | 67828988bfd0d3825fa10ee4          |
+| userId           | string   | Unique identifier for the user            | 677ac7224620315e952dabd6          |
+| createdAt        | datetime | Timestamp when the habit was created      | 2025-01-11T15:08:56.342Z          |
+| name             | string   | Name of the habit                        | No Fap Updated                    |
+| days             | integer  | Current number of days completed         | 30                                |
+| daysTarget       | integer  | Target number of days for habit          | 60                                |
+| completionDates  | array    | List of dates the habit was completed on | ["2025-01-01"]                    |
 
 Response Body Example:
+```json
+[
+    {
+        "habitId": "677ac8294620315e952dabd7",
+        "userId": "677ac7224620315e952dabd6",
+        "createdAt": "2024-09-21T11:30:00+01:00",
+        "name": "Code everyday",
+        "days": 30,
+        "daysTarget": 66,
+        "completionDates": [
+            "2024-12-02",
+            "2024-12-02",
+            "2024-12-11"
+        ]
+    },
+    {
+        "habitId": "678be5466b92995d30e58dad",
+        "userId": "678bde1d6b92995d30e58dac",
+        "createdAt": "2025-01-18T17:30:46.674Z",
+        "name": "Meditate Daily",
+        "days": 30,
+        "daysTarget": 30,
+        "completionDates": []
+    }
+]
+```
 
 **Example cURL**
+```bash
+curl -X GET "http://localhost/dohabitsapp/v1/retrievehabits" \
+-H "Content-Type: application/json" \
+-H "X-CSRF-Token: sXNia5iMYKiDUFyY0YcJLXJnh0GHeEwqpA4cXZQMiN0" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDczNDR9.nX7pZO9q6otlF9Y_s_3-ktgjuOF0Zm6z6KFB0KCqL3A"
+```
 
 ### 4. Update Habit
-**Endpoint** `PUT /dohabitsapp/v1/updatehabit`
+**Endpoint** `PUT /dohabitsapp/v1/updatehabit?habitId={habitId}`
 
 **Request**
 
@@ -358,8 +419,23 @@ Request Headers:
 | Authorization     | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ |
 
 Request Body:
+| Field            | Type     | Description                               | Example                           |
+|------------------|----------|-------------------------------------------|-----------------------------------|
+| name             | string   | Name of the habit                        | No Fap Updated                    |
+| days             | integer  | Current number of days completed         | 30                                |
+| daysTarget       | integer  | Target number of days for habit          | 60                                |
+| completionDates  | array    | List of dates the habit was completed on | ["2025-01-01"]                    |
+
 
 Request Body Example:
+```json
+{
+    "Name": "Delete Me Again",
+	"Days": 1,
+	"DaysTarget": 60,
+	"CompletionDates": ["2025-01-01"]
+}
+```
 
 **Response:**
 
@@ -370,13 +446,39 @@ Response Headers:
 | Set-Cookie     | csrf_token=OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs; Path=/; HttpOnly; SameSite=Strict |
 
 Response Body:
+| Field            | Type     | Description                               | Example                           |
+|------------------|----------|-------------------------------------------|-----------------------------------|
+| name             | string   | Name of the habit                        | No Fap Updated                    |
+| days             | integer  | Current number of days completed         | 30                                |
+| daysTarget       | integer  | Target number of days for habit          | 60                                |
+| completionDates  | array    | List of dates the habit was completed on | ["2025-01-01"]                    |
 
 Response Body Example:
+```json
+{
+    "Name": "Delete Me Again",
+	"Days": 1,
+	"DaysTarget": 60,
+	"CompletionDates": ["2025-01-01"]
+}
+```
 
 **Example cURL**
+```bash
+curl -X PUT "http://localhost/dohabitsapp/v1/updatehabit?habitId=678be5466b92995d30e58dad" \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: sXNia5iMYKiDUFyY0YcJLXJnh0GHeEwqpA4cXZQMiN0" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3M373MDczNDR9.nX7pZO9q6otlF9Y_s_3-ktgjuOF0Zm6z6KFB0KCqL3A" \
+  -d '{
+    "Name": "Delete Me Again",
+    "Days": 1,
+    "DaysTarget": 60,
+    "CompletionDates": ["2025-01-01"]
+}'
+```
 
 ### 5. Delete Habit
-**Endpoint** `DELETE /dohabitsapp/v1/deletehabit`
+**Endpoint** `DELETE /dohabitsapp/v1/deletehabit?habitId={habitId}`
 
 **Request**
 
@@ -400,7 +502,21 @@ Response Headers:
 | Set-Cookie     | csrf_token=OdPd7MYHVUlwjPxpTuF_D4IohzmUsmZOzJLOQYz7Vhs; Path=/; HttpOnly; SameSite=Strict |
 
 Response Body:
+| Field            | Type     | Description                               | Example                           |
+|------------------|----------|-------------------------------------------|-----------------------------------|
+| success          | boolean  | Indicates success                         |                                   |
+
 
 Response Body Example:
+```json
+{
+    "success": true
+}
+```
 
 **Example cURL**
+curl -X DELETE "http://localhost/dohabitsapp/v1/deletehabit?habitId=67828a01bfd0d3825fa10ee5" \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ"
+
