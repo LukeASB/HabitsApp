@@ -4,7 +4,7 @@
 DoHabitsAPI controls the backend operations for the DoHabitsApp. 
 
 ## Endpoints
-See: ![api.md](https://github.com/LukeASB/HabitsApp/blob/documentation/backend/api.md) 
+See: https://github.com/LukeASB/HabitsApp/blob/documentation/backend/api.md
 ### User Endpoints
 1. **Register**: `POST /dohabitsapp/v1/register`
 2. **Login**: `POST /dohabitsapp/v1/login`
