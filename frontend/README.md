@@ -31,4 +31,5 @@ ReactJS, NextJS, TypeScript, Bootstrap CSS
 # Dependencies
 If the .env ENVIRONMENT var is not DEV then requires the DoHabitsAPI
 
-# Build See base README.md
+# Build
+See: https://github.com/LukeASB/HabitsApp/blob/documentation/README.md
