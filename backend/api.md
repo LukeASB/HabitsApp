@@ -515,8 +515,10 @@ Response Body Example:
 ```
 
 **Example cURL**
+```bash
 curl -X DELETE "http://localhost/dohabitsapp/v1/deletehabit?habitId=67828a01bfd0d3825fa10ee5" \
   -H "Content-Type: application/json" \
   -H "X-CSRF-Token: Xjn3I8OU_kgBLRfa1DlKOX-Zk9JuArNiE47gqLNPHCM" \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QzMzNAZXhhbXBsZS5jb20iLCJleHAiOjE3MzczMDY3OTN9.5-pP_mSsdVUhVy6i7fSwLYZzi4ZDIKxGxEyyERlIQRQ"
+```
 
