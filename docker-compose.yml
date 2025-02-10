@@ -1,0 +1,21 @@
+services:
+  backend:
+    image: lukesbdev/backend:habitsappbackend2025
+    container_name: habitsappbackend
+    networks:
+      - habitsapp-network
+    ports:
+      - "80:80"
+  frontend:
+    image: lukesbdev/frontend:habitsappfrontend2025
+    container_name: habitsappfrontend
+    networks:
+      - habitsapp-network
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://habitsapi
+
+networks:
+  habitsapp-network:
+    driver: bridge

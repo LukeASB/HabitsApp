@@ -1,0 +1,29 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write \"pages/**/*.{js,jsx,ts,tsx,json,css,scss,md}\" \"components/**/*.{js,jsx,ts,tsx,json,css,scss,md}\" \"model/**/*.{js,jsx,ts,tsx,json,css,scss,md}\" \"services/**/*.{js,jsx,ts,tsx,json,css,scss,md}\" \"validation/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "dotenv": "^16.4.7",
+    "next": "14.2.14",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/bootstrap": "^5.2.10",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.14",
+    "prettier": "^3.4.2",
+    "typescript": "^5"
+  }
+}

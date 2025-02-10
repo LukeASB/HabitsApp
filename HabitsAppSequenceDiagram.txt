@@ -1,0 +1,59 @@
+Credit: https://sequencediagram.org/
+
+title Habits App
+
+Habits UI->Habits API: POST - /dohabitsapp/v1/register (User Info)
+Habits API->MongoDB: INSERT - User
+MongoDB-->Habits API: Success/Failure Response
+Habits API-->Habits UI: Registration Success/Failure
+
+Habits UI->Habits API: POST - /dohabitsapp/v1/login (Credentials)
+Habits API->MongoDB: RETRIEVE - User Data
+MongoDB-->Habits API: User Found/Not Found
+Habits API->Habits API: GENERATE - Auth & Refresh Tokens
+Habits API->MongoDB: INSERT - User Session Data
+
+Habits API-->Habits UI: Login Success (Auth Token)/Failure
+Habits UI->Habits API: POST - /dohabitsapp/v1/logout (Auth Token)
+Habits API->MongoDB: DELETE - User Session Data
+MongoDB-->Habits API: Session Invalidated
+Habits API-->Habits UI: Logout Success
+
+Habits UI->Habits API: POST - /dohabitsapp/v1/refresh (Refresh Token)
+Habits API->MongoDB: RETRIEVE - User Session Data
+MongoDB-->Habits API:Refresh Token Found/Not Found
+Habits API->Habits API:Validate - Refresh Token
+Habits API->Habits API:Generate Access Token
+Habits API-->Habits UI: Token Refresh Success/Failure
+
+
+Habits UI->Habits API: POST - /dohabitsapp/v1/createhabit (Habit Data, Auth Token)
+Habits API->MongoDB: INSERT - New Habit
+MongoDB-->Habits API: Insert Success/Failure
+Habits API-->Habits UI: Create Habit Success/Failure
+
+Habits UI->Habits API: GET - /dohabitsapp/v1/retrievehabit (Habit ID, Auth Token)
+Habits API->MongoDB: RETRIEVE - Habit by ID
+MongoDB-->Habits API: Habit Found/Not Found
+Habits API-->Habits UI: Retrieve Habit Success/Failure
+
+Habits UI->Habits API: GET - /dohabitsapp/v1/retrievehabits (Auth Token)
+Habits API->MongoDB: RETRIEVE - All Habits for User
+MongoDB-->Habits API: Habits Data/Not Found
+Habits API-->Habits UI: Retrieve All Habits Success/Failure
+
+Habits UI->Habits API: PUT - /dohabitsapp/v1/updatehabit (Habit ID, Updated Data, Auth Token)
+Habits API->MongoDB: UPDATE - Habit by ID
+MongoDB-->Habits API: Update Success/Failure
+Habits API-->Habits UI: Update Habit Success/Failure
+
+Habits UI->Habits API: PUT - /dohabitsapp/v1/updatehabits (Bulk Update Data, Auth Token)
+Habits API->MongoDB: BULK UPDATE - All User Habits
+MongoDB-->Habits API: Bulk Update Success/Failure
+Habits API-->Habits UI: Update All Habits Success/Failure
+
+Habits UI->Habits API: DELETE - /dohabitsapp/v1/deletehabit (Habit ID, Auth Token)
+Habits API->MongoDB: DELETE - Habit by ID
+MongoDB-->Habits API: Delete Success/Failure
+Habits API-->Habits UI: Delete Habit Success/Failure
+
