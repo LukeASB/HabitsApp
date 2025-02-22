@@ -15,7 +15,7 @@ type contextKey string
 
 const ClaimsKey = contextKey("claims")
 
-func AuthMiddleware(jwtTokens IJWTTokens, logger logger.ILogger) func(http.HandlerFunc) http.HandlerFunc {
+func AuthMiddleware(jwtTokens IJSONWebToken, logger logger.ILogger) func(http.HandlerFunc) http.HandlerFunc {
 	functionName := helper.GetFunctionName()
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +41,7 @@ func AuthMiddleware(jwtTokens IJWTTokens, logger logger.ILogger) func(http.Handl
 				return
 			}
 
-			newAccessToken, err := jwtTokens.RefreshJWTTokens(claims.Username)
+			newAccessToken, err := jwtTokens.HandleLongLivedJSONWebToken(claims.Username)
 
 			if err != nil {
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

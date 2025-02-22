@@ -2,30 +2,27 @@ package session
 
 import (
 	"dohabits/db"
-	"errors"
-	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type JWTTokens struct {
+type JSONWebToken struct {
 	jwtKey []byte
 	db     db.IDB
 }
 
-type IJWTTokens interface {
+type IJSONWebToken interface {
 	GetJWTKey() []byte
 	GenerateJSONWebTokens(username string) (string, string, error)
-	generateAccessJWT(username string) (string, error)
-	generateRefreshJWT(username string) (string, error)
-	RefreshJWTTokens(username string) (string, error)
-	GetJWTToken(r *http.Request) (string, error)
-	generateToken(username string, expirationTime time.Time) (string, error)
+	generateShortLivedJSONWebToken(username string) (string, error)
+	generateLongLivedJSONWebToken(username string) (string, error)
+	generateJSONWebToken(username string, expirationTime time.Time) (string, error)
+	HandleLongLivedJSONWebToken(username string) (string, error)
 }
 
-func NewJWTTokens(jwtSecret string, db db.IDB) *JWTTokens {
-	return &JWTTokens{
+func NewJSONWebToken(jwtSecret string, db db.IDB) *JSONWebToken {
+	return &JSONWebToken{
 		jwtKey: []byte(jwtSecret),
 		db:     db,
 	}
@@ -37,19 +34,19 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func (sa *JWTTokens) GetJWTKey() []byte {
+func (sa *JSONWebToken) GetJWTKey() []byte {
 	return sa.jwtKey
 }
 
-// GenerateJSONWebTokens generates the Access/Refresh JWT Tokens
-func (sa *JWTTokens) GenerateJSONWebTokens(username string) (string, string, error) {
-	accessToken, err := sa.generateAccessJWT(username) // username will be passed as query param
+// Generates the Access/Refresh JWT Tokens
+func (sa *JSONWebToken) GenerateJSONWebTokens(username string) (string, string, error) {
+	accessToken, err := sa.generateShortLivedJSONWebToken(username) // username will be passed as query param
 
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err := sa.generateRefreshJWT(username)
+	refreshToken, err := sa.generateLongLivedJSONWebToken(username)
 
 	if err != nil {
 		return "", "", err
@@ -58,21 +55,38 @@ func (sa *JWTTokens) GenerateJSONWebTokens(username string) (string, string, err
 	return accessToken, refreshToken, err
 }
 
-// GenerateAccessJWT generates a new JWT for a given username
-func (sa *JWTTokens) generateAccessJWT(username string) (string, error) {
+// Generates a new short-lived access token
+func (sa *JSONWebToken) generateShortLivedJSONWebToken(username string) (string, error) {
 	shortLivedJWT := time.Now().Add(5 * time.Minute)
-	return sa.generateToken(username, shortLivedJWT)
+	return sa.generateJSONWebToken(username, shortLivedJWT)
 }
 
-// GenerateRefreshJWT generates a new long-lived refresh token
-func (sa *JWTTokens) generateRefreshJWT(username string) (string, error) {
+// Generates a new long-lived refresh token
+func (sa *JSONWebToken) generateLongLivedJSONWebToken(username string) (string, error) {
 	longLivedJWT := time.Now().Add(24 * time.Hour) // Long-lived refresh token
-	tokenString, err := sa.generateToken(username, longLivedJWT)
+	tokenString, err := sa.generateJSONWebToken(username, longLivedJWT)
 
 	return tokenString, err
 }
 
-func (sa *JWTTokens) RefreshJWTTokens(username string) (string, error) {
+// Generate a JSON Web Token with username and expiry claims
+func (sa *JSONWebToken) generateJSONWebToken(username string, expirationTime time.Time) (string, error) {
+	expires := expirationTime
+
+	claims := &Claims{
+		Username: username,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expires),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString(sa.jwtKey)
+}
+
+// Retrieve the refresh token and validate it
+func (sa *JSONWebToken) HandleLongLivedJSONWebToken(username string) (string, error) {
 	refreshToken, err := sa.db.RetrieveUserSession(username, "")
 
 	if err != nil {
@@ -96,29 +110,4 @@ func (sa *JWTTokens) RefreshJWTTokens(username string) (string, error) {
 	}
 
 	return newJWTAccessToken, nil
-}
-
-func (sa *JWTTokens) GetJWTToken(r *http.Request) (string, error) {
-	claims, ok := r.Context().Value("claims").(*Claims)
-
-	if !ok {
-		return "", errors.New("JWTTokens.GetJWTToken - No claims value")
-	}
-
-	return claims.Username, nil
-}
-
-func (sa *JWTTokens) generateToken(username string, expirationTime time.Time) (string, error) {
-	expires := expirationTime
-
-	claims := &Claims{
-		Username: username,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expires),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	return token.SignedString(sa.jwtKey)
 }

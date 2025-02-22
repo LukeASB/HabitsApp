@@ -15,7 +15,7 @@ import (
 type AuthController struct {
 	authModel  model.IAuthModel
 	authView   view.IAuthView
-	jwtTokens  session.IJWTTokens
+	jwtTokens  session.IJSONWebToken
 	csrfTokens session.ICSRFToken
 	logger     logger.ILogger
 }
@@ -27,7 +27,7 @@ type IAuthController interface {
 	RefreshHandler(w http.ResponseWriter, r *http.Request)
 }
 
-func NewAuthController(authModel model.IAuthModel, authView view.IAuthView, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken, logger logger.ILogger) *AuthController {
+func NewAuthController(authModel model.IAuthModel, authView view.IAuthView, jwtTokens session.IJSONWebToken, csrfTokens session.ICSRFToken, logger logger.ILogger) *AuthController {
 	return &AuthController{
 		authModel:  authModel,
 		authView:   authView,

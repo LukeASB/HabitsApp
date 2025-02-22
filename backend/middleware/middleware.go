@@ -8,7 +8,7 @@ import (
 )
 
 type Middleware struct {
-	jwtTokens  session.IJWTTokens
+	jwtTokens  session.IJSONWebToken
 	csrfTokens session.ICSRFToken
 	logger     logger.ILogger
 }
@@ -19,7 +19,7 @@ type IMiddleware interface {
 	chainMiddleware(handler http.HandlerFunc, middlewares []func(http.HandlerFunc) http.HandlerFunc) http.HandlerFunc
 }
 
-func NewMiddleware(jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken, logger logger.ILogger) *Middleware {
+func NewMiddleware(jwtTokens session.IJSONWebToken, csrfTokens session.ICSRFToken, logger logger.ILogger) *Middleware {
 	return &Middleware{
 		jwtTokens:  jwtTokens,
 		csrfTokens: csrfTokens,

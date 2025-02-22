@@ -18,7 +18,7 @@ type App struct {
 	apiVersion       string
 	appVersion       string
 	port             string
-	jwtTokens        session.IJWTTokens
+	jwtTokens        session.IJSONWebToken
 }
 
 type IApp interface {
@@ -43,7 +43,7 @@ func NewApp(
 	apiVersion string,
 	appVersion string,
 	port string,
-	jwtTokens *session.JWTTokens,
+	jwtTokens *session.JSONWebToken,
 ) *App {
 	return &App{
 		authController:   authController,

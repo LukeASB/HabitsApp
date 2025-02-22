@@ -20,9 +20,9 @@ type AuthModel struct {
 
 type IAuthModel interface {
 	RegisterUserHandler(userRegisterRequest *data.RegisterUserRequest) (*data.RegisterUserData, error)
-	LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedInData, error)
-	LogoutHandler(w http.ResponseWriter, UserLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) error
-	RefreshHandler(w http.ResponseWriter, userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (string, string, error)
+	LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth, jwtTokens session.IJSONWebToken, csrfTokens session.ICSRFToken) (*data.UserLoggedInData, error)
+	LogoutHandler(w http.ResponseWriter, UserLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJSONWebToken, csrfTokens session.ICSRFToken) error
+	RefreshHandler(w http.ResponseWriter, userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJSONWebToken, csrfTokens session.ICSRFToken) (string, string, error)
 }
 
 func NewAuthModel(logger logger.ILogger, db db.IDB) *AuthModel {
@@ -79,7 +79,7 @@ func (am *AuthModel) RegisterUserHandler(userRegisterRequest *data.RegisterUserR
 	}, nil
 }
 
-func (am *AuthModel) LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (*data.UserLoggedInData, error) {
+func (am *AuthModel) LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth, jwtTokens session.IJSONWebToken, csrfTokens session.ICSRFToken) (*data.UserLoggedInData, error) {
 	am.logger.InfoLog(helper.GetFunctionName(), "")
 
 	userDetails, err := am.db.RetrieveUserDetails(userAuth)
@@ -146,7 +146,7 @@ func (am *AuthModel) LoginHandler(w http.ResponseWriter, userAuth *data.UserAuth
 	}, nil
 }
 
-func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) error {
+func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *data.UserLoggedOutRequest, jwtTokens session.IJSONWebToken, csrfTokens session.ICSRFToken) error {
 	am.logger.InfoLog(helper.GetFunctionName(), "")
 
 	userDetails, err := am.db.RetrieveUserDetails(userLoggedOutRequest)
@@ -178,10 +178,10 @@ func (am *AuthModel) LogoutHandler(w http.ResponseWriter, userLoggedOutRequest *
 	return nil
 }
 
-func (am *AuthModel) RefreshHandler(w http.ResponseWriter, userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJWTTokens, csrfTokens session.ICSRFToken) (string, string, error) {
+func (am *AuthModel) RefreshHandler(w http.ResponseWriter, userRefreshRequest *data.UserRefreshRequest, jwtTokens session.IJSONWebToken, csrfTokens session.ICSRFToken) (string, string, error) {
 	am.logger.InfoLog(helper.GetFunctionName(), "")
 
-	newAccessToken, err := jwtTokens.RefreshJWTTokens(userRefreshRequest.EmailAddress)
+	newAccessToken, err := jwtTokens.HandleLongLivedJSONWebToken(userRefreshRequest.EmailAddress)
 
 	if err != nil {
 		return "", "", err

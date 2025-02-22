@@ -1,11 +1,10 @@
 package session
 
 import (
-	"net/http"
 	"time"
 )
 
-var _ IJWTTokens = (*MockJWTTokens)(nil)
+var _ IJSONWebToken = (*MockJWTTokens)(nil)
 
 type MockJWTTokens struct {
 	jwtKey []byte
@@ -29,24 +28,20 @@ func (sa *MockJWTTokens) GenerateJSONWebTokens(username string) (string, string,
 }
 
 // GenerateAccessJWT generates a new JWT for a given username
-func (sa *MockJWTTokens) generateAccessJWT(username string) (string, error) {
+func (sa *MockJWTTokens) generateShortLivedJSONWebToken(username string) (string, error) {
 	return "", nil
 }
 
 // GenerateRefreshJWT generates a new long-lived refresh token
-func (sa *MockJWTTokens) generateRefreshJWT(username string) (string, error) {
+func (sa *MockJWTTokens) generateLongLivedJSONWebToken(username string) (string, error) {
 	return "", nil
 }
 
-func (sa *MockJWTTokens) RefreshJWTTokens(username string) (string, error) {
+func (sa *MockJWTTokens) HandleLongLivedJSONWebToken(username string) (string, error) {
 	return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UxQGV4YW1wbGUuY29tIiwiZXhwIjoxNzMyMjU5NjUzfQ.vu2Vv_2z--i3p8TLYIHRmyKX9xjyICr_esCGrGYs2Es", nil
 }
 
-func (sa *MockJWTTokens) GetJWTToken(r *http.Request) (string, error) {
-	return "", nil
-}
-
-func (sa *MockJWTTokens) generateToken(username string, expirationTime time.Time) (string, error) {
+func (sa *MockJWTTokens) generateJSONWebToken(username string, expirationTime time.Time) (string, error) {
 	return "", nil
 }
 

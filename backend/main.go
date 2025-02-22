@@ -52,7 +52,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	jwtTokens := session.NewJWTTokens(os.Getenv("JWT_SECRET"), db)
+	jwtTokens := session.NewJSONWebToken(os.Getenv("JWT_SECRET"), db)
 	csrfTokens := session.NewCSRFToken(os.Getenv("JWT_SECRET"), logger)
 
 	authModel := model.NewAuthModel(logger, db)
