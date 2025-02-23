@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -23,6 +24,7 @@ func AuthMiddleware(jwtTokens IJSONWebToken, logger logger.ILogger) func(http.Ha
 
 			authHeader := r.Header.Get("Authorization")
 
+			// Attempt to get the Access Token from the Authorization Header
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 				logger.ErrorLog(functionName, "No Auth Header present")
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -41,6 +43,19 @@ func AuthMiddleware(jwtTokens IJSONWebToken, logger logger.ILogger) func(http.Ha
 				return
 			}
 
+			// Check Access Token Expiry Time - If there's less than a minute left get the Refresh Token to attempt to re-issue a new Access Token
+			expirationTime := claims.ExpiresAt.Time
+
+			timeRemaining := time.Until(expirationTime)
+
+			if timeRemaining > time.Minute {
+				w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", tokenStr))
+				ctx := context.WithValue(r.Context(), ClaimsKey, claims)
+				next.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+
+			// Attempt to get a new Access Token
 			newAccessToken, err := jwtTokens.HandleLongLivedJSONWebToken(claims.Username)
 
 			if err != nil {

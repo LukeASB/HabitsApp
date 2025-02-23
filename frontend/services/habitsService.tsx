@@ -26,6 +26,13 @@ export class HabitsService {
 
 			if (!response.ok) throw new Error("Failed to fetch habits.");
 
+            const newAccessToken = response.headers.get("Authorization");
+			const newCSRFToken = response.headers.get("X-Csrf-Token");
+			if (!newAccessToken || !newCSRFToken) throw new Error("No access token provided.");
+
+			sessionStorage.setItem("access-token", newAccessToken);
+			sessionStorage.setItem("csrf-token", newCSRFToken);
+
 			const data: IHabit = await response.json();
 
 			return data;
@@ -54,6 +61,11 @@ export class HabitsService {
 			if (response.status === 401) await AuthService.refresh(HabitsService.retrieveHabits, router);
 			if (!response.ok) throw new Error("Failed to fetch habits.");
 
+            const newAccessToken = response.headers.get("Authorization");
+			if (!newAccessToken) throw new Error("No access token provided.");
+
+			sessionStorage.setItem("access-token", newAccessToken);
+
 			const data: IHabit[] = await response.json();
 
 			return data;
@@ -81,6 +93,11 @@ export class HabitsService {
 
 			if (response.status === 401) await AuthService.refresh(HabitsService.retrieveHabit, router, habitId);
 			if (!response.ok) throw new Error("Failed to fetch habit.");
+
+            const newAccessToken = response.headers.get("Authorization");
+			if (!newAccessToken) throw new Error("No access token provided.");
+
+			sessionStorage.setItem("access-token", newAccessToken);
 
 			const data: IHabit[] = await response.json();
 
@@ -112,6 +129,13 @@ export class HabitsService {
 			if (response.status === 403) await AuthService.refresh(HabitsService.updateHabit, router, habit);
 			if (!response.ok) throw new Error("Failed to fetch habit.");
 
+            const newAccessToken = response.headers.get("Authorization");
+			const newCSRFToken = response.headers.get("X-Csrf-Token");
+			if (!newAccessToken || !newCSRFToken) throw new Error("No access token provided.");
+
+			sessionStorage.setItem("access-token", newAccessToken);
+			sessionStorage.setItem("csrf-token", newCSRFToken);
+
 			const data: IHabit = await response.json();
 
 			return data;
@@ -142,6 +166,13 @@ export class HabitsService {
 			if (response.status === 403) await AuthService.refresh(HabitsService.updateAllHabits, router, habit);
 			if (!response.ok) throw new Error("Failed to fetch habit.");
 
+            const newAccessToken = response.headers.get("Authorization");
+			const newCSRFToken = response.headers.get("X-Csrf-Token");
+			if (!newAccessToken || !newCSRFToken) throw new Error("No access token provided.");
+
+			sessionStorage.setItem("access-token", newAccessToken);
+			sessionStorage.setItem("csrf-token", newCSRFToken);
+
 			const data: IHabit[] = await response.json();
 
 			return data;
@@ -170,6 +201,13 @@ export class HabitsService {
 			if (response.status === 401) await AuthService.refresh(HabitsService.deleteHabit, router, habitId);
 			if (response.status === 403) await AuthService.refresh(HabitsService.deleteHabit, router, habitId);
 			if (!response.ok) throw new Error("Failed to delete habit.");
+
+            const newAccessToken = response.headers.get("Authorization");
+			const newCSRFToken = response.headers.get("X-Csrf-Token");
+			if (!newAccessToken || !newCSRFToken) throw new Error("No access token provided.");
+
+			sessionStorage.setItem("access-token", newAccessToken);
+			sessionStorage.setItem("csrf-token", newCSRFToken);
 
 			const data = await response.json();
 
