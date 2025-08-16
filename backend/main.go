@@ -15,6 +15,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 var App *internal.App
@@ -24,11 +25,13 @@ func init() {
 		log.Fatal(err)
 	}
 
-	logger := &logger.Logger{}
+	verbosity, err := strconv.Atoi(os.Getenv("LOG_VERBOSITY"))
 
-	if err := logger.SetVerbosity(os.Getenv("LOG_VERBOSITY")); err != nil {
-		log.Fatal(err)
+	if err != nil {
+		log.Fatalf("Log Verbosity must be an integer: err=%s", err)
 	}
+
+	logger := logger.NewLogger(verbosity)
 
 	var database interface{}
 

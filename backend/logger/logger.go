@@ -3,7 +3,6 @@ package logger
 import (
 	"log"
 	"os"
-	"strconv"
 )
 
 type Logger struct {
@@ -11,27 +10,15 @@ type Logger struct {
 }
 
 type ILogger interface {
-	SetVerbosity(level string) error
-	GetVerbosity() int
 	InfoLog(functionName, message string)
 	ErrorLog(functionName, message string)
 	DebugLog(functionName, message string)
 }
 
-func (l *Logger) SetVerbosity(level string) error {
-	parsedLevel, err := strconv.Atoi(level)
-
-	if err != nil {
-		return err
+func NewLogger(verbosity int) *Logger {
+	return &Logger{
+		verbosity: verbosity,
 	}
-
-	l.verbosity = parsedLevel
-
-	return nil
-}
-
-func (l *Logger) GetVerbosity() int {
-	return 0
 }
 
 func (l *Logger) InfoLog(functionName, message string) {

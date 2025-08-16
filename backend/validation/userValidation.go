@@ -29,7 +29,6 @@ func IsValidName(name string) bool {
 	return success
 }
 
-// https://emaillistvalidation.com/blog/demystifying-email-validation-understanding-the-maximum-length-of-email-addresses/
 func IsValidEmail(email string) bool {
 	success := true
 	if len(email) == 0 || len(email) > maxEmailLength {
