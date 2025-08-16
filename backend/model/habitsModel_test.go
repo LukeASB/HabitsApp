@@ -3,13 +3,14 @@ package model
 import (
 	"dohabits/data"
 	"dohabits/db"
+	"dohabits/helper"
 	"dohabits/logger"
 	"reflect"
 	"testing"
 )
 
 func TestCreateHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
@@ -32,13 +33,15 @@ func TestCreateHabitsHandler(t *testing.T) {
 			newHabitResponse, err := model.CreateHabitsHandler(val.userEmailAddress, val.newHabit)
 
 			if err != nil {
-				t.Errorf("TestCreate Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			getLatestHabitID := data.MockHabit[len(data.MockHabit)-1].HabitID
 
 			if getLatestHabitID == "" {
-				t.Errorf("TestCreate Failed - failed to get latest MockHabit HabitID")
+				t.Errorf("%s - Failed - failed to get latest MockHabit HabitID", helper.GetFunctionName())
+				return
 			}
 
 			val.want.HabitID = getLatestHabitID
@@ -46,15 +49,15 @@ func TestCreateHabitsHandler(t *testing.T) {
 			habitsMatch := reflect.DeepEqual(newHabitResponse, val.want)
 
 			if habitsMatch == false {
-				t.Errorf("TestCreate Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
-
 		})
 	}
 }
 
 func TestRetrieveHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
@@ -77,20 +80,22 @@ func TestRetrieveHabitsHandler(t *testing.T) {
 			habit, err := model.RetrieveHabitsHandler(val.userEmailAddress, val.habitId)
 
 			if err != nil {
-				t.Errorf("TestRetrieve Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			habitsMatch := reflect.DeepEqual(habit, val.want)
 
 			if habitsMatch == false {
-				t.Errorf("TestRetrieve Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 		})
 	}
 }
 
 func TestRetrieveAllHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
@@ -120,13 +125,15 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 
 			if err != nil {
 				t.Errorf("TestRetrieve Failed - err=%s", err)
+				return
 			}
 
 			for i, habit := range habits {
 				habitsMatch := reflect.DeepEqual(habit, val.want[i])
 
 				if habitsMatch == false {
-					t.Errorf("TestRetrieve Failed - err=%s", err)
+					t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+					return
 				}
 			}
 		})
@@ -134,7 +141,7 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 }
 
 func TestUpdateHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
@@ -155,14 +162,15 @@ func TestUpdateHabitsHandler(t *testing.T) {
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
 			if err := model.UpdateHabitsHandler(val.userEmailAddress, val.updateHabit, val.habitId); err != nil {
-				t.Errorf("TestUpdate Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 		})
 	}
 }
 
 func TestUpdateAllHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
@@ -190,14 +198,15 @@ func TestUpdateAllHabitsHandler(t *testing.T) {
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
 			if err := model.UpdateAllHabitsHandler(val.userEmailAddress, &val.updateHabit); err != nil {
-				t.Errorf("TestUpdate Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 		})
 	}
 }
 
 func TestDeleteHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	model := NewHabitsModel(logger, db)
 
@@ -224,14 +233,13 @@ func TestDeleteHabitsHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			err := model.DeleteHabitsHandler(val.userEmailAddress, val.habitId)
-
-			if err != nil {
+			if err := model.DeleteHabitsHandler(val.userEmailAddress, val.habitId); err != nil {
 				val.got = true
 			}
 
 			if val.wantErr != val.got {
-				t.Errorf("TestDelete Failed - err=%s", err)
+				t.Errorf("%s - Failed - want=%v, got=%v", helper.GetFunctionName(), val.wantErr, val.got)
+				return
 			}
 		})
 	}

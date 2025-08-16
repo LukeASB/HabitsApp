@@ -3,6 +3,7 @@ package view
 import (
 	"bytes"
 	"dohabits/data"
+	"dohabits/helper"
 	"dohabits/logger"
 	"encoding/json"
 	"testing"
@@ -10,7 +11,7 @@ import (
 )
 
 func TestRegisterUserHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	authView := NewAuthView(logger)
 
 	fixedTime := time.Date(2023, time.November, 19, 12, 0, 0, 0, time.UTC)
@@ -51,24 +52,27 @@ func TestRegisterUserHandler(t *testing.T) {
 			marshalledRegisterUserResponse, err := json.Marshal(val.want)
 
 			if err != nil {
-				t.Errorf("TestRegisterUserHandler - Fail err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			got, err := authView.RegisterUserHandler(val.registerUserData)
 
 			if err != nil {
-				t.Errorf("TestRegisterUserHandler - Fail err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			if !bytes.Equal(marshalledRegisterUserResponse, got) {
-				t.Errorf("TestRegisterUserHandler - Fail want doesn't match got")
+				t.Errorf("%s - Failed - got=%s, want=%s", helper.GetFunctionName(), string(got), string(marshalledRegisterUserResponse))
+				return
 			}
 		})
 	}
 }
 
 func TestLoginHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	authView := NewAuthView(logger)
 
 	fixedTime := time.Date(2023, time.November, 19, 12, 0, 0, 0, time.UTC)
@@ -112,24 +116,27 @@ func TestLoginHandler(t *testing.T) {
 			marshalledUserLoggedInResponse, err := json.Marshal(val.want)
 
 			if err != nil {
-				t.Errorf("TestLoginHandler - Fail err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			got, err := authView.LoginHandler(val.userLoggedInData)
 
 			if err != nil {
-				t.Errorf("TestLoginHandler - Fail err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			if !bytes.Equal(marshalledUserLoggedInResponse, got) {
-				t.Errorf("TestLoginHandler - Fail want doesn't match got")
+				t.Errorf("%s - Failed - got=%s, want=%s", helper.GetFunctionName(), string(got), string(marshalledUserLoggedInResponse))
+				return
 			}
 		})
 	}
 }
 
 func TestRefreshHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	authView := NewAuthView(logger)
 
 	testCases := []struct {
@@ -154,17 +161,20 @@ func TestRefreshHandler(t *testing.T) {
 			marshalledUserRefreshResponse, err := json.Marshal(val.want)
 
 			if err != nil {
-				t.Errorf("TestRefreshHandler - Fail err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			got, err := authView.RefreshHandler(val.userRefreshRequest)
 
 			if err != nil {
-				t.Errorf("TestRefreshHandler - Fail err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			if !bytes.Equal(marshalledUserRefreshResponse, got) {
-				t.Errorf("TestRefreshHandler - Fail want doesn't match got")
+				t.Errorf("%s - Failed - got=%s, want=%s", helper.GetFunctionName(), string(got), string(marshalledUserRefreshResponse))
+				return
 			}
 		})
 	}

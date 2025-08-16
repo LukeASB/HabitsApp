@@ -9,7 +9,7 @@ import (
 )
 
 func Test_CreateHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	v := NewHabitsView(logger)
 
 	newHabit := data.NewHabitResponse{
@@ -51,7 +51,7 @@ func Test_CreateHabitsHandler(t *testing.T) {
 }
 
 func Test_RetrieveHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	v := NewHabitsView(logger)
 
 	habit := data.MockHabit[0]
@@ -88,7 +88,7 @@ func Test_RetrieveHabitsHandler(t *testing.T) {
 }
 
 func Test_RetrieveAllHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	v := NewHabitsView(logger)
 
 	habits := data.MockHabit
@@ -125,7 +125,7 @@ func Test_RetrieveAllHabitsHandler(t *testing.T) {
 }
 
 func Test_UpdateHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	v := NewHabitsView(logger)
 
 	habit := data.Habit{
@@ -172,7 +172,7 @@ func Test_UpdateHabitsHandler(t *testing.T) {
 }
 
 func Test_UpdateAllHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	v := NewHabitsView(logger)
 
 	habit := []data.Habit{
@@ -235,7 +235,7 @@ func Test_UpdateAllHabitsHandler(t *testing.T) {
 }
 
 func Test_DeleteHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	v := NewHabitsView(logger)
 
 	want, err := json.Marshal(map[string]bool{"success": true})
