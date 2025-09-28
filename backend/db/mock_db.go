@@ -182,7 +182,13 @@ func (db *MyMockDB) CreateHabitsHandler(userId string, value interface{}) (*data
 		return nil, fmt.Errorf("%s - value type is not data.Habit", helper.GetFunctionName())
 	}
 
-	id, err := strconv.Atoi(data.MockHabit[len(data.MockHabit)-1].HabitID)
+	var id int
+	var err error
+	if len(data.MockHabit) == 0 {
+		id = 0 // Initial HabitID
+	} else {
+		id, err = strconv.Atoi(data.MockHabit[len(data.MockHabit)-1].HabitID)
+	}
 
 	if err != nil {
 		db.logger.ErrorLog(helper.GetFunctionName(), "failed to get latest id")

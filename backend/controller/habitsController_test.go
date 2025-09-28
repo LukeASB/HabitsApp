@@ -5,66 +5,45 @@ import (
 	"context"
 	"dohabits/data"
 	"dohabits/db"
+	"dohabits/helper"
 	"dohabits/logger"
 	"dohabits/middleware/session"
 	"dohabits/model"
 	"dohabits/view"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
 
 func TestCreateHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)
 
-	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
-
 	// Make a deep copy of the original state
 	originalMockHabitState := make([]data.Habit, len(data.MockHabit))
 	copy(originalMockHabitState, data.MockHabit)
 
-	marshalledNewHabitRequest, err := json.Marshal(data.NewHabit{
-		Name:       "Test Create Habit",
-		DaysTarget: 50,
-	})
-
-	if err != nil {
-		t.Errorf("Fail err: %s", err)
-	}
-
-	marshalledNewHabitResponse, err := json.Marshal(data.NewHabitResponse{
-		HabitID:         "0",
-		Name:            "Test Create Habit",
-		DaysTarget:      50,
-		CompletionDates: []string{},
-	})
-
-	if err != nil {
-		t.Errorf("Fail err: %s", err)
-	}
-
 	testCases := []struct {
-		name string
-		want []byte
+		name        string
+		newHabitReq string
+		newHabitRes string
+		want        []byte
 	}{
 		{
-			name: "Test successful Create",
-			want: marshalledNewHabitResponse,
+			name:        "Test successful Create",
+			newHabitReq: `{"name": "Test Create Habit", "daysTarget": 50}`,
+			want:        []byte("{\"habitId\":\"7\",\"name\":\"Test Create Habit\",\"daysTarget\":50,\"completionDates\":[]}"),
 		},
 	}
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-
-			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/%s/CreateHabit", endpoint), io.NopCloser(bytes.NewBuffer(marshalledNewHabitRequest)))
+			req := httptest.NewRequest(http.MethodPost, "/CreateHabit", io.NopCloser(bytes.NewBuffer([]byte(val.newHabitReq))))
 			w := httptest.NewRecorder()
 
 			claims := &session.Claims{Username: "johndoe1@example.com"}
@@ -76,7 +55,7 @@ func TestCreateHabitsHandler(t *testing.T) {
 			c.CreateHabitsHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestCreateHabitsHandler - HTTP Status Code = %d", status)
+				t.Errorf("%s - Failed - HTTP Status Code = %d", helper.GetFunctionName(), status)
 				return
 			}
 
@@ -87,42 +66,13 @@ func TestCreateHabitsHandler(t *testing.T) {
 			got, err := io.ReadAll(res.Body)
 
 			if err != nil {
-				t.Errorf("Fail err: %s", err)
-			}
-
-			newHabitResponse := &data.NewHabitResponse{}
-
-			err = json.Unmarshal(val.want, newHabitResponse)
-
-			if err != nil {
-				t.Errorf("TestCreateHabitsHandler err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
 				return
 			}
-
-			getLatestHabitID := data.MockHabit[len(data.MockHabit)-1].HabitID
-
-			if getLatestHabitID == "" {
-				t.Errorf("TestCreate Failed - failed to get latest MockHabit HabitID")
-			}
-
-			newHabitResponse.HabitID = getLatestHabitID
-
-			marshalledNewHabitResponse, err = json.Marshal(data.NewHabitResponse{
-				HabitID:         newHabitResponse.HabitID,
-				Name:            "Test Create Habit",
-				DaysTarget:      50,
-				CompletionDates: []string{},
-			})
-
-			if err != nil {
-				t.Errorf("TestCreateHabitsHandler err: %s", err)
-				return
-			}
-
-			val.want = marshalledNewHabitResponse
 
 			if !bytes.Equal(val.want, got) {
-				t.Errorf("Fail want doesn't match got")
+				t.Errorf("%s - Failed - got=%s, want=%s", helper.GetFunctionName(), string(got), string(val.want))
+				return
 			}
 		})
 	}
@@ -131,18 +81,17 @@ func TestCreateHabitsHandler(t *testing.T) {
 }
 
 func TestRetrieveHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)
 
-	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
-
 	marshalledHabit, err := json.Marshal(data.MockHabit[0])
 
 	if err != nil {
-		t.Errorf("Fail err: %s", err)
+		t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+		return
 	}
 
 	testCases := []struct {
@@ -157,7 +106,7 @@ func TestRetrieveHabitsHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s/RetrieveAllHabits", endpoint), nil)
+			req := httptest.NewRequest(http.MethodGet, "/RetrieveAllHabits", nil)
 			w := httptest.NewRecorder()
 			q := req.URL.Query()
 			q.Add("habitId", "1")
@@ -172,7 +121,7 @@ func TestRetrieveHabitsHandler(t *testing.T) {
 			c.RetrieveHabitsHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestRetrieveHabitsHandler - HTTP Status Code = %d", status)
+				t.Errorf("%s - Failed - HTTP Status Code = %d", helper.GetFunctionName(), status)
 				return
 			}
 
@@ -183,24 +132,24 @@ func TestRetrieveHabitsHandler(t *testing.T) {
 			got, err := io.ReadAll(res.Body)
 
 			if err != nil {
-				t.Errorf("Fail err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			if !bytes.Equal(val.want, got) {
-				t.Errorf("Fail want doesn't match got")
+				t.Errorf("%s - Failed - got=%s, want=%s", helper.GetFunctionName(), string(got), string(val.want))
+				return
 			}
 		})
 	}
 }
 
 func TestRetrieveAllHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)
-
-	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
 
 	userMockHabits := []data.Habit{}
 
@@ -213,7 +162,8 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 	marshalledAllHabits, err := json.Marshal(userMockHabits)
 
 	if err != nil {
-		t.Errorf("Fail err: %s", err)
+		t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+		return
 	}
 
 	testCases := []struct {
@@ -228,7 +178,7 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 
 	for _, val := range testCases {
 		t.Run(val.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s/RetrieveAllHabits", endpoint), nil)
+			req := httptest.NewRequest(http.MethodGet, "/RetrieveAllHabits", nil)
 			w := httptest.NewRecorder()
 
 			claims := &session.Claims{Username: "johndoe1@example.com"}
@@ -240,7 +190,7 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 			c.RetrieveAllHabitsHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestRetrieveAllHabitsHandler - HTTP Status Code = %d", status)
+				t.Errorf("%s - Failed - HTTP Status Code = %d", helper.GetFunctionName(), status)
 				return
 			}
 
@@ -251,46 +201,28 @@ func TestRetrieveAllHabitsHandler(t *testing.T) {
 			got, err := io.ReadAll(res.Body)
 
 			if err != nil {
-				t.Errorf("Fail err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			if !bytes.Equal(val.want, got) {
-				t.Errorf("Fail want doesn't match got")
+				t.Errorf("%s - Failed - got=%s, want=%s", helper.GetFunctionName(), string(got), string(val.want))
+				return
 			}
 		})
 	}
 }
 
 func TestUpdateHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)
 
-	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
-
 	// Make a deep copy of the original state
 	originalMockHabitState := make([]data.Habit, len(data.MockHabit))
 	copy(originalMockHabitState, data.MockHabit)
-
-	habit := data.Habit{
-		Name:            "Test Update Habit",
-		Days:            30,
-		DaysTarget:      50,
-		CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"},
-	}
-
-	marshalledUpdatedHabit, err := json.Marshal(data.UpdateHabit{
-		Name:            &habit.Name,
-		Days:            &habit.Days,
-		DaysTarget:      &habit.DaysTarget,
-		CompletionDates: &habit.CompletionDates,
-	})
-
-	if err != nil {
-		t.Errorf("Fail err: %s", err)
-	}
 
 	testCases := []struct {
 		name        string
@@ -300,7 +232,7 @@ func TestUpdateHabitsHandler(t *testing.T) {
 		{
 			name:        "Test successful Update",
 			updateHabit: data.Habit{Name: "Test Update Habit", Days: 30, DaysTarget: 50, CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"}},
-			want:        marshalledUpdatedHabit,
+			want:        []byte("{\"habitId\":\"\",\"name\":\"Test Update Habit\",\"days\":30,\"daysTarget\":50,\"completionDates\":[\"2021-09-01\",\"2021-09-02\",\"2021-09-03\"]}"),
 		},
 	}
 
@@ -317,10 +249,10 @@ func TestUpdateHabitsHandler(t *testing.T) {
 			marshalledNewHabit, err := json.Marshal(newHabit)
 
 			if err != nil {
-				t.Errorf("Fail err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
 			}
 
-			req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/%s/UpdateHabit", endpoint), io.NopCloser(bytes.NewBuffer(marshalledNewHabit)))
+			req := httptest.NewRequest(http.MethodPut, "/UpdateHabit", io.NopCloser(bytes.NewBuffer(marshalledNewHabit)))
 			w := httptest.NewRecorder()
 
 			claims := &session.Claims{Username: "johndoe1@example.com"}
@@ -332,7 +264,7 @@ func TestUpdateHabitsHandler(t *testing.T) {
 			c.UpdateHabitsHandler(w, req)
 
 			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestUpdateHabitsHandler - HTTP Status Code = %d", status)
+				t.Errorf("%s - Failed - HTTP Status Code = %d", helper.GetFunctionName(), status)
 				return
 			}
 
@@ -343,11 +275,11 @@ func TestUpdateHabitsHandler(t *testing.T) {
 			got, err := io.ReadAll(res.Body)
 
 			if err != nil {
-				t.Errorf("Fail err: %s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
 			}
 
 			if !bytes.Equal(val.want, got) {
-				t.Errorf("Fail want doesn't match got")
+				t.Errorf("%s - Failed - got=%s, want=%s", helper.GetFunctionName(), string(got), string(val.want))
 			}
 		})
 	}
@@ -356,13 +288,323 @@ func TestUpdateHabitsHandler(t *testing.T) {
 }
 
 func TestUpdateAllHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)
 
-	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
+	// Make a deep copy of the original state
+	originalMockHabitState := make([]data.Habit, len(data.MockHabit))
+	copy(originalMockHabitState, data.MockHabit)
+
+	testCases := []struct {
+		name        string
+		updateHabit []data.Habit
+		want        []byte
+	}{
+		{
+			name: "Test successful Update All",
+			updateHabit: []data.Habit{
+				{
+					Name: "Test Update Habit 1", Days: 30, DaysTarget: 50, CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"},
+				},
+				{
+					Name: "Test Update Habit 2", Days: 30, DaysTarget: 50, CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"},
+				},
+				{
+					Name: "Test Update Habit 3", Days: 30, DaysTarget: 50, CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"},
+				},
+			},
+			want: []byte("[{\"habitId\":\"1\",\"name\":\"Test Update Habit 1\",\"days\":30,\"daysTarget\":50,\"completionDates\":[\"2021-09-01\",\"2021-09-02\",\"2021-09-03\"]},{\"habitId\":\"2\",\"name\":\"Test Update Habit 2\",\"days\":30,\"daysTarget\":50,\"completionDates\":[\"2021-09-01\",\"2021-09-02\",\"2021-09-03\"]},{\"habitId\":\"6\",\"name\":\"Test Update Habit 3\",\"days\":30,\"daysTarget\":50,\"completionDates\":[\"2021-09-01\",\"2021-09-02\",\"2021-09-03\"]}]"),
+		},
+	}
+
+	for _, val := range testCases {
+		t.Run(val.name, func(t *testing.T) {
+			newHabit := []data.UpdateHabit{
+				{
+					HabitID:         "1",
+					Name:            &val.updateHabit[0].Name,
+					Days:            &val.updateHabit[0].Days,
+					DaysTarget:      &val.updateHabit[0].DaysTarget,
+					CompletionDates: &val.updateHabit[0].CompletionDates,
+				},
+				{
+					HabitID:         "2",
+					Name:            &val.updateHabit[1].Name,
+					Days:            &val.updateHabit[1].Days,
+					DaysTarget:      &val.updateHabit[1].DaysTarget,
+					CompletionDates: &val.updateHabit[1].CompletionDates,
+				},
+				{
+					HabitID:         "6",
+					Name:            &val.updateHabit[2].Name,
+					Days:            &val.updateHabit[2].Days,
+					DaysTarget:      &val.updateHabit[2].DaysTarget,
+					CompletionDates: &val.updateHabit[2].CompletionDates,
+				},
+			}
+
+			marshalledNewHabit, err := json.Marshal(newHabit)
+
+			if err != nil {
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
+			}
+
+			req := httptest.NewRequest(http.MethodPut, "/UpdateHabits", io.NopCloser(bytes.NewBuffer(marshalledNewHabit)))
+			w := httptest.NewRecorder()
+
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
+
+			c.UpdateAllHabitsHandler(w, req)
+
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("%s - Failed - HTTP Status Code = %d", helper.GetFunctionName(), status)
+				return
+			}
+
+			res := w.Result()
+
+			defer res.Body.Close()
+
+			got, err := io.ReadAll(res.Body)
+
+			if err != nil {
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
+			}
+
+			if !bytes.Equal(val.want, got) {
+				t.Errorf("%s - Failed - got=%s, want=%s", helper.GetFunctionName(), string(got), string(val.want))
+				return
+			}
+		})
+	}
+
+	data.MockHabit = originalMockHabitState
+}
+
+func TestDeleteHabitsHandler(t *testing.T) {
+	logger := logger.NewLogger(0)
+	db := db.NewMockDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
+
+	// Make a deep copy of the original state
+	originalMockHabitState := make([]data.Habit, len(data.MockHabit))
+	copy(originalMockHabitState, data.MockHabit)
+
+	testCases := []struct {
+		name string
+		want map[string]bool
+	}{
+		{
+			name: "Test Success Delete",
+			want: map[string]bool{"success": true},
+		},
+	}
+
+	for _, val := range testCases {
+		t.Run(val.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodDelete, "/DeleteHabit", nil)
+			w := httptest.NewRecorder()
+			q := req.URL.Query()
+			q.Add("habitId", "1")
+			req.URL.RawQuery = q.Encode()
+
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
+
+			expect, err := json.Marshal(map[string]bool{"success": true})
+
+			if err != nil {
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
+			}
+
+			c.DeleteHabitsHandler(w, req)
+
+			if status := w.Code; status == http.StatusInternalServerError {
+				t.Errorf("%s - Failed - HTTP Status Code = %d", helper.GetFunctionName(), status)
+				return
+			}
+
+			res := w.Result()
+
+			defer res.Body.Close()
+
+			got, err := io.ReadAll(res.Body)
+
+			if err != nil {
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
+			}
+
+			if !bytes.Equal(expect, got) {
+				t.Errorf("%s - Failed - got=%s, want=%s", helper.GetFunctionName(), string(got), string(expect))
+				return
+			}
+		})
+	}
+	data.MockHabit = originalMockHabitState
+}
+
+func BenchmarkCreateHabitsHandler(b *testing.B) {
+	logger := logger.NewLogger(0)
+	db := db.NewMockDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
+
+	// Make a deep copy of the original state
+	originalMockHabitState := make([]data.Habit, len(data.MockHabit))
+	copy(originalMockHabitState, data.MockHabit)
+
+	marshalledNewHabitRequest, err := json.Marshal(data.NewHabit{
+		Name:       "Test Create Habit",
+		DaysTarget: 50,
+	})
+
+	if err != nil {
+		b.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+		return
+	}
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			req := httptest.NewRequest(http.MethodPost, "/CreateHabit", io.NopCloser(bytes.NewBuffer(marshalledNewHabitRequest)))
+			w := httptest.NewRecorder()
+
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
+
+			c.CreateHabitsHandler(w, req)
+		}
+	})
+}
+
+func BenchmarkRetrieveHabitsHandler(b *testing.B) {
+	logger := logger.NewLogger(0)
+	db := db.NewMockDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			req := httptest.NewRequest(http.MethodGet, "/RetrieveAllHabits", nil)
+			w := httptest.NewRecorder()
+			q := req.URL.Query()
+			q.Add("habitId", "1")
+			req.URL.RawQuery = q.Encode()
+
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
+
+			c.RetrieveHabitsHandler(w, req)
+		}
+	})
+
+}
+
+func BenchmarkRetrieveAllHabitsHandler(b *testing.B) {
+	logger := logger.NewLogger(0)
+	db := db.NewMockDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			req := httptest.NewRequest(http.MethodGet, "/RetrieveAllHabits", nil)
+			w := httptest.NewRecorder()
+
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
+
+			c.RetrieveAllHabitsHandler(w, req)
+		}
+	})
+}
+
+func BenchmarkUpdateHabitsHandler(b *testing.B) {
+	logger := logger.NewLogger(0)
+	db := db.NewMockDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
+
+	// Make a deep copy of the original state
+	originalMockHabitState := make([]data.Habit, len(data.MockHabit))
+	copy(originalMockHabitState, data.MockHabit)
+
+	habit := data.Habit{
+		Name:            "Test Update Habit",
+		Days:            30,
+		DaysTarget:      50,
+		CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"},
+	}
+
+	newHabit := data.UpdateHabit{
+		HabitID:         "1",
+		Name:            &habit.Name,
+		Days:            &habit.Days,
+		DaysTarget:      &habit.DaysTarget,
+		CompletionDates: &habit.CompletionDates,
+	}
+
+	marshalledNewHabit, err := json.Marshal(newHabit)
+
+	if err != nil {
+		b.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+		return
+	}
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			req := httptest.NewRequest(http.MethodPut, "/UpdateHabit", io.NopCloser(bytes.NewBuffer(marshalledNewHabit)))
+			w := httptest.NewRecorder()
+
+			claims := &session.Claims{Username: "johndoe1@example.com"}
+
+			ctx := context.WithValue(req.Context(), session.ClaimsKey, claims)
+
+			req = req.WithContext(ctx)
+
+			c.UpdateHabitsHandler(w, req)
+		}
+	})
+}
+
+func BenchmarkUpdateAllHabitsHandler(b *testing.B) {
+	logger := logger.NewLogger(0)
+	db := db.NewMockDB(logger)
+	habitsModel := model.NewHabitsModel(logger, db)
+	habitsView := view.NewHabitsView(logger)
+	c := NewHabitsController(habitsModel, habitsView, logger)
 
 	// Make a deep copy of the original state
 	originalMockHabitState := make([]data.Habit, len(data.MockHabit))
@@ -405,64 +647,14 @@ func TestUpdateAllHabitsHandler(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Errorf("Fail err: %s", err)
+		b.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+		return
 	}
 
-	testCases := []struct {
-		name        string
-		updateHabit []data.Habit
-		want        []byte
-	}{
-		{
-			name: "Test successful Update All",
-			updateHabit: []data.Habit{
-				{
-					Name: "Test Update Habit 1", Days: 30, DaysTarget: 50, CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"},
-				},
-				{
-					Name: "Test Update Habit 2", Days: 30, DaysTarget: 50, CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"},
-				},
-				{
-					Name: "Test Update Habit 3", Days: 30, DaysTarget: 50, CompletionDates: []string{"2021-09-01", "2021-09-02", "2021-09-03"},
-				},
-			},
-			want: marshalledUpdatedHabit,
-		},
-	}
-
-	for _, val := range testCases {
-		t.Run(val.name, func(t *testing.T) {
-			newHabit := []data.UpdateHabit{
-				{
-					HabitID:         "1",
-					Name:            &val.updateHabit[0].Name,
-					Days:            &val.updateHabit[0].Days,
-					DaysTarget:      &val.updateHabit[0].DaysTarget,
-					CompletionDates: &val.updateHabit[0].CompletionDates,
-				},
-				{
-					HabitID:         "2",
-					Name:            &val.updateHabit[1].Name,
-					Days:            &val.updateHabit[1].Days,
-					DaysTarget:      &val.updateHabit[1].DaysTarget,
-					CompletionDates: &val.updateHabit[1].CompletionDates,
-				},
-				{
-					HabitID:         "6",
-					Name:            &val.updateHabit[2].Name,
-					Days:            &val.updateHabit[2].Days,
-					DaysTarget:      &val.updateHabit[2].DaysTarget,
-					CompletionDates: &val.updateHabit[2].CompletionDates,
-				},
-			}
-
-			marshalledNewHabit, err := json.Marshal(newHabit)
-
-			if err != nil {
-				t.Errorf("Fail err: %s", err)
-			}
-
-			req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/%s/UpdateHabits", endpoint), io.NopCloser(bytes.NewBuffer(marshalledNewHabit)))
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			req := httptest.NewRequest(http.MethodPut, "/UpdateHabits", io.NopCloser(bytes.NewBuffer(marshalledUpdatedHabit)))
 			w := httptest.NewRecorder()
 
 			claims := &session.Claims{Username: "johndoe1@example.com"}
@@ -472,57 +664,22 @@ func TestUpdateAllHabitsHandler(t *testing.T) {
 			req = req.WithContext(ctx)
 
 			c.UpdateAllHabitsHandler(w, req)
+		}
+	})
 
-			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestUpdateHabitsHandler - HTTP Status Code = %d", status)
-				return
-			}
-
-			res := w.Result()
-
-			defer res.Body.Close()
-
-			got, err := io.ReadAll(res.Body)
-
-			if err != nil {
-				t.Errorf("Fail err: %s", err)
-			}
-
-			if !bytes.Equal(val.want, got) {
-				t.Errorf("Fail want doesn't match got. got=%s, want=%s", got, val.want)
-			}
-		})
-	}
-
-	data.MockHabit = originalMockHabitState
 }
 
-func TestDeleteHabitsHandler(t *testing.T) {
-	logger := &logger.Logger{}
+func BenchmarkDeleteHabitsHandler(b *testing.B) {
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	habitsModel := model.NewHabitsModel(logger, db)
 	habitsView := view.NewHabitsView(logger)
 	c := NewHabitsController(habitsModel, habitsView, logger)
 
-	endpoint := fmt.Sprintf("%s/%s", os.Getenv("API_NAME"), os.Getenv("API_VERSION"))
-
-	// Make a deep copy of the original state
-	originalMockHabitState := make([]data.Habit, len(data.MockHabit))
-	copy(originalMockHabitState, data.MockHabit)
-
-	testCases := []struct {
-		name string
-		want map[string]bool
-	}{
-		{
-			name: "Test Success Delete",
-			want: map[string]bool{"success": true},
-		},
-	}
-
-	for _, val := range testCases {
-		t.Run(val.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/%s/DeleteHabit", endpoint), nil)
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			req := httptest.NewRequest(http.MethodDelete, "/DeleteHabit", nil)
 			w := httptest.NewRecorder()
 			q := req.URL.Query()
 			q.Add("habitId", "1")
@@ -534,33 +691,7 @@ func TestDeleteHabitsHandler(t *testing.T) {
 
 			req = req.WithContext(ctx)
 
-			expect, err := json.Marshal(map[string]bool{"success": true})
-
-			if err != nil {
-				t.Errorf("Fail err: %s", err)
-			}
-
 			c.DeleteHabitsHandler(w, req)
-
-			if status := w.Code; status == http.StatusInternalServerError {
-				t.Errorf("TestDeleteHabitsHandler - HTTP Status Code = %d", status)
-				return
-			}
-
-			res := w.Result()
-
-			defer res.Body.Close()
-
-			got, err := io.ReadAll(res.Body)
-
-			if err != nil {
-				t.Errorf("Fail err: %s", "cake")
-			}
-
-			if !bytes.Equal(expect, got) {
-				t.Errorf("Fail want doesn't match got.")
-			}
-		})
-	}
-	data.MockHabit = originalMockHabitState
+		}
+	})
 }

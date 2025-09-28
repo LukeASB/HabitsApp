@@ -3,6 +3,7 @@ package model
 import (
 	"dohabits/data"
 	"dohabits/db"
+	"dohabits/helper"
 	"dohabits/logger"
 	"dohabits/middleware/session"
 	"fmt"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestRegisterUserHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
@@ -38,21 +39,22 @@ func TestRegisterUserHandler(t *testing.T) {
 			registeredUserData, err := authModel.RegisterUserHandler(val.userRegisterRequest)
 
 			if err != nil {
-				t.Errorf("TestRegisterUser Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
 				return
 			}
 
 			got := registeredUserData.Success
 
 			if got != val.want {
-				t.Errorf("TestRegisterUser Failed - got=%v, want=%v", got, val.want)
+				t.Errorf("%s - Failed - got=%v, want=%v", helper.GetFunctionName(), got, val.want)
+				return
 			}
 		})
 	}
 }
 
 func TestLoginHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
@@ -78,21 +80,22 @@ func TestLoginHandler(t *testing.T) {
 			userLoggedIn, err := authModel.LoginHandler(w, val.userAuth, jwtTokensMock, csrfTokenMock)
 
 			if err != nil {
-				t.Errorf("TestLoginHandler Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
 				return
 			}
 
 			got := userLoggedIn.Success
 
 			if got != val.want {
-				t.Errorf("TestLoginHandler Failed - got=%v, want=%v", got, val.want)
+				t.Errorf("%s - Failed - got=%v, want=%v", helper.GetFunctionName(), got, val.want)
+				return
 			}
 		})
 	}
 }
 
 func TestLogoutHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
@@ -119,20 +122,22 @@ func TestLogoutHandler(t *testing.T) {
 			var refreshTokenFile = "mock_refresh_token.txt"
 			err := os.WriteFile(fmt.Sprintf("../%s/%s_%s", refreshTokenPath, val.userLoggedOutRequest.EmailAddress, refreshTokenFile), []byte("testjwt"), 0644)
 			if err != nil {
-				t.Errorf("TestLogoutHandler Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 
 			err = authModel.LogoutHandler(w, val.userLoggedOutRequest, jwtTokensMock, csrfTokenMock)
 
 			if err != nil {
-				t.Errorf("TestLogoutHandler Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 		})
 	}
 }
 
 func TestRefreshHandler(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 	db := db.NewMockDB(logger)
 	authModel := NewAuthModel(logger, db)
 
@@ -157,14 +162,15 @@ func TestRefreshHandler(t *testing.T) {
 			newAccessToken, _, err := authModel.RefreshHandler(w, val.userRefreshRequest, jwtTokensMock, csrfTokenMock)
 
 			if err != nil {
-				t.Errorf("TestRefreshHandler Failed - err=%s", err)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
 				return
 			}
 
 			got := newAccessToken
 
 			if val.want != got {
-				t.Errorf("TestLogoutHandler Failed - got=%s, want=%s", got, val.want)
+				t.Errorf("%s - Failed - err=%s", helper.GetFunctionName(), err)
+				return
 			}
 		})
 	}

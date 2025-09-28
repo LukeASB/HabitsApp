@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sync"
 )
 
 type AuthController struct {
@@ -18,6 +19,7 @@ type AuthController struct {
 	jwtTokens  session.IJSONWebToken
 	csrfTokens session.ICSRFToken
 	logger     logger.ILogger
+	mx         sync.RWMutex
 }
 
 type IAuthController interface {
@@ -34,10 +36,14 @@ func NewAuthController(authModel model.IAuthModel, authView view.IAuthView, jwtT
 		jwtTokens:  jwtTokens,
 		csrfTokens: csrfTokens,
 		logger:     logger,
+		mx:         sync.RWMutex{},
 	}
 }
 
 func (ac *AuthController) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
+	ac.mx.Lock()
+	defer ac.mx.Unlock()
+
 	userRegisterRequest := data.RegisterUserRequest{}
 
 	if err := json.NewDecoder(r.Body).Decode(&userRegisterRequest); err != nil {
@@ -65,6 +71,9 @@ func (ac *AuthController) RegisterUserHandler(w http.ResponseWriter, r *http.Req
 }
 
 func (ac *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
+	ac.mx.Lock()
+	defer ac.mx.Unlock()
+
 	userAuth := data.UserAuth{}
 
 	if err := json.NewDecoder(r.Body).Decode(&userAuth); err != nil {
@@ -111,6 +120,9 @@ func (ac *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ac *AuthController) LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	ac.mx.Lock()
+	defer ac.mx.Unlock()
+
 	// frontend will delete this short-lived JWT accessToken from session, delete user's refreshToken to prevent new short-lived JWT accessToken. It will invalidate itself after 5 mins.
 	claims, ok := r.Context().Value(session.ClaimsKey).(*session.Claims)
 

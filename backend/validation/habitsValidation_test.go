@@ -2,12 +2,13 @@ package validation
 
 import (
 	"dohabits/data"
+	"dohabits/helper"
 	"dohabits/logger"
 	"testing"
 )
 
 func Test_ValidateHabit(t *testing.T) {
-	logger := &logger.Logger{}
+	logger := logger.NewLogger(0)
 
 	testCases := []struct {
 		name    string
@@ -36,7 +37,8 @@ func Test_ValidateHabit(t *testing.T) {
 			got := ValidateHabit(val.habit, logger)
 
 			if val.wantErr != (got != nil) {
-				t.Errorf("Fail want not equal to got. wantErr: %v, got: %s", val.wantErr, got)
+				t.Errorf("%s - Failed - got=%v, want=%v", helper.GetFunctionName(), got, val.wantErr)
+				return
 			}
 		})
 	}
@@ -85,7 +87,8 @@ func Test_ValidateHabitName(t *testing.T) {
 			got := validateHabitName(val.habit.Name)
 
 			if val.wantErr != (got != nil) {
-				t.Errorf("Fail want not equal to got. wantErr: %v, got: %s", val.wantErr, got)
+				t.Errorf("%s - Failed - got=%v, want=%v", helper.GetFunctionName(), got, val.wantErr)
+				return
 			}
 		})
 	}
@@ -120,7 +123,8 @@ func Test_ValidateHabitDaysTarget(t *testing.T) {
 			got := validateHabitDaysTarget(val.habit.DaysTarget)
 
 			if val.wantErr != (got != nil) {
-				t.Errorf("Fail want not equal to got. wantErr: %v, got: %s", val.wantErr, got)
+				t.Errorf("%s - Failed - got=%v, want=%v", helper.GetFunctionName(), got, val.wantErr)
+				return
 			}
 		})
 	}
