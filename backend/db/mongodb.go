@@ -79,7 +79,7 @@ func (db *MongoDB) Connect() error {
 	client, err := mongo.Connect(opts)
 	if err != nil {
 		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("%s", err))
-		return fmt.Errorf(fmt.Sprintf("%s - %s", helper.GetFunctionName(), err))
+		return fmt.Errorf("%s - %s", helper.GetFunctionName(), err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -88,7 +88,7 @@ func (db *MongoDB) Connect() error {
 	// Send a ping to confirm a successful connection
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
 		db.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("%s", err))
-		return fmt.Errorf(fmt.Sprintf("%s - %s", helper.GetFunctionName(), err))
+		return fmt.Errorf("%s - %s", helper.GetFunctionName(), err)
 	}
 
 	db.client = client
