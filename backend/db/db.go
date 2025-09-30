@@ -1,6 +1,9 @@
 package db
 
-import "dohabits/data"
+import (
+	"dohabits/data"
+	"dohabits/logger"
+)
 
 type IDB interface {
 	Connect() error
@@ -16,4 +19,15 @@ type IDB interface {
 	UpdateHabitsHandler(userId, habitId string, value interface{}) error
 	UpdateAllHabitsHandler(userId string, value interface{}) error
 	DeleteHabitsHandler(userId, habitId string) error
+}
+
+func NewDB(algorithm string, logger logger.ILogger) IDB {
+	switch algorithm {
+	case "mockdb":
+		return NewMockDB(logger)
+	case "mongodb":
+		return NewMongoDB(logger)
+	default:
+		return NewMockDB(logger) // Default to MockDB if unspecified.
+	}
 }

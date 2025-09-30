@@ -33,22 +33,7 @@ func init() {
 
 	logger := logger.NewLogger(verbosity)
 
-	var database interface{}
-
-	if os.Getenv("ENVIRONMENT") == "DEV" {
-		logger.InfoLog(helper.GetFunctionName(), "Connected to Mock DB dataset.")
-		database = db.NewMockDB(logger)
-	} else {
-		logger.InfoLog(helper.GetFunctionName(), "Connected to Production DB.")
-		database = db.NewMongoDB(logger)
-	}
-
-	db, ok := database.(db.IDB)
-
-	if !ok {
-		logger.ErrorLog(helper.GetFunctionName(), "db is not of type IDB.")
-		log.Fatal("db is not of type IDB.")
-	}
+	db := db.NewDB(os.Getenv("DB_TYPE"), logger)
 
 	if err := db.Connect(); err != nil {
 		logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("An error occured when connecting to the DB. err=%s", err))
