@@ -44,14 +44,12 @@ func (db *MyMockDB) RegisterUserHandler(value interface{}) (interface{}, error) 
 	newUser, ok := value.(*data.RegisterUserRequest)
 
 	if !ok {
-		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.UserData")
 		return nil, fmt.Errorf("%s - value type is not data.UserData", helper.GetFunctionName())
 	}
 
 	latestUserID, err := strconv.Atoi(data.MockUsers[len(data.MockUsers)-1].UserID)
 
 	if err != nil {
-		db.logger.ErrorLog(helper.GetFunctionName(), "get latestUserID and convert to int")
 		return nil, fmt.Errorf("%s - couldn't get latestUserID and convert to int", helper.GetFunctionName())
 	}
 
@@ -75,7 +73,6 @@ func (db *MyMockDB) LoginUser(value interface{}) error {
 	userSession, ok := value.(*data.UserSession)
 
 	if !ok {
-		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.UserSession")
 		return fmt.Errorf("%s - value type is not data.UserSession", helper.GetFunctionName())
 	}
 
@@ -86,7 +83,6 @@ func (db *MyMockDB) LoginUser(value interface{}) error {
 
 			err := os.WriteFile(fmt.Sprintf("../%s/%s_%s", refreshTokenPath, val.EmailAddress, refreshTokenFile), []byte(userSession.RefreshToken), 0644)
 			if err != nil {
-				db.logger.ErrorLog(helper.GetFunctionName(), "Failed to store the Refresh Token")
 				return fmt.Errorf("%s - Failed to store the Refresh Token", helper.GetFunctionName())
 			}
 			data.MockUsers[i].LastLogin = userSession.CreatedAt
@@ -101,7 +97,6 @@ func (db *MyMockDB) LogoutUser(value interface{}) error {
 	userLoggedOut, ok := value.(*data.UserData)
 
 	if !ok {
-		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.UserLoggedOutRequest")
 		return fmt.Errorf("%s - value type is not data.UserLoggedOutRequest", helper.GetFunctionName())
 	}
 
@@ -127,7 +122,6 @@ func (db *MyMockDB) RetrieveUserSession(value interface{}, userID string) (strin
 	username, ok := value.(string)
 
 	if !ok {
-		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.MockRefreshJWT")
 		return "", fmt.Errorf("%s - value type is not data.MockRefreshJWT", helper.GetFunctionName())
 	}
 
@@ -169,7 +163,6 @@ func (db *MyMockDB) RetrieveUserDetails(value interface{}) (interface{}, error) 
 		return nil, fmt.Errorf("%s - User doesn't exist", helper.GetFunctionName())
 	}
 
-	db.logger.ErrorLog(helper.GetFunctionName(), "value type is unsupported")
 	return nil, fmt.Errorf("%s - value type is unsupported", helper.GetFunctionName())
 }
 
@@ -178,7 +171,6 @@ func (db *MyMockDB) CreateHabitsHandler(userId string, value interface{}) (*data
 	newHabit, ok := value.(data.NewHabit)
 
 	if !ok {
-		db.logger.ErrorLog(helper.GetFunctionName(), "value type is not data.Habit")
 		return nil, fmt.Errorf("%s - value type is not data.Habit", helper.GetFunctionName())
 	}
 
@@ -191,7 +183,6 @@ func (db *MyMockDB) CreateHabitsHandler(userId string, value interface{}) (*data
 	}
 
 	if err != nil {
-		db.logger.ErrorLog(helper.GetFunctionName(), "failed to get latest id")
 		return nil, fmt.Errorf("%s - failed to get latest id", helper.GetFunctionName())
 	}
 
@@ -278,7 +269,6 @@ func (db *MyMockDB) UpdateAllHabitsHandler(userId string, value interface{}) err
 
 	if !ok {
 		err := "value type is not []data.Habit"
-		db.logger.ErrorLog(helper.GetFunctionName(), err)
 		return fmt.Errorf("%s - %s", helper.GetFunctionName(), err)
 	}
 
@@ -313,6 +303,5 @@ func (db *MyMockDB) DeleteHabitsHandler(userId, habitId string) error {
 	}
 
 	err := "Failed to delete"
-	db.logger.ErrorLog(helper.GetFunctionName(), err)
 	return fmt.Errorf("%s - %s", helper.GetFunctionName(), err)
 }

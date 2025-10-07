@@ -34,7 +34,6 @@ func (m *HabitsModel) CreateHabitsHandler(userEmailAddress string, habit data.Ne
 	m.logger.InfoLog(helper.GetFunctionName(), fmt.Sprintf("userEmailAddress=%s", userEmailAddress))
 
 	if err := validation.ValidateHabit(habit, m.logger); err != nil {
-		m.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("habitsModel.Create - err=%s", err))
 		return nil, err
 	}
 
@@ -53,7 +52,6 @@ func (m *HabitsModel) CreateHabitsHandler(userEmailAddress string, habit data.Ne
 	newHabitResponse, err := m.db.CreateHabitsHandler(currentUserData.UserID, habit)
 
 	if err != nil {
-		m.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("err=%s", err))
 		return nil, err
 	}
 
@@ -79,7 +77,6 @@ func (m *HabitsModel) RetrieveHabitsHandler(userEmailAddress, habitId string) (d
 	result, err := m.db.RetrieveHabitsHandler(currentUserData.UserID, habitId)
 
 	if err != nil {
-		m.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("err=%s", err))
 		return habit, err
 	}
 
@@ -110,7 +107,6 @@ func (m *HabitsModel) RetrieveAllHabitsHandler(userEmailAddress string) ([]data.
 	result, err := m.db.RetrieveAllHabitsHandler(currentUserData.UserID)
 
 	if err != nil {
-		m.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("err=%s", err))
 		return nil, err
 	}
 
@@ -139,12 +135,10 @@ func (m *HabitsModel) UpdateHabitsHandler(userEmailAddress string, habit data.Ha
 	}
 
 	if err := validation.ValidateHabit(habit, m.logger); err != nil {
-		m.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("err=%s", err))
 		return err
 	}
 
 	if err := m.db.UpdateHabitsHandler(currentUserData.UserID, habitId, habit); err != nil {
-		m.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("err=%s", err))
 		return err
 	}
 
@@ -172,13 +166,11 @@ func (m *HabitsModel) UpdateAllHabitsHandler(userEmailAddress string, habits *[]
 
 	for _, habit := range *habits {
 		if err := validation.ValidateHabit(habit, m.logger); err != nil {
-			m.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("err=%s", err))
 			return err
 		}
 	}
 
 	if err := m.db.UpdateAllHabitsHandler(currentUserData.UserID, *habits); err != nil {
-		m.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("err=%s", err))
 		return err
 	}
 
@@ -201,7 +193,6 @@ func (m *HabitsModel) DeleteHabitsHandler(userEmailAddress, habitId string) erro
 	}
 
 	if err := m.db.DeleteHabitsHandler(currentUserData.UserID, habitId); err != nil {
-		m.logger.ErrorLog(helper.GetFunctionName(), fmt.Sprintf("err=%s", err))
 		return err
 	}
 
