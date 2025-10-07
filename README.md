@@ -70,7 +70,7 @@ go mod tidy
 ```
 Create a `.env` file based on `.example_env` (For example, refer to [backend/.example_env](backend/.example_env).
 ```
-ENVIRONMENT=DEV (runs mock data in mock_db.go) | PROD (runs data from the Database)
+DB_TYPE=mockdb (Note: this dictates the DB you want to use via Strategy Design Pattern).
 DB_URL=connectionstring@example:username/password
 DB_NAME=habitsapp
 USERS_COLLECTION=users
